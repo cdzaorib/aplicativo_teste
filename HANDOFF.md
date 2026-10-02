@@ -23,7 +23,22 @@ acessa o banco.
 ### 2. Testar em aparelho físico
 
 Nunca foi rodado em celular. O usuário tem Android e iPhone e testa com o Expo Go
-(`npx expo start`). Pontos que só o aparelho confirma:
+(`npx expo start`, ou `npx expo start --tunnel` se o celular não estiver na mesma rede). Rode no
+computador do usuário: a rede da sessão na nuvem bloqueia o ngrok (`tunnel.us.ngrok.com`), o
+`exp.direct` e o túnel do Expo (`boltexpo.dev`), então o túnel não sobe lá.
+
+O endereço de volta do login (`Linking.createURL('auth-callback')`) já foi conferido contra as
+Redirect URLs:
+
+| Onde roda               | Endereço gerado                       | Redirect URL que libera    |
+| ----------------------- | ------------------------------------- | -------------------------- |
+| Expo Go (rede ou túnel) | `exp://<host>/--/auth-callback`       | `exp://**`                 |
+| Build do app            | `enxoval://auth-callback`             | `enxoval://**`             |
+| Web (`npm run web`)     | `http://localhost:8081/auth-callback` | `http://localhost:8081/**` |
+
+A web em outra porta ou pelo túnel cai na Site URL.
+
+Pontos que só o aparelho confirma:
 
 - Abas nativas (`expo-router/unstable-native-tabs`) e ícones (`sf` no iOS, `md` no Android).
 - Volta do login para o app:

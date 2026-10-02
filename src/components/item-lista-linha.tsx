@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { HoraDeComprarBadge } from '@/components/hora-de-comprar-badge';
 import { Icone } from '@/components/icone';
 import { PrioridadeBadge } from '@/components/prioridade-badge';
 import { ThemedText } from '@/components/themed-text';
@@ -14,9 +15,11 @@ type Props = {
   onAlternar: () => void;
   /** Numa lista compartilhada só de leitura (ou só de preços), não dá para marcar como comprado. */
   podeMarcar?: boolean;
+  /** A fase de comprar o item já chegou (pela data prevista do parto). */
+  horaDeComprar?: boolean;
 };
 
-export function ItemListaLinha({ item, onAlternar, podeMarcar = true }: Props) {
+export function ItemListaLinha({ item, onAlternar, podeMarcar = true, horaDeComprar }: Props) {
   const theme = useTheme();
   const detalhes = [item.modelo, item.quantidade > 1 ? `${item.quantidade} un.` : '']
     .filter(Boolean)
@@ -52,7 +55,10 @@ export function ItemListaLinha({ item, onAlternar, podeMarcar = true }: Props) {
                 {detalhes}
               </ThemedText>
             ) : null}
-            <PrioridadeBadge prioridade={item.prioridade} />
+            <View style={styles.selos}>
+              <PrioridadeBadge prioridade={item.prioridade} />
+              {horaDeComprar && <HoraDeComprarBadge />}
+            </View>
           </View>
           <ThemedText
             type="smallBold"
@@ -83,6 +89,11 @@ const styles = StyleSheet.create({
   },
   textos: {
     flex: 1,
+    gap: Spacing.one,
+  },
+  selos: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.one,
   },
   bloqueado: {

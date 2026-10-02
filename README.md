@@ -2,7 +2,8 @@
 
 Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê: sugere o que comprar,
 indica o que é essencial ou desaconselhado (com fonte oficial) e organiza a lista de compras com
-orçamento. Para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na
+orçamento. Com a data prevista do parto (guardada só no aparelho), mostra o que já é hora de
+comprar em cada fase da gestação. Para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na
 média ou barato demais para ser verdade. Com login pelo Google, a lista fica salva na nuvem e
 sincroniza entre aparelhos e pode ser compartilhada com parceiro e família, com permissões
 definidas pela gestante. A conta pode ser excluída pelo próprio app, com todos os dados dela.

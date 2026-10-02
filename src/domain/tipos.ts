@@ -47,7 +47,7 @@ export type ItemLista = {
   atualizadoEm: number;
 };
 
-export type OrdemLista = 'nome' | 'valor' | 'modelo' | 'prioridade' | 'categoria';
+export type OrdemLista = 'nome' | 'valor' | 'modelo' | 'prioridade' | 'categoria' | 'quando';
 
 export const CATEGORIAS: Record<Categoria, string> = {
   quarto: 'Quarto e sono',
@@ -80,4 +80,5 @@ export const ORDENS: Record<OrdemLista, string> = {
   valor: 'Valor',
   modelo: 'Modelo',
   categoria: 'Categoria',
+  quando: 'Quando comprar',
 };

@@ -82,6 +82,8 @@ Nenhuma das duas está em uso nem exposta.
     dependem da Fase 2b.
   - No Android, o Expo Go não recebe push desde o SDK 53. Testar exige um development build
     (`eas build --profile development`), além de conta no Expo e credenciais do Firebase (FCM).
+- **Revisar os começos de cada fase** (`INICIO_COMPRA`) com quem for revisar o catálogo. A
+  semana 32 para a mala da maternidade foi uma escolha de produto, não uma recomendação médica.
 - **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
   de busca (out/2026), porque o WebFetch está bloqueado nesta sessão. 19 itens têm faixa, e os
   outros ficam sem faixa até haver preços informados.
@@ -135,9 +137,20 @@ Nenhuma das duas está em uso nem exposta.
     - Código de convite: no máximo 10 tentativas por pessoa por hora.
   - Excluir conta (aba Conta): apaga a conta e os dados dela. Os convidados da dona voltam para
     as próprias listas.
+  - Quando comprar:
+    - A pessoa informa a data prevista do parto no topo da lista. Ela fica só no aparelho
+      (`src/store/gestacao.ts`), nunca na nuvem, porque é dado de saúde (LGPD).
+    - O cartão mostra as semanas, o trimestre e quantos itens já é hora de comprar.
+    - O selo "Hora de comprar" aparece na lista e nas sugestões.
+    - A lista pode ser ordenada por "Quando comprar".
+    - As contas ficam em `src/domain/gestacao.ts`, com `INICIO_COMPRA`: 2º trimestre a partir
+      da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
+      prevista.
 - **Verificação:**
-  - `npm run check` passa (lint, typecheck, Prettier, 104 testes do app, inclusive de componentes
+  - `npm run check` passa (lint, typecheck, Prettier, 116 testes do app, inclusive de componentes
     com a Testing Library, e 14 testes do banco).
+  - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
+    ordenação e a data mantida depois de recarregar.
   - `npm run test:banco` (também no CI) aplica todas as migrações num Postgres local (PGlite) e
     testa compartilhamento, permissões, exclusão de conta e limite de convites. Sem as migrações
     novas, os testes delas falham.

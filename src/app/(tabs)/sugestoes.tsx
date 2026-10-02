@@ -8,9 +8,11 @@ import { Chips } from '@/components/chips';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { CATALOGO } from '@/domain/catalogo';
+import { eHoraDeComprar } from '@/domain/gestacao';
 import { CATEGORIAS, PRIORIDADES, type Categoria, type Prioridade } from '@/domain/tipos';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
+import { useSemanasDeGestacao } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 import { usePermissao } from '@/store/sessao';
 
@@ -27,6 +29,7 @@ export default function SugestoesScreen() {
   const itens = useListaStore((s) => s.itens);
   const adicionarDoCatalogo = useListaStore((s) => s.adicionarDoCatalogo);
   const podeAdicionar = usePermissao() === 'total';
+  const semanas = useSemanasDeGestacao();
 
   const naLista = new Set(itens.map((i) => i.catalogoId));
   const essenciaisFaltando = ESSENCIAIS.filter((item) => !naLista.has(item.id));
@@ -50,6 +53,7 @@ export default function SugestoesScreen() {
         <CatalogoCard
           item={item}
           naLista={naLista.has(item.id)}
+          horaDeComprar={semanas !== undefined && eHoraDeComprar(item.quando, semanas)}
           onAdicionar={podeAdicionar ? () => adicionarDoCatalogo([item]) : undefined}
         />
       )}

@@ -4,13 +4,16 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { Botao } from '@/components/botao';
 import { Chips } from '@/components/chips';
 import { ItemListaLinha } from '@/components/item-lista-linha';
+import { QuandoComprar } from '@/components/quando-comprar';
 import { ResumoCard } from '@/components/resumo-card';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
+import { eHoraDeComprar, quandoDoItem } from '@/domain/gestacao';
 import { ordenarLista, resumirLista } from '@/domain/lista';
 import { ORDENS } from '@/domain/tipos';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
+import { useSemanasDeGestacao } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 import { usePermissao, useSessaoStore } from '@/store/sessao';
 
@@ -24,6 +27,7 @@ export default function MinhaListaScreen() {
   const permissao = usePermissao();
   const lista = useSessaoStore((s) => (s.usuario ? s.lista : undefined));
   const compartilhada = lista && !lista.souDona;
+  const semanas = useSemanasDeGestacao();
 
   const vazia = itens.length === 0;
 
@@ -38,6 +42,9 @@ export default function MinhaListaScreen() {
           item={item}
           onAlternar={() => alternarComprado(item.id)}
           podeMarcar={permissao === 'total'}
+          horaDeComprar={
+            semanas !== undefined && !item.comprado && eHoraDeComprar(quandoDoItem(item), semanas)
+          }
         />
       )}
       ItemSeparatorComponent={Separador}
@@ -60,6 +67,7 @@ export default function MinhaListaScreen() {
               </ThemedText>
             </View>
           )}
+          <QuandoComprar itens={itens} />
           {!vazia && (
             <>
               <ResumoCard resumo={resumirLista(itens)} />

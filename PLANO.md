@@ -3,7 +3,7 @@
 Aplicativo mobile (Android + iOS) que sugere o que comprar para o enxoval, indica o que é
 essencial, útil, opcional ou desaconselhado, e mostra onde está o melhor preço.
 
-> Nome provisório ("Enxoval"). Status: Fases 1, 2a e compartilhamento (Fase 3) no código, além da exclusão de conta exigida pelas lojas; falta ativar o Google no Supabase — ver `HANDOFF.md`.
+> Nome provisório ("Enxoval"). Status: Fases 1, 2a e compartilhamento (Fase 3) no código, além do "quando comprar" pela data prevista do parto e da exclusão de conta exigida pelas lojas; falta ativar o Google no Supabase — ver `HANDOFF.md`.
 
 ## 1. Problema e público
 

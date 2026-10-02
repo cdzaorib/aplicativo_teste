@@ -38,6 +38,23 @@ describe('ordenarLista', () => {
     item({ id: '4', nome: 'berço', modelo: 'Beta', prioridade: 'essencial' }),
   ];
 
+  it('ordena pela fase de compra do catálogo, com itens próprios no fim', () => {
+    const porFase = [
+      item({ id: 'a', nome: 'Mamadeira', catalogoId: 'mamadeira' }),
+      item({ id: 'b', nome: 'Item próprio' }),
+      item({ id: 'c', nome: 'Touca', catalogoId: 'touca' }),
+      item({ id: 'd', nome: 'Berço', catalogoId: 'berco' }),
+      item({ id: 'e', nome: 'Lençol', catalogoId: 'lencol-elastico' }),
+    ];
+    expect(nomes(ordenarLista(porFase, 'quando'))).toEqual([
+      'Berço',
+      'Lençol',
+      'Touca',
+      'Mamadeira',
+      'Item próprio',
+    ]);
+  });
+
   it('ordena por nome ignorando maiúsculas e acentos, com comprados no fim', () => {
     expect(nomes(ordenarLista(itens, 'nome'))).toEqual(['Abajur', 'Banheira', 'berço', 'Carrinho']);
   });

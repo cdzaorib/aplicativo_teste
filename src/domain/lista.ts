@@ -1,3 +1,4 @@
+import { INICIO_COMPRA, quandoDoItem } from './gestacao';
 import { CATEGORIAS, type ItemLista, type OrdemLista, type Prioridade } from './tipos';
 
 const PESO_PRIORIDADE: Record<Prioridade, number> = {
@@ -17,12 +18,19 @@ function comparaOpcional<T>(a: T | undefined, b: T | undefined, compara: (x: T, 
   return compara(a, b);
 }
 
+/** Semana em que começa a fase de compra do item; itens criados pela pessoa não têm. */
+function inicioDaCompra(item: ItemLista): number | undefined {
+  const quando = quandoDoItem(item);
+  return quando && INICIO_COMPRA[quando];
+}
+
 const COMPARADORES: Record<OrdemLista, (a: ItemLista, b: ItemLista) => number> = {
   nome: () => 0,
   valor: (a, b) => comparaOpcional(a.precoCentavos, b.precoCentavos, (x, y) => x - y),
   modelo: (a, b) => comparaOpcional(a.modelo || undefined, b.modelo || undefined, comparaTexto),
   prioridade: (a, b) => PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade],
   categoria: (a, b) => comparaTexto(CATEGORIAS[a.categoria], CATEGORIAS[b.categoria]),
+  quando: (a, b) => comparaOpcional(inicioDaCompra(a), inicioDaCompra(b), (x, y) => x - y),
 };
 
 /** Ordena a lista: itens pendentes primeiro, depois pelo critério escolhido e, no empate, pelo nome. */

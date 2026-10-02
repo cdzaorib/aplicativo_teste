@@ -2,9 +2,10 @@
 
 Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê: sugere o que comprar,
 indica o que é essencial ou desaconselhado (com fonte oficial) e organiza a lista de compras com
-orçamento. Em breve: login com Google e comparação de preços entre lojas.
+orçamento. Com login pelo Google, a lista fica salva na nuvem e sincroniza entre aparelhos.
+Em breve: comparação de preços entre lojas.
 
-Feito com React Native + Expo (SDK 57) e TypeScript.
+Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login e banco de dados).
 
 ## Como rodar
 
@@ -17,6 +18,9 @@ Abra o app **Expo Go** no celular (Android ou iPhone) e leia o QR code que apare
 O celular e o computador precisam estar na mesma rede Wi-Fi.
 
 Para ver no navegador: `npm run web`.
+
+O `.env` já traz o endereço e a chave pública do Supabase. Para o login funcionar, o Google
+precisa estar ativado no projeto: veja [`docs/login-google.md`](docs/login-google.md).
 
 ## Scripts
 
@@ -37,13 +41,17 @@ src/
     (tabs)/     abas: Minha lista, Sugestões, Conta
     item/       modais de criar e editar item
   components/   componentes visuais reutilizáveis
-  domain/       regras de negócio sem React: tipos, catálogo, ordenação, preços
-  store/        estado da lista (Zustand, salvo no aparelho)
+  domain/       regras de negócio sem React: tipos, catálogo, ordenação, preços, mesclagem
+  nuvem/        Supabase: cliente, login com Google e sincronização da lista
+  store/        estado da lista (Zustand, salvo no aparelho) e da sessão
   hooks/        hooks de tema e layout
   constants/    cores e espaçamentos
+supabase/
+  migrations/   estrutura do banco (tabela da lista e regras de acesso)
 ```
 
 ## Documentos
 
 - [`PLANO.md`](PLANO.md) — produto, decisões, fases e riscos.
 - [`HANDOFF.md`](HANDOFF.md) — o que já foi feito e o que falta.
+- [`docs/login-google.md`](docs/login-google.md) — como ativar o login com Google.

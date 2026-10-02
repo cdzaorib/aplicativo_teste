@@ -3,7 +3,7 @@
 Aplicativo mobile (Android + iOS) que sugere o que comprar para o enxoval, indica o que é
 essencial, útil, opcional ou desaconselhado, e mostra onde está o melhor preço.
 
-> Nome provisório ("Enxoval"). Status: Fases 0 e 1 em andamento — ver `HANDOFF.md`.
+> Nome provisório ("Enxoval"). Status: Fase 1 concluída no código; falta ativar o Google no Supabase — ver `HANDOFF.md`.
 
 ## 1. Problema e público
 
@@ -22,7 +22,7 @@ _onde está mais barato_.
 | Kotlin + Swift | **Não**                                                  | Seriam dois apps separados (dobro do trabalho), e Swift exige Mac. Só faz sentido se o objetivo for vaga nativa |
 | Backend        | **Supabase** (Postgres, Auth, Edge Functions, `pg_cron`) | Grátis para começar, resolve login, banco e tarefas agendadas sem servidor próprio                              |
 | Notificações   | Expo Notifications                                       | Push Android/iOS com a mesma API                                                                                |
-| Estado/dados   | Zustand + AsyncStorage (lista salva no aparelho)         | Simples e funciona offline; a sincronização com o Supabase entra junto com o login                              |
+| Estado/dados   | Zustand + AsyncStorage, sincronizado com o Supabase      | Funciona offline; ao entrar com Google a lista vai para a nuvem (última alteração vence)                        |
 | Qualidade      | ESLint, Prettier, Jest, GitHub Actions                   | Vira argumento de portfólio                                                                                     |
 
 ## 3. Funcionalidades

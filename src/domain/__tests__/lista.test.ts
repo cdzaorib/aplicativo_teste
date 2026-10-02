@@ -9,6 +9,7 @@ function item(dados: Partial<ItemLista> & Pick<ItemLista, 'id' | 'nome'>): ItemL
     quantidade: 1,
     comprado: false,
     criadoEm: 0,
+    atualizadoEm: 0,
     ...dados,
   };
 }

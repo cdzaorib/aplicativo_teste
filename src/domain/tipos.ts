@@ -43,6 +43,8 @@ export type ItemLista = {
   quantidade: number;
   comprado: boolean;
   criadoEm: number;
+  /** Momento da última alteração; decide qual versão vence na sincronização. */
+  atualizadoEm: number;
 };
 
 export type OrdemLista = 'nome' | 'valor' | 'modelo' | 'prioridade' | 'categoria';

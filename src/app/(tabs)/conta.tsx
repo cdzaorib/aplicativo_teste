@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { AvisoRevisao } from '@/components/aviso-revisao';
@@ -7,6 +8,10 @@ import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
+import { entrarComGoogle, sair } from '@/nuvem/auth';
+import { sincronizar } from '@/nuvem/sincronizar';
+import { supabase } from '@/nuvem/supabase';
+import { useSessaoStore } from '@/store/sessao';
 
 export default function ContaScreen() {
   const theme = useTheme();
@@ -19,12 +24,13 @@ export default function ContaScreen() {
       <ThemedText type="subtitle">Conta</ThemedText>
 
       <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-        <ThemedText type="smallBold">Sua lista na nuvem</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Em breve você poderá entrar com sua conta Google para guardar a lista na nuvem e
-          compartilhar com a família. Por enquanto, a lista fica salva neste aparelho.
-        </ThemedText>
-        <Botao titulo="Entrar com Google (em breve)" desabilitado onPress={() => {}} />
+        {supabase ? (
+          <CartaoNuvem />
+        ) : (
+          <ThemedText type="small" themeColor="textSecondary">
+            O login não está disponível nesta versão. A lista fica salva neste aparelho.
+          </ThemedText>
+        )}
       </View>
 
       <View style={styles.secao}>
@@ -43,6 +49,92 @@ export default function ContaScreen() {
   );
 }
 
+function CartaoNuvem() {
+  const theme = useTheme();
+  const { usuario, sincronizando, ultimaSincronizacao, erroSincronizacao } = useSessaoStore();
+  const [ocupado, setOcupado] = useState(false);
+  const [erro, setErro] = useState<string>();
+
+  async function executar(acao: () => Promise<unknown>, mensagemErro: string) {
+    setOcupado(true);
+    setErro(undefined);
+    try {
+      await acao();
+    } catch {
+      setErro(mensagemErro);
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  if (!usuario) {
+    return (
+      <>
+        <ThemedText type="smallBold">Sua lista na nuvem</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          Entre com sua conta Google para guardar a lista na nuvem e usar em outro celular. A lista
+          que você já montou neste aparelho vai junto.
+        </ThemedText>
+        <Botao
+          titulo={ocupado ? 'Entrando…' : 'Entrar com Google'}
+          desabilitado={ocupado}
+          onPress={() =>
+            executar(entrarComGoogle, 'Não foi possível entrar. Tente de novo em instantes.')
+          }
+        />
+        {erro && <ThemedText style={{ color: theme.danger }}>{erro}</ThemedText>}
+      </>
+    );
+  }
+
+  const status = sincronizando
+    ? 'Sincronizando…'
+    : (erroSincronizacao ??
+      (ultimaSincronizacao
+        ? `Lista salva na nuvem às ${new Date(ultimaSincronizacao).toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}`
+        : 'Aguardando a primeira sincronização'));
+
+  return (
+    <>
+      <View style={styles.usuario}>
+        <ThemedText type="smallBold">{usuario.nome ?? usuario.email}</ThemedText>
+        {usuario.nome && usuario.email && (
+          <ThemedText type="small" themeColor="textSecondary">
+            {usuario.email}
+          </ThemedText>
+        )}
+      </View>
+      <ThemedText
+        type="small"
+        style={erroSincronizacao && !sincronizando ? { color: theme.danger } : undefined}
+        themeColor="textSecondary">
+        {status}
+      </ThemedText>
+      <Botao
+        titulo="Sincronizar agora"
+        variante="secundario"
+        desabilitado={ocupado || sincronizando}
+        onPress={() => executar(sincronizar, 'Não foi possível sincronizar agora.')}
+      />
+      <Botao
+        titulo={ocupado ? 'Saindo…' : 'Sair'}
+        variante="perigo"
+        desabilitado={ocupado}
+        onPress={() =>
+          executar(
+            sair,
+            'Não foi possível salvar sua lista na nuvem antes de sair. Verifique a internet e tente de novo.',
+          )
+        }
+      />
+      {erro && <ThemedText style={{ color: theme.danger }}>{erro}</ThemedText>}
+    </>
+  );
+}
+
 const styles = StyleSheet.create({
   conteudo: {
     width: '100%',
@@ -57,5 +149,8 @@ const styles = StyleSheet.create({
   },
   secao: {
     gap: Spacing.two,
+  },
+  usuario: {
+    gap: Spacing.half,
   },
 });

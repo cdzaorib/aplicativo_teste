@@ -5,7 +5,7 @@ indica o que é essencial ou desaconselhado (com fonte oficial) e organiza a lis
 orçamento. Para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na
 média ou barato demais para ser verdade. Com login pelo Google, a lista fica salva na nuvem e
 sincroniza entre aparelhos e pode ser compartilhada com parceiro e família, com permissões
-definidas pela gestante.
+definidas pela gestante. A conta pode ser excluída pelo próprio app, com todos os dados dela.
 
 Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login e banco de dados).
 
@@ -26,14 +26,15 @@ precisa estar ativado no projeto: veja [`docs/login-google.md`](docs/login-googl
 
 ## Scripts
 
-| Comando             | O que faz                                        |
-| ------------------- | ------------------------------------------------ |
-| `npm start`         | Inicia o servidor de desenvolvimento             |
-| `npm test`          | Roda os testes (Jest)                            |
-| `npm run lint`      | Verifica o código com ESLint                     |
-| `npm run typecheck` | Verifica os tipos com TypeScript                 |
-| `npm run format`    | Formata o código com Prettier                    |
-| `npm run check`     | Roda tudo acima, como o CI faz em cada push e PR |
+| Comando              | O que faz                                                                  |
+| -------------------- | -------------------------------------------------------------------------- |
+| `npm start`          | Inicia o servidor de desenvolvimento                                       |
+| `npm test`           | Roda os testes do app (Jest)                                               |
+| `npm run test:banco` | Aplica as migrações num Postgres local (PGlite) e testa as regras do banco |
+| `npm run lint`       | Verifica o código com ESLint                                               |
+| `npm run typecheck`  | Verifica os tipos com TypeScript                                           |
+| `npm run format`     | Formata o código com Prettier                                              |
+| `npm run check`      | Roda tudo acima, como o CI faz em cada push e PR                           |
 
 ## Estrutura
 
@@ -51,6 +52,8 @@ src/
   constants/    cores e espaçamentos
 supabase/
   migrations/   estrutura do banco (listas, membros, itens, preços e regras de acesso)
+  functions/    Edge Functions (Deno): excluir-conta
+  testes/       testes do banco com PGlite (npm run test:banco)
 ```
 
 ## Documentos

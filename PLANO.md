@@ -3,7 +3,7 @@
 Aplicativo mobile (Android + iOS) que sugere o que comprar para o enxoval, indica o que é
 essencial, útil, opcional ou desaconselhado, e mostra onde está o melhor preço.
 
-> Nome provisório ("Enxoval"). Status: Fases 1, 2a e compartilhamento (Fase 3) no código; falta ativar o Google no Supabase — ver `HANDOFF.md`.
+> Nome provisório ("Enxoval"). Status: Fases 1, 2a e compartilhamento (Fase 3) no código, além da exclusão de conta exigida pelas lojas; falta ativar o Google no Supabase — ver `HANDOFF.md`.
 
 ## 1. Problema e público
 
@@ -108,6 +108,7 @@ decisão do usuário.
 
 **Fase 4 — Lançamento (1–2 semanas)**
 Ícone, telas da loja, política de privacidade, Google Play (taxa única) e Apple Developer (anual), TestFlight/teste fechado.
+Já feito: exclusão de conta pelo app. Falta a página na web para pedir a exclusão, que o Google Play exige.
 
 Estimativa total: **~6–8 semanas com dedicação integral** (varia com a curva de aprendizado de React Native).
 

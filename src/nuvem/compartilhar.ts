@@ -26,11 +26,9 @@ function cliente() {
   return supabase;
 }
 
-/** Erros de regra vêm do banco em português (P0001/P0002); os demais viram uma mensagem genérica. */
+/** Erros de regra vêm do banco em português (P0001); os demais viram uma mensagem genérica. */
 function traduzirErro(erro: { code?: string; message: string }, padrao: string): never {
-  throw new ErroCompartilhar(
-    erro.code === 'P0001' || erro.code === 'P0002' ? erro.message : padrao,
-  );
+  throw new ErroCompartilhar(erro.code === 'P0001' ? erro.message : padrao);
 }
 
 export async function buscarMembros(): Promise<Membro[]> {
@@ -55,8 +53,10 @@ export async function buscarMembros(): Promise<Membro[]> {
 export async function entrarNaLista(codigo: string): Promise<void> {
   const banco = cliente();
   await sincronizar();
-  const { error } = await banco.rpc('entrar_na_lista', { codigo });
+  // O banco devolve null para código que não existe (e conta a tentativa: são 10 por hora).
+  const { data, error } = await banco.rpc('entrar_na_lista', { codigo });
   if (error) traduzirErro(error, 'Não foi possível entrar na lista. Tente de novo.');
+  if (!data) throw new ErroCompartilhar('Código de convite inválido. Confira com quem enviou.');
   useListaStore.getState().limpar();
   await sincronizar();
 }

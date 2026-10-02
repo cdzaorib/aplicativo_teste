@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { AvisoRevisao } from '@/components/aviso-revisao';
 import { Botao } from '@/components/botao';
+import { ExcluirConta } from '@/components/excluir-conta';
 import { ListaCompartilhada } from '@/components/lista-compartilhada';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
@@ -50,6 +51,8 @@ export default function ContaScreen() {
           citadas em cada item.
         </ThemedText>
       </View>
+
+      {conectado && <ExcluirConta />}
 
       <ThemedText type="small" themeColor="textSecondary">
         Versão {Constants.expoConfig?.version}

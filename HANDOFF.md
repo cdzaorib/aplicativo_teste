@@ -43,10 +43,13 @@ Pontos que só o aparelho confirma:
 - Abas nativas (`expo-router/unstable-native-tabs`) e ícones (`sf` no iOS, `md` no Android).
 - Volta do login para o app:
   - **iOS:** o `openAuthSessionAsync` captura o retorno.
-  - **Android:** o deep link pode chegar também ao Expo Router. Por isso existe a rota
-    `src/app/auth-callback.tsx`, que só redireciona para Conta.
+  - **Android:** o deep link chega também ao Expo Router, na rota `src/app/auth-callback.tsx`.
+    Ela também troca o código pela sessão (`concluirLogin`, uma troca só por código), o que cobre
+    o caso de o sistema fechar o app enquanto a pessoa está no navegador.
 - Sincronização entre dois aparelhos com a mesma conta.
 - Compartilhamento entre duas contas: convite, permissões dadas pela dona e "sair da lista".
+- "Excluir minha conta" pelo app. A função já foi testada de ponta a ponta no Supabase, mas não
+  a partir do app.
 
 ### 3. Limpeza no Supabase — ação do usuário
 
@@ -54,7 +57,7 @@ O conector do Supabase estoura o tempo em comandos destrutivos (`drop`, `delete`
 confirmação que não chega. Rodar no SQL Editor do painel:
 
 ```sql
-drop extension http;        -- ligada só para testar a API do Mercado Livre
+drop extension http;        -- usada só em testes (API do Mercado Livre e Edge Function)
 drop table public.itens_lista; -- substituída por `itens` (listas compartilhadas); está vazia
 ```
 
@@ -77,8 +80,8 @@ Nenhuma das duas está em uso nem exposta.
 - **Fase 3 restante:**
   - Alertas push, por exemplo quando a dona libera uma permissão ou um preço cai. Os de preço
     dependem da Fase 2b.
-- **Limite de tentativas de código de convite.** Hoje não há limite. O código tem 8 caracteres
-  de 32 opções, cerca de 10¹² combinações.
+  - No Android, o Expo Go não recebe push desde o SDK 53. Testar exige um development build
+    (`eas build --profile development`), além de conta no Expo e credenciais do Firebase (FCM).
 - **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
   de busca (out/2026), porque o WebFetch está bloqueado nesta sessão. 19 itens têm faixa, e os
   outros ficam sem faixa até haver preços informados.
@@ -90,19 +93,29 @@ Nenhuma das duas está em uso nem exposta.
   Inmetro.
 - Política de privacidade: o app guarda nome, e-mail e a lista na nuvem, além dos preços
   informados. Esses ficam ligados ao usuário só para limite e exclusão, nunca expostos.
+- Exclusão de conta:
+  - Pelo app já existe (aba Conta → "Excluir minha conta"), o que a Apple exige.
+  - O Google Play também pede um link na web para pedir a exclusão sem o app. Falta criar essa
+    página, que pode ficar junto da política de privacidade.
 
 ## Estado atual
 
 - **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #1.
-- **PR:** #1 (Fases 0 a 2a) já está na `main`. A Fase 3 vai num PR novo (ver o link na conversa).
+- **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2 traz a Fase 3 (compartilhamento), a exclusão
+  de conta, o limite de tentativas de convite e a correção da volta do login no Android.
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
   - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções
     (RPC), criadas pelas migrações em `supabase/migrations/`.
+  - `privado.tentativas_convite` conta as tentativas de código de convite.
+  - Edge Function `excluir-conta` (`supabase/functions/`), publicada com `verify_jwt = false`. Ela
+    mesma confere o token no Supabase Auth.
   - `itens_lista` não é mais usada (ver item 3).
   - O advisor de segurança aponta as funções SECURITY DEFINER chamáveis pela API. É intencional:
     - `referencia_precos` devolve só agregados de 5 pessoas ou mais;
     - as operações de lista conferem dentro delas quem é dona ou membro.
+  - O advisor também avisa que `privado.tentativas_convite` tem RLS sem política. É intencional:
+    só a função `entrar_na_lista` mexe nela, e o esquema `privado` não é publicado.
 - **Feito:**
   - Fase 0.
   - Fase 1: sugestões, lista, comprado, ordenação, orçamento, itens próprios, login com Google
@@ -119,9 +132,19 @@ Nenhuma das duas está em uso nem exposta.
     - Ao entrar, a lista do convidado é juntada à compartilhada.
     - O convidado pode sair, e a dona pode removê-lo. Nos dois casos ele volta para a própria
       lista.
+    - Código de convite: no máximo 10 tentativas por pessoa por hora.
+  - Excluir conta (aba Conta): apaga a conta e os dados dela. Os convidados da dona voltam para
+    as próprias listas.
 - **Verificação:**
-  - `npm run check` passa (lint, typecheck, Prettier, 90 testes, inclusive de componentes com a
-    Testing Library).
+  - `npm run check` passa (lint, typecheck, Prettier, 104 testes do app, inclusive de componentes
+    com a Testing Library, e 14 testes do banco).
+  - `npm run test:banco` (também no CI) aplica todas as migrações num Postgres local (PGlite) e
+    testa compartilhamento, permissões, exclusão de conta e limite de convites. Sem as migrações
+    novas, os testes delas falham.
+  - Exclusão de conta testada de ponta a ponta no Supabase real:
+    - duas contas de teste (dona e convidado) entraram com senha e chamaram a função;
+    - a lista e os itens da dona sumiram, e o convidado voltou para a própria lista;
+    - as duas contas foram excluídas pela própria função, e o banco ficou vazio de novo.
   - `expo export` gera os bundles de Android, iOS e web.
   - Fluxo web com Playwright, inclusive a persistência após recarregar.
   - RLS testado no banco com dois usuários simulados, numa transação desfeita:
@@ -165,6 +188,17 @@ Nenhuma das duas está em uso nem exposta.
   por outro celular, os itens locais, que são de outra lista, são descartados antes de
   sincronizar (`itensSaoDeOutraLista`). Voltando para a própria lista, eles ficam como cópia.
 
+## Como a exclusão de conta funciona
+
+- **App** (`excluirConta`, em `src/nuvem/auth.ts`): chama a Edge Function `excluir-conta`,
+  esquece a sessão no aparelho (`signOut({ scope: 'local' })`) e apaga a lista do aparelho.
+- **Edge Function:** confere o token com `auth.getUser` e apaga o usuário com
+  `auth.admin.deleteUser`. Usa a chave secreta nova (`SUPABASE_SECRET_KEYS`) ou, sem ela, a
+  `service_role`.
+- **Banco:** tudo que é do usuário tem `on delete cascade` para `auth.users`. O gatilho
+  `devolver_convidados` (antes de apagar uma lista) leva os convidados de volta às próprias
+  listas, como se a dona os tivesse removido.
+
 ## Como a avaliação de preço funciona
 
 - **Avaliação** (`src/domain/precos.ts`), em relação à faixa comum [mín, máx]:
@@ -207,12 +241,19 @@ Nenhuma das duas está em uso nem exposta.
     falta").
   - Instale pacotes com `EXPO_OFFLINE=1 npx expo install <pacote>` e confira as APIs nos tipos em
     `node_modules`.
-  - Teste o banco pelas ferramentas `mcp__Supabase__*`.
+  - Teste o banco pelas ferramentas `mcp__Supabase__*`, em transação desfeita. Comandos com
+    `delete` ou `drop` travam no conector; para esses cenários, use `npm run test:banco`.
+  - Enquanto a extensão `http` existir, dá para chamar a API e as Edge Functions de dentro do
+    banco (`extensions.http`). Foi assim que a exclusão de conta foi testada.
 - **`.env` versionado:** só contém valores públicos (URL e chave publishable). A proteção dos
   dados é o RLS. Nunca coloque ali o Client secret do Google nem a chave `service_role`.
 - **URL global:** o Expo já instala `URL`/`URLSearchParams` no celular, então o projeto não usa
   `react-native-url-polyfill`.
 - **Login sem `expo-auth-session`:** a URL de retorno é montada com `Linking.createURL`.
+- **Edge Functions:** rodam no Deno, por isso `supabase/functions` fica fora do `tsconfig.json` e
+  do ESLint. Publique com a ferramenta `deploy_edge_function` do conector.
+- **Testes do banco:** `supabase/testes/supabase-local.sql` recria o mínimo do Supabase (papéis,
+  `auth.users`, `auth.uid()`, `pgcrypto`). Toda migração nova roda neles automaticamente.
 - **TypeScript 6:** `types` começa vazio, por isso o `tsconfig.json` declara
   `["jest", "expo/types"]`.
 - **Hidratação da lista:**

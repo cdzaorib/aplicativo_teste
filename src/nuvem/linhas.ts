@@ -1,3 +1,4 @@
+import type { EstatisticaPrecos } from '@/domain/precos';
 import type { RegistroNuvem } from '@/domain/sincronizacao';
 import type { Categoria, Prioridade } from '@/domain/tipos';
 
@@ -51,4 +52,25 @@ export function deLinha(linha: LinhaItem): RegistroNuvem {
     criadoEm: Date.parse(linha.criado_em),
     atualizadoEm: Date.parse(linha.atualizado_em),
   };
+}
+
+/** Linha devolvida pela função `referencia_precos` (supabase/migrations). */
+export type LinhaReferencia = {
+  catalogo_id: string;
+  quantidade: number;
+  p25_centavos: number;
+  p75_centavos: number;
+};
+
+export function deLinhasReferencia(linhas: LinhaReferencia[]): Record<string, EstatisticaPrecos> {
+  return Object.fromEntries(
+    linhas.map((linha) => [
+      linha.catalogo_id,
+      {
+        quantidade: linha.quantidade,
+        p25Centavos: linha.p25_centavos,
+        p75Centavos: linha.p75_centavos,
+      },
+    ]),
+  );
 }

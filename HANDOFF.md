@@ -32,30 +32,45 @@ Nunca foi rodado em celular. O usuário tem Android e iPhone e testa com o Expo 
     `src/app/auth-callback.tsx`, que só redireciona para Conta.
 - Sincronização entre dois aparelhos com a mesma conta.
 
-### 3. Pendências do usuário no GitHub
+### 3. Remover a extensão `http` do Supabase — ação do usuário
+
+Ela foi ligada só para testar a API do Mercado Livre a partir do servidor. O `drop extension`
+pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam uma confirmação.
+
+- Não está exposta na API do app (o esquema `extensions` não é publicado), e os advisors não a
+  apontam.
+- Remover no SQL Editor do painel com `drop extension http;`.
+
+### 4. Pendências do usuário no GitHub
 
 - [ ] Mudar a branch padrão para `main` (Settings → General → Default branch). Hoje a padrão é
       `claude/plano-enxoval-app`.
 - [ ] Apagar a branch antiga `claude/plano-enxoval-app`. O conteúdo dela já está na branch nova.
 - [ ] Revisar e fazer merge do PR #1.
 
-### 4. Próximas funcionalidades
+### 5. Próximas funcionalidades
 
+- **Fase 2b: opções com preço dentro do app.** Depende da aprovação da Shopee Affiliate Open
+  API, que o usuário vai pedir.
+  - Quando sair, criar uma tabela `ofertas` e uma Edge Function agendada (`pg_cron` + `pg_net`)
+    que busca pelo campo `busca` de cada item.
+  - As credenciais da Shopee vão em segredos da Edge Function, nunca no app.
+  - O usuário decidiu não usar links de afiliado por enquanto.
 - **Compartilhar a lista com parceiro ou família (Fase 3).**
-  - Hoje cada item pertence a um usuário (`user_id`).
-  - Compartilhar exige tabelas `listas` e `membros_lista` e trocar o RLS para "membro da lista".
+  - Exige tabelas `listas` e `membros_lista` e trocar o RLS de `itens_lista` para "membro da
+    lista".
   - Decidir com o usuário (`grill-me`) antes de codar.
-- **Fase 2 (preços):**
-  - Lojas iniciais e forma de obter preço (API de afiliado ou feed).
-  - O Mercado Livre já tem conta de afiliado.
-  - Os requisitos dos programas foram vistos em blogs e precisam ser confirmados.
+- **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
+  de busca (out/2026), porque o WebFetch está bloqueado nesta sessão. 19 itens têm faixa, e os
+  outros ficam sem faixa até haver preços informados.
 
-### 5. Antes de publicar (Fase 4)
+### 6. Antes de publicar (Fase 4)
 
 - Nome definitivo, ícone e splash (hoje: "Enxoval" e ícones do template Expo).
 - Revisão profissional do catálogo (`src/domain/catalogo.ts`) e da lista de itens com selo
   Inmetro.
-- Política de privacidade: o app agora guarda nome, e-mail e a lista na nuvem.
+- Política de privacidade: o app guarda nome, e-mail e a lista na nuvem, além dos preços
+  informados. Esses ficam ligados ao usuário só para limite e exclusão, nunca expostos.
 
 ## Estado atual
 
@@ -63,20 +78,47 @@ Nunca foi rodado em celular. O usuário tem Android e iPhone e testa com o Expo 
 - **PR:** https://github.com/cdzaorib/aplicativo_teste/pull/1 (draft), com CI em GitHub Actions.
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
-  - Tabela `itens_lista` criada pela migração em `supabase/migrations/`.
-  - Os advisors de segurança e desempenho não acusam nada.
+  - Tabelas `itens_lista` e `precos_informados` e a função `referencia_precos`, criadas pelas
+    migrações em `supabase/migrations/`.
+  - O advisor de segurança aponta só o `referencia_precos` (SECURITY DEFINER executável sem
+    login). É intencional: a função devolve apenas agregados de 5 pessoas ou mais.
 - **Feito:**
   - Fase 0.
   - Fase 1: sugestões, lista, comprado, ordenação, orçamento, itens próprios, login com Google
     (falta a configuração do item 1) e sincronização da lista com a nuvem.
+  - Fase 2a:
+    - Tela "Comparar preço" (`src/app/preco/[catalogoId].tsx`), com a faixa comum, a busca do
+      item nas 4 lojas e o "achou um preço? digite aqui".
+    - O preço digitado é avaliado e compartilhado de forma anônima se a pessoa estiver logada.
+    - A faixa aparece no card de sugestões, e a avaliação aparece na edição do item.
 - **Verificação:**
-  - `npm run check` passa (lint, typecheck, Prettier, 57 testes).
+  - `npm run check` passa (lint, typecheck, Prettier, 73 testes).
   - `expo export` gera os bundles de Android, iOS e web.
   - Fluxo web com Playwright, inclusive a persistência após recarregar.
   - RLS testado no banco com dois usuários simulados, numa transação desfeita:
     - cada um lê e grava só os próprios itens;
     - o upsert por `user_id,id` funciona;
     - ninguém apaga linhas.
+  - Preços informados testados no banco com seis usuários simulados:
+    - o upsert do mesmo dia funciona;
+    - ninguém lê preços de outros;
+    - sem login dá para ler a referência, mas não informar preço;
+    - a referência só aparece com 5 pessoas e resiste a um valor distorcido.
+
+## Como a avaliação de preço funciona
+
+- **Avaliação** (`src/domain/precos.ts`), em relação à faixa comum [mín, máx]:
+  - abaixo de 60% do mínimo: "muito abaixo, desconfie" (golpe, usado ou sem Inmetro);
+  - abaixo do mínimo: "abaixo";
+  - até o máximo: "dentro";
+  - acima disso: "acima".
+- **Faixa:**
+  - Com 5 pessoas ou mais informando, vale a faixa central (25% a 75%) do preço mais recente de
+    cada pessoa nos últimos 180 dias (`referencia_precos`).
+  - Antes disso, vale a faixa pesquisada.
+- **Envio:** um preço por item, por pessoa, por dia. Informar de novo substitui o anterior.
+- **Cache:** as referências ficam no aparelho (`src/store/referencias.ts`) e são atualizadas no
+  máximo de hora em hora.
 
 ## Como a sincronização funciona
 
@@ -98,7 +140,10 @@ Nunca foi rodado em celular. O usuário tem Android e iPhone e testa com o Expo 
 ## Contexto que não está óbvio no código
 
 - **Rede desta sessão:**
-  - Bloqueia `docs.expo.dev`, a API do Expo e `ggcocihztrpwfptnuqbc.supabase.co`.
+  - Bloqueia `docs.expo.dev`, a API do Expo, `ggcocihztrpwfptnuqbc.supabase.co` e quase todos os
+    sites no WebFetch. O WebSearch funciona.
+  - Para testar APIs externas, foi usada a extensão `http` no banco (ver item 3 de "O que
+    falta").
   - Instale pacotes com `EXPO_OFFLINE=1 npx expo install <pacote>` e confira as APIs nos tipos em
     `node_modules`.
   - Teste o banco pelas ferramentas `mcp__Supabase__*`.

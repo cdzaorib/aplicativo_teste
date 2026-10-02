@@ -1,5 +1,5 @@
 import type { RegistroNuvem } from '@/domain/sincronizacao';
-import { deLinha, paraLinha } from '../linhas';
+import { deLinha, deLinhasReferencia, paraLinha } from '../linhas';
 
 const completo: RegistroNuvem = {
   id: 'abc',
@@ -50,5 +50,15 @@ describe('conversão entre item e linha da tabela', () => {
 
     expect(linha).toMatchObject({ catalogo_id: null, preco_centavos: null });
     expect(deLinha(linha)).toEqual(semOpcionais);
+  });
+});
+
+describe('referências de preço vindas do banco', () => {
+  it('vira um mapa por item do catálogo', () => {
+    expect(
+      deLinhasReferencia([
+        { catalogo_id: 'berco', quantidade: 7, p25_centavos: 60000, p75_centavos: 80000 },
+      ]),
+    ).toEqual({ berco: { quantidade: 7, p25Centavos: 60000, p75Centavos: 80000 } });
   });
 });

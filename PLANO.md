@@ -3,7 +3,7 @@
 Aplicativo mobile (Android + iOS) que sugere o que comprar para o enxoval, indica o que é
 essencial, útil, opcional ou desaconselhado, e mostra onde está o melhor preço.
 
-> Nome provisório ("Enxoval"). Status: Fase 1 concluída no código; falta ativar o Google no Supabase — ver `HANDOFF.md`.
+> Nome provisório ("Enxoval"). Status: Fase 1 e Fase 2a no código; falta ativar o Google no Supabase — ver `HANDOFF.md`.
 
 ## 1. Problema e público
 
@@ -55,13 +55,26 @@ Cada item do catálogo tem:
 
 ## 4. Preços: como obter (ponto de maior risco técnico)
 
-Ordem de preferência:
+Situação verificada em out/2026:
 
-1. **APIs oficiais / feeds de afiliados** (Mercado Livre, Amazon PA-API, redes como Awin/Lomadee, Magalu Parceiro, Shopee Afiliados).
-2. Scraping — só como último recurso, com poucas lojas, com limite de requisições e **depois de ler os termos de uso** de cada site. Quebra com frequência e pode ser proibido.
+- **Mercado Livre:**
+  - A API exige login de desenvolvedor para tudo.
+  - A busca de produtos responde 403 (testado pelo Supabase).
+  - O programa de afiliados não tem API: os links são gerados um a um no painel.
+- **Shopee:** a _Affiliate Open API_ busca por palavra e devolve preço e link. Exige aprovação, que
+  o usuário vai pedir.
+- **Amazon:** a PA-API foi desligada em maio de 2026. A _Creators API_ exige 10 vendas em 30 dias.
 
-> Antes de codar a Fase 2: confirmar os termos atuais e requisitos de cada programa de afiliados
-> (alguns exigem vendas mínimas ou conta aprovada). Isso muda quais lojas entram no MVP.
+Por isso a Fase 2 foi dividida:
+
+- **2a (feita):**
+  - Botões que abrem a busca do item em cada loja.
+  - "Achou um preço? Digite aqui", com a avaliação muito abaixo / abaixo / dentro / acima da
+    faixa comum.
+  - A faixa vem de uma pesquisa inicial (`src/domain/faixas-preco.ts`) e, quando há 5 pessoas ou
+    mais, dos preços informados de forma anônima.
+- **2b (quando a Shopee aprovar):** opções com preço dentro do app, coletadas por um robô
+  (Edge Function + `pg_cron`), e histórico de preço.
 
 ## 5. Riscos e como tratar
 
@@ -84,7 +97,9 @@ Catálogo curado (local, ~60–80 itens), lista, marcar comprado, ordenação, o
 _Já dá para mostrar em entrevista e testar com usuárias._
 
 **Fase 2 — Preços (3–4 semanas)**
-Supabase, tabelas de produtos/lojas/preços, coletor agendado (2–3 lojas), histórico, selo barato/caro.
+2a, feita: comparar preço digitado com a faixa comum, links de busca nas lojas, preços informados
+anônimos. 2b, depende da API da Shopee: opções com preço dentro do app, robô de coleta e
+histórico.
 
 **Fase 3 — Engajamento e receita (2 semanas)**
 Alertas push, links de afiliado e compartilhamento da lista.
@@ -125,5 +140,6 @@ Estimativa total: **~6–8 semanas com dedicação integral** (varia com a curva
 - [x] Confirmar React Native + Expo
 - [x] Montar a lista inicial de itens do catálogo e as fontes de cada um (rascunho em `src/domain/catalogo.ts`)
 - [ ] Definir o nome do app
-- [ ] Definir as 2–3 lojas iniciais e verificar acesso a API/afiliados
+- [x] Verificar acesso às APIs das lojas (ver seção 4)
+- [ ] Pedir acesso à Shopee Affiliate Open API (usuário)
 - [ ] Encontrar um pediatra/enfermeira para revisar o conteúdo do catálogo

@@ -1,8 +1,10 @@
 import { AppState, Platform } from 'react-native';
 
+import { atualizarReferencias } from '@/nuvem/precos';
 import { sincronizar } from '@/nuvem/sincronizar';
 import { supabase } from '@/nuvem/supabase';
 import { useListaStore } from '@/store/lista';
+import { useReferenciasStore } from '@/store/referencias';
 import { useSessaoStore } from '@/store/sessao';
 
 /** Espera depois da última alteração antes de sincronizar, para juntar alterações seguidas. */
@@ -10,15 +12,19 @@ const ESPERA_ALTERACOES_MS = 2000;
 
 // O erro já fica registrado em useSessaoStore e aparece na tela Conta.
 const sincronizarEmSegundoPlano = () => sincronizar().catch(() => {});
+// Sem as referências novas, o app usa as que já tem guardadas (ou a faixa pesquisada).
+const atualizarReferenciasEmSegundoPlano = () => atualizarReferencias().catch(() => {});
 
 /**
  * Liga a sessão do Supabase ao app: acompanha login e logout e sincroniza a lista ao entrar,
- * ao voltar para o app e depois de cada alteração. Chame depois de carregar a lista do aparelho.
- * Retorna a função que desliga tudo.
+ * ao voltar para o app e depois de cada alteração. Também mantém as referências de preço em dia.
+ * Chame depois de carregar a lista do aparelho. Retorna a função que desliga tudo.
  */
 export function iniciarNuvem(): () => void {
   if (!supabase) return () => {};
   const cliente = supabase;
+
+  useReferenciasStore.persist.rehydrate()?.then(atualizarReferenciasEmSegundoPlano);
 
   const {
     data: { subscription },
@@ -40,6 +46,7 @@ export function iniciarNuvem(): () => void {
     if (estado === 'active') {
       if (Platform.OS !== 'web') cliente.auth.startAutoRefresh();
       sincronizarEmSegundoPlano();
+      atualizarReferenciasEmSegundoPlano();
     } else if (Platform.OS !== 'web') {
       cliente.auth.stopAutoRefresh();
     }

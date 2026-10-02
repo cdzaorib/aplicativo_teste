@@ -57,6 +57,10 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="item/novo" options={{ presentation: 'modal', title: 'Novo item' }} />
         <Stack.Screen name="item/[id]" options={{ presentation: 'modal', title: 'Editar item' }} />
+        <Stack.Screen
+          name="preco/[catalogoId]"
+          options={{ presentation: 'modal', title: 'Comparar preço' }}
+        />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>

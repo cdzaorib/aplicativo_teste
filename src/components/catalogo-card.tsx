@@ -1,10 +1,13 @@
+import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icone } from '@/components/icone';
 import { PrioridadeBadge } from '@/components/prioridade-badge';
 import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
+import { formatarPreco } from '@/domain/lista';
 import { QUANDO, type ItemCatalogo } from '@/domain/tipos';
+import { useReferencia } from '@/hooks/use-referencia';
 import { useTheme } from '@/hooks/use-theme';
 
 type Props = {
@@ -16,6 +19,7 @@ type Props = {
 export function CatalogoCard({ item, naLista, onAdicionar }: Props) {
   const theme = useTheme();
   const evitar = item.prioridade === 'evitar';
+  const referencia = useReferencia(evitar ? undefined : item.id);
 
   return (
     <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
@@ -49,6 +53,27 @@ export function CatalogoCard({ item, naLista, onAdicionar }: Props) {
         <ThemedText type="small" themeColor="textSecondary">
           Fonte: {item.fonte}
         </ThemedText>
+      )}
+
+      {!evitar && (
+        <Link href={{ pathname: '/preco/[catalogoId]', params: { catalogoId: item.id } }} asChild>
+          <Pressable
+            accessibilityRole="link"
+            style={({ pressed }) => [
+              styles.precos,
+              { borderTopColor: theme.border },
+              pressed && styles.pressionado,
+            ]}>
+            <ThemedText type="small" themeColor="textSecondary" style={styles.textoPrecos}>
+              {referencia
+                ? `Costuma custar de ${formatarPreco(referencia.faixa.minCentavos)} a ${formatarPreco(referencia.faixa.maxCentavos)}`
+                : 'Ver opções nas lojas'}
+            </ThemedText>
+            <ThemedText type="smallBold" style={{ color: theme.primary }}>
+              Comparar preços
+            </ThemedText>
+          </Pressable>
+        </Link>
       )}
     </View>
   );
@@ -129,6 +154,16 @@ const styles = StyleSheet.create({
   },
   pressionado: {
     opacity: 0.7,
+  },
+  precos: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    paddingTop: Spacing.two,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  textoPrecos: {
+    flex: 1,
   },
   inmetro: {
     flexDirection: 'row',

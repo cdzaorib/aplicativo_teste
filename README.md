@@ -2,8 +2,9 @@
 
 Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê: sugere o que comprar,
 indica o que é essencial ou desaconselhado (com fonte oficial) e organiza a lista de compras com
-orçamento. Com login pelo Google, a lista fica salva na nuvem e sincroniza entre aparelhos.
-Em breve: comparação de preços entre lojas.
+orçamento. Para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na
+média ou barato demais para ser verdade. Com login pelo Google, a lista fica salva na nuvem e
+sincroniza entre aparelhos.
 
 Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login e banco de dados).
 
@@ -40,14 +41,15 @@ src/
   app/          telas (Expo Router: cada arquivo é uma rota)
     (tabs)/     abas: Minha lista, Sugestões, Conta
     item/       modais de criar e editar item
+    preco/      modal de comparar preço
   components/   componentes visuais reutilizáveis
-  domain/       regras de negócio sem React: tipos, catálogo, ordenação, preços, mesclagem
-  nuvem/        Supabase: cliente, login com Google e sincronização da lista
-  store/        estado da lista (Zustand, salvo no aparelho) e da sessão
+  domain/       regras de negócio sem React: catálogo, faixas de preço, avaliação, mesclagem
+  nuvem/        Supabase: cliente, login, sincronização e preços informados
+  store/        estado da lista, da sessão e das referências de preço (Zustand)
   hooks/        hooks de tema e layout
   constants/    cores e espaçamentos
 supabase/
-  migrations/   estrutura do banco (tabela da lista e regras de acesso)
+  migrations/   estrutura do banco (lista, preços informados e regras de acesso)
 ```
 
 ## Documentos

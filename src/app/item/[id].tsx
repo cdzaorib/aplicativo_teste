@@ -1,11 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Alert, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
+import { AvaliacaoPreco, FaixaReferencia } from '@/components/avaliacao-preco';
 import { Botao } from '@/components/botao';
 import { ItemForm } from '@/components/item-form';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { CATALOGO } from '@/domain/catalogo';
+import { avaliarPreco } from '@/domain/precos';
+import { useReferencia } from '@/hooks/use-referencia';
 import { useTheme } from '@/hooks/use-theme';
 import { useListaStore } from '@/store/lista';
 
@@ -27,6 +30,7 @@ export default function EditarItemScreen() {
   const item = useListaStore((s) => s.itens.find((i) => i.id === id));
   const atualizar = useListaStore((s) => s.atualizar);
   const remover = useListaStore((s) => s.remover);
+  const referencia = useReferencia(item?.catalogoId);
 
   if (!item) {
     return (
@@ -51,6 +55,28 @@ export default function EditarItemScreen() {
               Fonte: {doCatalogo.fonte}
             </ThemedText>
           )}
+        </View>
+      )}
+
+      {doCatalogo && doCatalogo.prioridade !== 'evitar' && (
+        <View style={[styles.dica, { backgroundColor: theme.backgroundElement }]}>
+          <FaixaReferencia referencia={referencia} />
+          {referencia && item.precoCentavos !== undefined && (
+            <AvaliacaoPreco
+              avaliacao={avaliarPreco(item.precoCentavos, referencia.faixa)}
+              exigeInmetro={doCatalogo.inmetro}
+            />
+          )}
+          <Botao
+            titulo="Comparar preços"
+            variante="secundario"
+            onPress={() =>
+              router.push({
+                pathname: '/preco/[catalogoId]',
+                params: { catalogoId: doCatalogo.id },
+              })
+            }
+          />
         </View>
       )}
 
@@ -88,7 +114,7 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
   },
   dica: {
-    gap: Spacing.one,
+    gap: Spacing.two,
     padding: Spacing.three,
     borderRadius: Radius.medium,
   },

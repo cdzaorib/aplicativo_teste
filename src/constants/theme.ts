@@ -26,6 +26,8 @@ export const Colors = {
     opcionalText: '#4F4466',
     evitarBg: '#FBE3DF',
     evitarText: '#8C2A1E',
+    alertaBg: '#FCEFD9',
+    alertaText: '#7A4B0C',
   },
   dark: {
     text: '#F2F1EF',
@@ -45,6 +47,8 @@ export const Colors = {
     opcionalText: '#CFC4E6',
     evitarBg: '#44201B',
     evitarText: '#F6B8AD',
+    alertaBg: '#3D2E14',
+    alertaText: '#F5CF8E',
   },
 } as const;
 

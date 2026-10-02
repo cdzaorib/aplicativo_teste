@@ -3,7 +3,7 @@
 Aplicativo mobile (Android + iOS) que sugere o que comprar para o enxoval, indica o que é
 essencial, útil, opcional ou desaconselhado, e mostra onde está o melhor preço.
 
-> Nome provisório ("Enxoval"). Status: Fase 1 e Fase 2a no código; falta ativar o Google no Supabase — ver `HANDOFF.md`.
+> Nome provisório ("Enxoval"). Status: Fases 1, 2a e compartilhamento (Fase 3) no código; falta ativar o Google no Supabase — ver `HANDOFF.md`.
 
 ## 1. Problema e público
 
@@ -102,7 +102,9 @@ anônimos. 2b, depende da API da Shopee: opções com preço dentro do app, rob�
 histórico.
 
 **Fase 3 — Engajamento e receita (2 semanas)**
-Alertas push, links de afiliado e compartilhamento da lista.
+Feito: compartilhamento da lista por código de convite. A dona decide, por pessoa, quem edita a
+lista e quem edita preços. Falta: alertas push. Links de afiliado ficaram para depois, por
+decisão do usuário.
 
 **Fase 4 — Lançamento (1–2 semanas)**
 Ícone, telas da loja, política de privacidade, Google Play (taxa única) e Apple Developer (anual), TestFlight/teste fechado.

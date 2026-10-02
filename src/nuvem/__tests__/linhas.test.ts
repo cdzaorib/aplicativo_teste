@@ -1,5 +1,5 @@
 import type { RegistroNuvem } from '@/domain/sincronizacao';
-import { deLinha, deLinhasReferencia, paraLinha } from '../linhas';
+import { deLinha, deLinhaInfoLista, deLinhasReferencia, paraLinha } from '../linhas';
 
 const completo: RegistroNuvem = {
   id: 'abc',
@@ -18,9 +18,9 @@ const completo: RegistroNuvem = {
 
 describe('conversão entre item e linha da tabela', () => {
   it('usa os nomes de coluna do banco e datas ISO', () => {
-    expect(paraLinha(completo, 'usuario-1')).toEqual({
+    expect(paraLinha(completo, 'lista-1')).toEqual({
       id: 'abc',
-      user_id: 'usuario-1',
+      lista_id: 'lista-1',
       catalogo_id: 'berco',
       nome: 'Berço',
       categoria: 'quarto',
@@ -37,7 +37,7 @@ describe('conversão entre item e linha da tabela', () => {
 
   it('volta ao mesmo item, inclusive com as datas no formato que o Supabase devolve', () => {
     const linha = {
-      ...paraLinha(completo, 'usuario-1'),
+      ...paraLinha(completo, 'lista-1'),
       criado_em: '2026-10-02T12:00:00.123+00:00',
       atualizado_em: '2026-10-02T13:30:00.456+00:00',
     };
@@ -46,7 +46,7 @@ describe('conversão entre item e linha da tabela', () => {
 
   it('trata campos opcionais vazios', () => {
     const { catalogoId: _c, precoCentavos: _p, ...semOpcionais } = completo;
-    const linha = paraLinha(semOpcionais, 'usuario-1');
+    const linha = paraLinha(semOpcionais, 'lista-1');
 
     expect(linha).toMatchObject({ catalogo_id: null, preco_centavos: null });
     expect(deLinha(linha)).toEqual(semOpcionais);
@@ -60,5 +60,40 @@ describe('referências de preço vindas do banco', () => {
         { catalogo_id: 'berco', quantidade: 7, p25_centavos: 60000, p75_centavos: 80000 },
       ]),
     ).toEqual({ berco: { quantidade: 7, p25Centavos: 60000, p75Centavos: 80000 } });
+  });
+});
+
+describe('dados da lista vindos do banco', () => {
+  it('a dona recebe o código de convite', () => {
+    expect(
+      deLinhaInfoLista({
+        lista_id: 'l1',
+        e_dona: true,
+        pode_editar_lista: true,
+        pode_editar_precos: true,
+        codigo_convite: 'K7P2QX9M',
+        nome_dona: 'Gabi',
+      }),
+    ).toEqual({
+      id: 'l1',
+      souDona: true,
+      podeEditarLista: true,
+      podeEditarPrecos: true,
+      codigoConvite: 'K7P2QX9M',
+      nomeDona: 'Gabi',
+    });
+  });
+
+  it('o convidado não recebe código', () => {
+    expect(
+      deLinhaInfoLista({
+        lista_id: 'l1',
+        e_dona: false,
+        pode_editar_lista: false,
+        pode_editar_precos: true,
+        codigo_convite: null,
+        nome_dona: null,
+      }),
+    ).toEqual({ id: 'l1', souDona: false, podeEditarLista: false, podeEditarPrecos: true });
   });
 });

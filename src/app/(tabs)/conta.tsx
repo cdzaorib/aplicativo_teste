@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { AvisoRevisao } from '@/components/aviso-revisao';
 import { Botao } from '@/components/botao';
+import { ListaCompartilhada } from '@/components/lista-compartilhada';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
@@ -16,6 +17,7 @@ import { useSessaoStore } from '@/store/sessao';
 export default function ContaScreen() {
   const theme = useTheme();
   const insets = useScreenInsets();
+  const conectado = useSessaoStore((s) => s.usuario !== null);
 
   return (
     <ScrollView
@@ -32,6 +34,13 @@ export default function ContaScreen() {
           </ThemedText>
         )}
       </View>
+
+      {conectado && (
+        <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
+          <ThemedText type="smallBold">Lista compartilhada</ThemedText>
+          <ListaCompartilhada />
+        </View>
+      )}
 
       <View style={styles.secao}>
         <ThemedText type="smallBold">Sobre o conteúdo</ThemedText>

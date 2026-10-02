@@ -12,9 +12,11 @@ import { useTheme } from '@/hooks/use-theme';
 type Props = {
   item: ItemLista;
   onAlternar: () => void;
+  /** Numa lista compartilhada só de leitura (ou só de preços), não dá para marcar como comprado. */
+  podeMarcar?: boolean;
 };
 
-export function ItemListaLinha({ item, onAlternar }: Props) {
+export function ItemListaLinha({ item, onAlternar, podeMarcar = true }: Props) {
   const theme = useTheme();
   const detalhes = [item.modelo, item.quantidade > 1 ? `${item.quantidade} un.` : '']
     .filter(Boolean)
@@ -24,10 +26,12 @@ export function ItemListaLinha({ item, onAlternar }: Props) {
     <View style={[styles.linha, { backgroundColor: theme.backgroundElement }]}>
       <Pressable
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: item.comprado }}
+        accessibilityState={{ checked: item.comprado, disabled: !podeMarcar }}
         accessibilityLabel={`Marcar ${item.nome} como comprado`}
+        disabled={!podeMarcar}
         hitSlop={8}
-        onPress={onAlternar}>
+        onPress={onAlternar}
+        style={!podeMarcar && styles.bloqueado}>
         <Icone
           nome={item.comprado ? 'marcado' : 'desmarcado'}
           cor={item.comprado ? theme.primary : theme.textSecondary}
@@ -80,6 +84,9 @@ const styles = StyleSheet.create({
   textos: {
     flex: 1,
     gap: Spacing.one,
+  },
+  bloqueado: {
+    opacity: 0.5,
   },
   comprado: {
     textDecorationLine: 'line-through',

@@ -6,12 +6,13 @@ import { Chips } from '@/components/chips';
 import { ItemListaLinha } from '@/components/item-lista-linha';
 import { ResumoCard } from '@/components/resumo-card';
 import { ThemedText } from '@/components/themed-text';
-import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { ordenarLista, resumirLista } from '@/domain/lista';
 import { ORDENS } from '@/domain/tipos';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
 import { useListaStore } from '@/store/lista';
+import { usePermissao, useSessaoStore } from '@/store/sessao';
 
 export default function MinhaListaScreen() {
   const theme = useTheme();
@@ -20,6 +21,9 @@ export default function MinhaListaScreen() {
   const ordem = useListaStore((s) => s.ordem);
   const definirOrdem = useListaStore((s) => s.definirOrdem);
   const alternarComprado = useListaStore((s) => s.alternarComprado);
+  const permissao = usePermissao();
+  const lista = useSessaoStore((s) => (s.usuario ? s.lista : undefined));
+  const compartilhada = lista && !lista.souDona;
 
   const vazia = itens.length === 0;
 
@@ -30,12 +34,32 @@ export default function MinhaListaScreen() {
       data={ordenarLista(itens, ordem)}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <ItemListaLinha item={item} onAlternar={() => alternarComprado(item.id)} />
+        <ItemListaLinha
+          item={item}
+          onAlternar={() => alternarComprado(item.id)}
+          podeMarcar={permissao === 'total'}
+        />
       )}
       ItemSeparatorComponent={Separador}
       ListHeaderComponent={
         <View style={styles.cabecalho}>
           <ThemedText type="subtitle">Minha lista</ThemedText>
+          {compartilhada && (
+            <View style={[styles.aviso, { backgroundColor: theme.backgroundElement }]}>
+              <ThemedText type="smallBold">
+                Lista compartilhada{lista.nomeDona ? ` de ${lista.nomeDona}` : ''}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                {
+                  {
+                    total: 'Você pode editar a lista e os preços.',
+                    precos: 'Você pode editar os preços. O resto só a dona da lista libera.',
+                    leitura: 'Você pode ver a lista. Para editar, peça permissão à dona da lista.',
+                  }[permissao]
+                }
+              </ThemedText>
+            </View>
+          )}
           {!vazia && (
             <>
               <ResumoCard resumo={resumirLista(itens)} />
@@ -52,19 +76,23 @@ export default function MinhaListaScreen() {
       ListEmptyComponent={
         <View style={styles.vazia}>
           <ThemedText themeColor="textSecondary">
-            Sua lista está vazia. Comece pelas sugestões de enxoval ou adicione um item seu.
+            {permissao === 'total'
+              ? 'Sua lista está vazia. Comece pelas sugestões de enxoval ou adicione um item seu.'
+              : 'A lista ainda está vazia.'}
           </ThemedText>
           <Botao titulo="Ver sugestões" onPress={() => router.navigate('/sugestoes')} />
         </View>
       }
       ListFooterComponent={
-        <View style={styles.rodape}>
-          <Botao
-            titulo="Adicionar item próprio"
-            variante="secundario"
-            onPress={() => router.push('/item/novo')}
-          />
-        </View>
+        permissao === 'total' ? (
+          <View style={styles.rodape}>
+            <Botao
+              titulo="Adicionar item próprio"
+              variante="secundario"
+              onPress={() => router.push('/item/novo')}
+            />
+          </View>
+        ) : null
       }
     />
   );
@@ -79,6 +107,11 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
+  },
+  aviso: {
+    gap: Spacing.one,
+    padding: Spacing.three,
+    borderRadius: Radius.medium,
   },
   cabecalho: {
     gap: Spacing.three,

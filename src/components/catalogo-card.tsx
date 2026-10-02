@@ -13,7 +13,8 @@ import { useTheme } from '@/hooks/use-theme';
 type Props = {
   item: ItemCatalogo;
   naLista: boolean;
-  onAdicionar: () => void;
+  /** Ausente quando a pessoa não pode editar a lista (lista compartilhada). */
+  onAdicionar?: () => void;
 };
 
 export function CatalogoCard({ item, naLista, onAdicionar }: Props) {
@@ -83,7 +84,7 @@ type AcaoProps = {
   evitar: boolean;
   naLista: boolean;
   nome: string;
-  onAdicionar: () => void;
+  onAdicionar?: () => void;
 };
 
 function Acao({ evitar, naLista, nome, onAdicionar }: AcaoProps) {
@@ -104,6 +105,8 @@ function Acao({ evitar, naLista, nome, onAdicionar }: AcaoProps) {
       </View>
     );
   }
+
+  if (!onAdicionar) return null;
 
   return (
     <Pressable

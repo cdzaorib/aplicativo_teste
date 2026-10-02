@@ -24,7 +24,7 @@ import { useReferencia } from '@/hooks/use-referencia';
 import { useTheme } from '@/hooks/use-theme';
 import { informarPreco } from '@/nuvem/precos';
 import { useListaStore } from '@/store/lista';
-import { useSessaoStore } from '@/store/sessao';
+import { usePermissao, useSessaoStore } from '@/store/sessao';
 
 type Envio = 'enviando' | 'enviado' | 'erro';
 
@@ -36,6 +36,9 @@ export default function CompararPrecoScreen() {
   const usuario = useSessaoStore((s) => s.usuario);
   const naLista = useListaStore((s) => s.itens.find((i) => i.catalogoId === catalogoId));
   const { adicionarDoCatalogo, atualizar } = useListaStore.getState();
+  const permissao = usePermissao();
+  // Atualizar o preço de um item que já está na lista exige permissão de preços; adicionar, de lista.
+  const podeUsarNaLista = naLista ? permissao !== 'leitura' : permissao === 'total';
 
   const [texto, setTexto] = useState('');
   const [origem, setOrigem] = useState<OrigemPreco>();
@@ -191,13 +194,15 @@ export default function CompararPrecoScreen() {
               Preço de {formatarPreco(avaliado)} salvo na sua lista.
             </ThemedText>
           ) : (
-            <Botao
-              titulo={
-                naLista ? 'Usar este preço na minha lista' : 'Adicionar à lista com este preço'
-              }
-              variante="secundario"
-              onPress={() => usarNaLista(avaliado)}
-            />
+            podeUsarNaLista && (
+              <Botao
+                titulo={
+                  naLista ? 'Usar este preço na minha lista' : 'Adicionar à lista com este preço'
+                }
+                variante="secundario"
+                onPress={() => usarNaLista(avaliado)}
+              />
+            )
           )}
         </View>
       )}

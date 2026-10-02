@@ -12,6 +12,7 @@ import { CATEGORIAS, PRIORIDADES, type Categoria, type Prioridade } from '@/doma
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
 import { useListaStore } from '@/store/lista';
+import { usePermissao } from '@/store/sessao';
 
 type Filtro = Prioridade | 'todas';
 
@@ -25,6 +26,7 @@ export default function SugestoesScreen() {
   const [filtro, setFiltro] = useState<Filtro>('todas');
   const itens = useListaStore((s) => s.itens);
   const adicionarDoCatalogo = useListaStore((s) => s.adicionarDoCatalogo);
+  const podeAdicionar = usePermissao() === 'total';
 
   const naLista = new Set(itens.map((i) => i.catalogoId));
   const essenciaisFaltando = ESSENCIAIS.filter((item) => !naLista.has(item.id));
@@ -48,7 +50,7 @@ export default function SugestoesScreen() {
         <CatalogoCard
           item={item}
           naLista={naLista.has(item.id)}
-          onAdicionar={() => adicionarDoCatalogo([item])}
+          onAdicionar={podeAdicionar ? () => adicionarDoCatalogo([item]) : undefined}
         />
       )}
       renderSectionHeader={({ section }) => (
@@ -64,7 +66,7 @@ export default function SugestoesScreen() {
             O que comprar, quando comprar e o que evitar no enxoval.
           </ThemedText>
           <AvisoRevisao />
-          {essenciaisFaltando.length > 0 && (
+          {podeAdicionar && essenciaisFaltando.length > 0 && (
             <Botao
               titulo={`Adicionar ${essenciaisFaltando.length} itens essenciais`}
               onPress={() => adicionarDoCatalogo(essenciaisFaltando)}

@@ -31,22 +31,25 @@ Nunca foi rodado em celular. O usuário tem Android e iPhone e testa com o Expo 
   - **Android:** o deep link pode chegar também ao Expo Router. Por isso existe a rota
     `src/app/auth-callback.tsx`, que só redireciona para Conta.
 - Sincronização entre dois aparelhos com a mesma conta.
+- Compartilhamento entre duas contas: convite, permissões dadas pela dona e "sair da lista".
 
-### 3. Remover a extensão `http` do Supabase — ação do usuário
+### 3. Limpeza no Supabase — ação do usuário
 
-Ela foi ligada só para testar a API do Mercado Livre a partir do servidor. O `drop extension`
-pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam uma confirmação.
+O conector do Supabase estoura o tempo em comandos destrutivos (`drop`, `delete`), que esperam uma
+confirmação que não chega. Rodar no SQL Editor do painel:
 
-- Não está exposta na API do app (o esquema `extensions` não é publicado), e os advisors não a
-  apontam.
-- Remover no SQL Editor do painel com `drop extension http;`.
+```sql
+drop extension http;        -- ligada só para testar a API do Mercado Livre
+drop table public.itens_lista; -- substituída por `itens` (listas compartilhadas); está vazia
+```
+
+Nenhuma das duas está em uso nem exposta.
 
 ### 4. Pendências do usuário no GitHub
 
 - [ ] Mudar a branch padrão para `main` (Settings → General → Default branch). Hoje a padrão é
       `claude/plano-enxoval-app`.
-- [ ] Apagar a branch antiga `claude/plano-enxoval-app`. O conteúdo dela já está na branch nova.
-- [ ] Revisar e fazer merge do PR #1.
+- [ ] Apagar a branch antiga `claude/plano-enxoval-app`. O conteúdo dela já está na `main`.
 
 ### 5. Próximas funcionalidades
 
@@ -56,10 +59,11 @@ pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam
     que busca pelo campo `busca` de cada item.
   - As credenciais da Shopee vão em segredos da Edge Function, nunca no app.
   - O usuário decidiu não usar links de afiliado por enquanto.
-- **Compartilhar a lista com parceiro ou família (Fase 3).**
-  - Exige tabelas `listas` e `membros_lista` e trocar o RLS de `itens_lista` para "membro da
-    lista".
-  - Decidir com o usuário (`grill-me`) antes de codar.
+- **Fase 3 restante:**
+  - Alertas push, por exemplo quando a dona libera uma permissão ou um preço cai. Os de preço
+    dependem da Fase 2b.
+- **Limite de tentativas de código de convite.** Hoje não há limite. O código tem 8 caracteres
+  de 32 opções, cerca de 10¹² combinações.
 - **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
   de busca (out/2026), porque o WebFetch está bloqueado nesta sessão. 19 itens têm faixa, e os
   outros ficam sem faixa até haver preços informados.
@@ -74,14 +78,16 @@ pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam
 
 ## Estado atual
 
-- **Branch:** `claude/app-enxoval`, com base em `main`.
-- **PR:** https://github.com/cdzaorib/aplicativo_teste/pull/1 (draft), com CI em GitHub Actions.
+- **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #1.
+- **PR:** #1 (Fases 0 a 2a) já está na `main`. A Fase 3 vai num PR novo (ver o link na conversa).
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
-  - Tabelas `itens_lista` e `precos_informados` e a função `referencia_precos`, criadas pelas
-    migrações em `supabase/migrations/`.
-  - O advisor de segurança aponta só o `referencia_precos` (SECURITY DEFINER executável sem
-    login). É intencional: a função devolve apenas agregados de 5 pessoas ou mais.
+  - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções
+    (RPC), criadas pelas migrações em `supabase/migrations/`.
+  - `itens_lista` não é mais usada (ver item 3).
+  - O advisor de segurança aponta as funções SECURITY DEFINER chamáveis pela API. É intencional:
+    - `referencia_precos` devolve só agregados de 5 pessoas ou mais;
+    - as operações de lista conferem dentro delas quem é dona ou membro.
 - **Feito:**
   - Fase 0.
   - Fase 1: sugestões, lista, comprado, ordenação, orçamento, itens próprios, login com Google
@@ -91,8 +97,16 @@ pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam
       item nas 4 lojas e o "achou um preço? digite aqui".
     - O preço digitado é avaliado e compartilhado de forma anônima se a pessoa estiver logada.
     - A faixa aparece no card de sugestões, e a avaliação aparece na edição do item.
+  - Fase 3, compartilhamento da lista:
+    - A dona convida por código (aba Conta → "Enviar convite").
+    - Para cada convidado, ela liga "pode editar a lista" e/ou "pode editar preços". Sem
+      nenhuma das duas, o convidado só visualiza.
+    - Ao entrar, a lista do convidado é juntada à compartilhada.
+    - O convidado pode sair, e a dona pode removê-lo. Nos dois casos ele volta para a própria
+      lista.
 - **Verificação:**
-  - `npm run check` passa (lint, typecheck, Prettier, 73 testes).
+  - `npm run check` passa (lint, typecheck, Prettier, 90 testes, inclusive de componentes com a
+    Testing Library).
   - `expo export` gera os bundles de Android, iOS e web.
   - Fluxo web com Playwright, inclusive a persistência após recarregar.
   - RLS testado no banco com dois usuários simulados, numa transação desfeita:
@@ -104,6 +118,37 @@ pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam
     - ninguém lê preços de outros;
     - sem login dá para ler a referência, mas não informar preço;
     - a referência só aparece com 5 pessoas e resiste a um valor distorcido.
+  - Listas compartilhadas testadas no banco com gestante, parceiro, avó e um estranho (22
+    verificações), em transação desfeita:
+    - convite com código digitado em minúsculas e com hífen;
+    - junção sem repetir itens do catálogo;
+    - sem permissão não edita nada; só com preço muda o preço, mas não nome nem "comprado";
+    - estranho não vê nada;
+    - sair, remover e trocar o código;
+    - sem login nada funciona.
+
+## Como o compartilhamento funciona
+
+- **Modelo:** cada pessoa tem sempre a própria lista (`listas.dona_id`) e aponta para uma lista
+  ativa em `membros_lista`, que tem uma linha por pessoa.
+  - Entrar numa lista compartilhada só troca esse ponteiro.
+  - Sair, ou ser removido, volta o ponteiro para a própria lista. Nada é apagado, o que também
+    evita os comandos destrutivos que travam no conector.
+- **Permissões:**
+  - RLS por lista, com funções auxiliares no esquema `privado`, que a API não publica.
+  - O gatilho `conferir_edicao_item` impede quem só edita preço de mudar outra coisa.
+  - A dona tem tudo. "Editar a lista" inclui editar preços.
+- **No app:**
+  - `garantir_lista` roda a cada sincronização e devolve a lista atual e as permissões, que ficam
+    em `useSessaoStore().lista`.
+  - `mesclarListas` recebe a permissão: com `leitura` a nuvem manda; com `precos` só a mudança de
+    preço do aparelho é enviada, e por `update`, nunca `upsert`.
+  - As telas usam `usePermissao()` para esconder ou travar o que não pode.
+- **Entrar:** sincroniza, chama `entrar_na_lista`, que junta os itens no servidor, limpa a lista
+  do aparelho e sincroniza de novo.
+- **Outro aparelho:** a lista do aparelho guarda `listaId`. Se a pessoa virou convidada numa lista
+  por outro celular, os itens locais, que são de outra lista, são descartados antes de
+  sincronizar (`itensSaoDeOutraLista`). Voltando para a própria lista, eles ficam como cópia.
 
 ## Como a avaliação de preço funciona
 
@@ -132,7 +177,8 @@ pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam
   app e 2 s depois da última alteração.
   - Ele só é ligado depois que a lista do aparelho foi carregada, para não mesclar com uma lista
     vazia.
-- **Sair:** salva na nuvem antes e apaga a lista do aparelho. Se não conseguir salvar, não sai.
+- **Sair da conta:** salva na nuvem antes e apaga a lista do aparelho. Se não conseguir salvar,
+  não sai.
 - **Limites conhecidos:**
   - Usa o relógio de cada aparelho.
   - Busca no máximo 1000 itens, o limite padrão do Supabase.
@@ -165,8 +211,7 @@ pelo conector estoura o tempo, provavelmente porque comandos destrutivos esperam
 
 ## Skills sugeridas
 
-- `anthropic-skills:grill-me`: fechar as decisões do compartilhamento de lista e da Fase 2 antes
-  de codar.
+- `anthropic-skills:grill-me`: fechar decisões de produto antes de codar (Fase 2b, alertas).
 - `anthropic-skills:vercel-react-native-skills`: boas práticas de React Native e Expo nas telas.
 - `run`: subir o app e conferir as mudanças funcionando.
 - `code-review` e `security-review`: revisar o diff antes de cada push. O segundo vale

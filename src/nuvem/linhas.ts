@@ -1,11 +1,12 @@
 import type { EstatisticaPrecos } from '@/domain/precos';
 import type { RegistroNuvem } from '@/domain/sincronizacao';
 import type { Categoria, Prioridade } from '@/domain/tipos';
+import type { InfoLista } from '@/store/sessao';
 
-/** Linha da tabela `itens_lista` (supabase/migrations). */
+/** Linha da tabela `itens` (supabase/migrations). */
 export type LinhaItem = {
+  lista_id: string;
   id: string;
-  user_id: string;
   catalogo_id: string | null;
   nome: string;
   categoria: string;
@@ -19,10 +20,10 @@ export type LinhaItem = {
   atualizado_em: string;
 };
 
-export function paraLinha(registro: RegistroNuvem, userId: string): LinhaItem {
+export function paraLinha(registro: RegistroNuvem, listaId: string): LinhaItem {
   return {
+    lista_id: listaId,
     id: registro.id,
-    user_id: userId,
     catalogo_id: registro.catalogoId ?? null,
     nome: registro.nome,
     categoria: registro.categoria,
@@ -73,4 +74,25 @@ export function deLinhasReferencia(linhas: LinhaReferencia[]): Record<string, Es
       },
     ]),
   );
+}
+
+/** Linha devolvida pela função `garantir_lista` (supabase/migrations). */
+export type LinhaInfoLista = {
+  lista_id: string;
+  e_dona: boolean;
+  pode_editar_lista: boolean;
+  pode_editar_precos: boolean;
+  codigo_convite: string | null;
+  nome_dona: string | null;
+};
+
+export function deLinhaInfoLista(linha: LinhaInfoLista): InfoLista {
+  return {
+    id: linha.lista_id,
+    souDona: linha.e_dona,
+    podeEditarLista: linha.pode_editar_lista,
+    podeEditarPrecos: linha.pode_editar_precos,
+    ...(linha.codigo_convite !== null && { codigoConvite: linha.codigo_convite }),
+    ...(linha.nome_dona !== null && { nomeDona: linha.nome_dona }),
+  };
 }

@@ -8,10 +8,17 @@ type ChipsProps<T extends string> = {
   valor: T | undefined;
   onChange: (valor: T) => void;
   rotulo: string;
+  desabilitado?: boolean;
 };
 
 /** Linha horizontal de opções em que apenas uma fica selecionada. */
-export function Chips<T extends string>({ opcoes, valor, onChange, rotulo }: ChipsProps<T>) {
+export function Chips<T extends string>({
+  opcoes,
+  valor,
+  onChange,
+  rotulo,
+  desabilitado,
+}: ChipsProps<T>) {
   const theme = useTheme();
 
   return (
@@ -26,12 +33,14 @@ export function Chips<T extends string>({ opcoes, valor, onChange, rotulo }: Chi
           <Pressable
             key={chave}
             accessibilityRole="button"
-            accessibilityState={{ selected: selecionado }}
+            accessibilityState={{ selected: selecionado, disabled: desabilitado }}
+            disabled={desabilitado}
             onPress={() => onChange(chave)}
             style={[
               styles.chip,
               { borderColor: theme.border },
               selecionado && { backgroundColor: theme.primary, borderColor: theme.primary },
+              desabilitado && !selecionado && styles.esmaecido,
             ]}>
             <Text style={[styles.texto, { color: selecionado ? theme.onPrimary : theme.text }]}>
               {opcoes[chave]}
@@ -46,6 +55,9 @@ export function Chips<T extends string>({ opcoes, valor, onChange, rotulo }: Chi
 const styles = StyleSheet.create({
   linha: {
     gap: Spacing.two,
+  },
+  esmaecido: {
+    opacity: 0.5,
   },
   chip: {
     paddingHorizontal: Spacing.three,

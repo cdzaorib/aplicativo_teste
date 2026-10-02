@@ -97,3 +97,55 @@ describe('mesclarListas', () => {
     expect(itens.map((i) => i.id)).toEqual(['antigo', 'novo']);
   });
 });
+
+describe('mesclarListas sem permissão de editar a lista', () => {
+  const nuvem = [
+    registro('a', 10, { precoCentavos: 5000 }),
+    registro('b', 10),
+    registro('c', 10, { removido: true }),
+  ];
+
+  it('quem só visualiza recebe a lista da nuvem e não envia nada', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('a', 20, { precoCentavos: 1, comprado: true }), item('novo', 20)],
+      { b: 30 },
+      nuvem,
+      'leitura',
+    );
+    expect(itens).toEqual([item('a', 10, { precoCentavos: 5000 }), item('b', 10)]);
+    expect(enviar).toEqual([]);
+  });
+
+  it('quem edita preços envia só o preço alterado no aparelho', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('a', 20, { precoCentavos: 4500, comprado: true, modelo: 'outro' })],
+      {},
+      nuvem,
+      'precos',
+    );
+    expect(itens).toEqual([item('a', 20, { precoCentavos: 4500 }), item('b', 10)]);
+    expect(enviar).toEqual([registro('a', 20, { precoCentavos: 4500 })]);
+  });
+
+  it('quem edita preços descarta itens novos, remoções e mudanças que não são de preço', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('b', 20, { comprado: true }), item('novo', 20)],
+      { a: 30 },
+      nuvem,
+      'precos',
+    );
+    expect(itens).toEqual([item('a', 10, { precoCentavos: 5000 }), item('b', 10)]);
+    expect(enviar).toEqual([]);
+  });
+
+  it('um preço mais novo na nuvem vence o do aparelho', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('a', 5, { precoCentavos: 4500 })],
+      {},
+      nuvem,
+      'precos',
+    );
+    expect(itens[0]).toEqual(item('a', 10, { precoCentavos: 5000 }));
+    expect(enviar).toEqual([]);
+  });
+});

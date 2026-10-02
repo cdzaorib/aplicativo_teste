@@ -34,6 +34,7 @@ export function iniciarNuvem(): () => void {
       usuario: usuario
         ? { id: usuario.id, nome: usuario.user_metadata?.full_name, email: usuario.email }
         : null,
+      ...(!usuario && { lista: undefined }),
     });
     if (usuario && (evento === 'INITIAL_SESSION' || evento === 'SIGNED_IN')) {
       // Chamar o Supabase dentro deste callback pode travar; por isso o setTimeout.

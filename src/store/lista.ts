@@ -13,6 +13,8 @@ type ListaState = {
   ordem: OrdemLista;
   /** Itens removidos ainda não enviados à nuvem: id -> momento da remoção. */
   removidos: Record<string, number>;
+  /** Lista da nuvem a que estes itens pertencem (desde a última sincronização). */
+  listaId?: string;
   /** Aumenta a cada alteração feita pelo usuário; usado para disparar a sincronização. Não é salvo. */
   versaoLocal: number;
   /** Leitura do aparelho concluída, com sucesso ou não. Não é salvo. */
@@ -25,12 +27,12 @@ type ListaState = {
   remover: (id: string) => void;
   definirOrdem: (ordem: OrdemLista) => void;
   /** Substitui a lista pelo resultado da sincronização (não conta como alteração do usuário). */
-  aplicarSincronizacao: (itens: ItemLista[]) => void;
+  aplicarSincronizacao: (itens: ItemLista[], listaId?: string) => void;
   /** Apaga a lista do aparelho (ao sair da conta). */
   limpar: () => void;
 };
 
-type ListaSalva = Pick<ListaState, 'itens' | 'ordem' | 'removidos'>;
+type ListaSalva = Pick<ListaState, 'itens' | 'ordem' | 'removidos' | 'listaId'>;
 
 /** Migra listas salvas por versões anteriores do app. */
 export function migrarListaSalva(salva: unknown, versao: number): ListaSalva {
@@ -117,16 +119,22 @@ export const useListaStore = create<ListaState>()(
 
       definirOrdem: (ordem) => set({ ordem }),
 
-      aplicarSincronizacao: (itens) => set({ itens, removidos: {} }),
+      aplicarSincronizacao: (itens, listaId) =>
+        set({ itens, removidos: {}, ...(listaId && { listaId }) }),
 
-      limpar: () => set({ itens: [], removidos: {} }),
+      limpar: () => set({ itens: [], removidos: {}, listaId: undefined }),
     }),
     {
       name: 'lista-enxoval',
       version: 2,
       migrate: migrarListaSalva,
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (s): ListaSalva => ({ itens: s.itens, ordem: s.ordem, removidos: s.removidos }),
+      partialize: (s): ListaSalva => ({
+        itens: s.itens,
+        ordem: s.ordem,
+        removidos: s.removidos,
+        listaId: s.listaId,
+      }),
       // Na pré-renderização estática da versão web (Node) não há armazenamento para ler.
       skipHydration: typeof window === 'undefined',
       // Em caso de erro o persist não marca a hidratação como concluída; sem esta flag o app

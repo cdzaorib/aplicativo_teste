@@ -8,6 +8,7 @@ import { Icone } from '@/components/icone';
 import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
 import { lerPreco, precoParaTexto } from '@/domain/lista';
+import type { Permissao } from '@/domain/sincronizacao';
 import { CATEGORIAS, PRIORIDADES, type ItemLista, type Prioridade } from '@/domain/tipos';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -19,14 +20,18 @@ export type ValoresItem = Pick<
 type Props = {
   inicial: ValoresItem;
   mostrarComprado?: boolean;
+  /** Numa lista compartilhada, o que a pessoa pode alterar. */
+  permissao?: Permissao;
   onSalvar: (valores: ValoresItem) => void;
 };
 
 // "Evitar" só existe no catálogo curado; itens próprios usam as demais prioridades.
 const { evitar: _evitar, ...PRIORIDADES_ITEM_PROPRIO } = PRIORIDADES;
 
-export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
+export function ItemForm({ inicial, mostrarComprado, permissao = 'total', onSalvar }: Props) {
   const theme = useTheme();
+  const editaItem = permissao === 'total';
+  const editaPreco = permissao !== 'leitura';
   const [nome, setNome] = useState(inicial.nome);
   const [modelo, setModelo] = useState(inicial.modelo);
   const [preco, setPreco] = useState(precoParaTexto(inicial.precoCentavos));
@@ -57,12 +62,26 @@ export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
 
   return (
     <View style={styles.form}>
-      <Campo rotulo="Nome" value={nome} onChangeText={setNome} erro={erroNome} />
+      {permissao !== 'total' && (
+        <ThemedText type="small" themeColor="textSecondary">
+          {permissao === 'precos'
+            ? 'Nesta lista compartilhada você pode alterar só o preço.'
+            : 'Nesta lista compartilhada você pode só visualizar os itens.'}
+        </ThemedText>
+      )}
+      <Campo
+        rotulo="Nome"
+        value={nome}
+        onChangeText={setNome}
+        erro={erroNome}
+        editable={editaItem}
+      />
       <Campo
         rotulo="Modelo ou marca"
         placeholder="Opcional"
         value={modelo}
         onChangeText={setModelo}
+        editable={editaItem}
       />
       <Campo
         rotulo="Preço unitário (R$)"
@@ -71,6 +90,7 @@ export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
         value={preco}
         onChangeText={setPreco}
         erro={erroPreco}
+        editable={editaPreco}
       />
 
       <View style={styles.secao}>
@@ -79,7 +99,7 @@ export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Diminuir quantidade"
-            disabled={quantidade <= 1}
+            disabled={!editaItem || quantidade <= 1}
             onPress={() => setQuantidade((q) => Math.max(1, q - 1))}
             style={[styles.botaoContador, { backgroundColor: theme.backgroundElement }]}>
             <Icone nome="diminuir" cor={theme.text} />
@@ -90,6 +110,7 @@ export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Aumentar quantidade"
+            disabled={!editaItem}
             onPress={() => setQuantidade((q) => q + 1)}
             style={[styles.botaoContador, { backgroundColor: theme.backgroundElement }]}>
             <Icone nome="adicionar" cor={theme.text} />
@@ -99,7 +120,13 @@ export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
 
       <View style={styles.secao}>
         <ThemedText type="smallBold">Categoria</ThemedText>
-        <Chips rotulo="Categoria" opcoes={CATEGORIAS} valor={categoria} onChange={setCategoria} />
+        <Chips
+          rotulo="Categoria"
+          opcoes={CATEGORIAS}
+          valor={categoria}
+          onChange={setCategoria}
+          desabilitado={!editaItem}
+        />
       </View>
 
       <View style={styles.secao}>
@@ -109,6 +136,7 @@ export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
           opcoes={PRIORIDADES_ITEM_PROPRIO}
           valor={prioridade === 'evitar' ? undefined : prioridade}
           onChange={setPrioridade}
+          desabilitado={!editaItem}
         />
       </View>
 
@@ -117,14 +145,16 @@ export function ItemForm({ inicial, mostrarComprado, onSalvar }: Props) {
           <ThemedText type="smallBold">Já comprei</ThemedText>
           <Switch
             accessibilityLabel="Já comprei"
+            accessibilityState={{ checked: comprado, disabled: !editaItem }}
             value={comprado}
             onValueChange={setComprado}
+            disabled={!editaItem}
             trackColor={{ true: theme.primary }}
           />
         </View>
       )}
 
-      <Botao titulo="Salvar" onPress={salvar} />
+      {editaPreco && <Botao titulo="Salvar" onPress={salvar} />}
     </View>
   );
 }

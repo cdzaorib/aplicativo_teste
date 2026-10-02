@@ -10,23 +10,32 @@ export type ResultadoMescla = {
   enviar: RegistroNuvem[];
 };
 
+/** O que a pessoa pode alterar numa lista compartilhada: tudo, só os preços, ou nada. */
+export type Permissao = 'total' | 'precos' | 'leitura';
+
 function semRemovido({ removido: _removido, ...item }: RegistroNuvem): ItemLista {
   return item;
 }
 
+const porCriacao = (a: ItemLista, b: ItemLista) => a.criadoEm - b.criadoEm;
+
 /**
  * Junta a lista do aparelho com a da nuvem. Para cada item vence a versão alterada por último;
- * em caso de empate, vale a da nuvem.
+ * em caso de empate, vale a da nuvem. Sem permissão total, só vale o que a pessoa pode alterar.
  *
  * @param locais itens da lista do aparelho
  * @param removidos itens removidos no aparelho e ainda não enviados (id -> momento da remoção)
  * @param nuvem registros guardados na nuvem, inclusive os removidos
+ * @param permissao o que a pessoa pode alterar na lista
  */
 export function mesclarListas(
   locais: ItemLista[],
   removidos: Record<string, number>,
   nuvem: RegistroNuvem[],
+  permissao: Permissao = 'total',
 ): ResultadoMescla {
+  if (permissao !== 'total') return mesclarSemEditarLista(locais, nuvem, permissao);
+
   const daNuvem = new Map(nuvem.map((registro) => [registro.id, registro]));
   const itens: ItemLista[] = [];
   const enviar: RegistroNuvem[] = [];
@@ -58,6 +67,46 @@ export function mesclarListas(
     if (!remoto.removido) itens.push(semRemovido(remoto));
   }
 
-  itens.sort((a, b) => a.criadoEm - b.criadoEm);
+  itens.sort(porCriacao);
+  return { itens, enviar };
+}
+
+/**
+ * Para quem não pode editar a lista, a nuvem manda: itens criados ou removidos no aparelho são
+ * descartados. Com permissão de preços, vale só a mudança de preço feita no aparelho, se for a
+ * alteração mais recente do item.
+ */
+function mesclarSemEditarLista(
+  locais: ItemLista[],
+  nuvem: RegistroNuvem[],
+  permissao: Exclude<Permissao, 'total'>,
+): ResultadoMescla {
+  const doAparelho = new Map(locais.map((item) => [item.id, item]));
+  const itens: ItemLista[] = [];
+  const enviar: RegistroNuvem[] = [];
+
+  for (const remoto of nuvem) {
+    if (remoto.removido) continue;
+    const local = doAparelho.get(remoto.id);
+    const mudouPreco =
+      permissao === 'precos' &&
+      local !== undefined &&
+      local.atualizadoEm > remoto.atualizadoEm &&
+      local.precoCentavos !== remoto.precoCentavos;
+
+    if (mudouPreco) {
+      const atualizado = {
+        ...remoto,
+        precoCentavos: local.precoCentavos,
+        atualizadoEm: local.atualizadoEm,
+      };
+      itens.push(semRemovido(atualizado));
+      enviar.push(atualizado);
+    } else {
+      itens.push(semRemovido(remoto));
+    }
+  }
+
+  itens.sort(porCriacao);
   return { itens, enviar };
 }

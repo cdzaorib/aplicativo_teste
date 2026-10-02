@@ -1,0 +1,105 @@
+import { useState } from 'react';
+import { SectionList, StyleSheet, View } from 'react-native';
+
+import { AvisoRevisao } from '@/components/aviso-revisao';
+import { Botao } from '@/components/botao';
+import { CatalogoCard } from '@/components/catalogo-card';
+import { Chips } from '@/components/chips';
+import { ThemedText } from '@/components/themed-text';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { CATALOGO } from '@/domain/catalogo';
+import { CATEGORIAS, PRIORIDADES, type Categoria, type Prioridade } from '@/domain/tipos';
+import { useScreenInsets } from '@/hooks/use-screen-insets';
+import { useTheme } from '@/hooks/use-theme';
+import { useListaStore } from '@/store/lista';
+
+type Filtro = Prioridade | 'todas';
+
+const FILTROS: Record<Filtro, string> = { todas: 'Todas', ...PRIORIDADES };
+
+const ESSENCIAIS = CATALOGO.filter((item) => item.prioridade === 'essencial');
+
+export default function SugestoesScreen() {
+  const theme = useTheme();
+  const insets = useScreenInsets();
+  const [filtro, setFiltro] = useState<Filtro>('todas');
+  const itens = useListaStore((s) => s.itens);
+  const adicionarDoCatalogo = useListaStore((s) => s.adicionarDoCatalogo);
+
+  const naLista = new Set(itens.map((i) => i.catalogoId));
+  const essenciaisFaltando = ESSENCIAIS.filter((item) => !naLista.has(item.id));
+
+  const filtrados = CATALOGO.filter((item) => filtro === 'todas' || item.prioridade === filtro);
+  const secoes = (Object.keys(CATEGORIAS) as Categoria[])
+    .map((categoria) => ({
+      titulo: CATEGORIAS[categoria],
+      data: filtrados.filter((item) => item.categoria === categoria),
+    }))
+    .filter((secao) => secao.data.length > 0);
+
+  return (
+    <SectionList
+      style={{ backgroundColor: theme.background }}
+      contentContainerStyle={[styles.conteudo, insets]}
+      sections={secoes}
+      keyExtractor={(item) => item.id}
+      stickySectionHeadersEnabled={false}
+      renderItem={({ item }) => (
+        <CatalogoCard
+          item={item}
+          naLista={naLista.has(item.id)}
+          onAdicionar={() => adicionarDoCatalogo([item])}
+        />
+      )}
+      renderSectionHeader={({ section }) => (
+        <ThemedText type="smallBold" themeColor="textSecondary" style={styles.secao}>
+          {section.titulo.toUpperCase()}
+        </ThemedText>
+      )}
+      ItemSeparatorComponent={Separador}
+      ListHeaderComponent={
+        <View style={styles.cabecalho}>
+          <ThemedText type="subtitle">Sugestões</ThemedText>
+          <ThemedText themeColor="textSecondary">
+            O que comprar, quando comprar e o que evitar no enxoval.
+          </ThemedText>
+          <AvisoRevisao />
+          {essenciaisFaltando.length > 0 && (
+            <Botao
+              titulo={`Adicionar ${essenciaisFaltando.length} itens essenciais`}
+              onPress={() => adicionarDoCatalogo(essenciaisFaltando)}
+            />
+          )}
+          <Chips
+            rotulo="Filtrar por prioridade"
+            opcoes={FILTROS}
+            valor={filtro}
+            onChange={setFiltro}
+          />
+        </View>
+      }
+    />
+  );
+}
+
+function Separador() {
+  return <View style={styles.separador} />;
+}
+
+const styles = StyleSheet.create({
+  conteudo: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+  },
+  cabecalho: {
+    gap: Spacing.three,
+  },
+  secao: {
+    marginTop: Spacing.four,
+    marginBottom: Spacing.two,
+  },
+  separador: {
+    height: Spacing.two,
+  },
+});

@@ -45,6 +45,33 @@ Capturas da versão web (React Native Web). No celular, as abas são as nativas 
   migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
   tipos do app e das Edge Functions, Prettier e os testes em cada push.
 
+## Arquitetura
+
+```mermaid
+flowchart LR
+  subgraph app[Celular]
+    telas[Telas<br/>Expo Router] --> estado[Lista no aparelho<br/>Zustand + AsyncStorage]
+    estado <--> sinc[Sincronização<br/>mesclagem por item]
+  end
+  subgraph supabase[Supabase]
+    auth[Auth<br/>Google e Apple]
+    banco[(Postgres + RLS<br/>listas, itens, preços, ofertas)]
+    tempo[Realtime]
+    excluir[Edge Function<br/>excluir-conta]
+    coleta[Edge Function<br/>coletar-ofertas]
+    cron[pg_cron<br/>1 vez por dia]
+  end
+  telas --> auth
+  sinc <-->|API REST| banco
+  banco --> tempo -->|mudou a lista| sinc
+  telas -->|excluir conta| excluir --> auth
+  cron --> coleta -->|API de afiliados| shopee[Shopee]
+  coleta --> banco
+```
+
+A data prevista do parto e os avisos de fase ficam só no aparelho. A coleta de ofertas está
+pronta, mas só liga com a credencial da Shopee ([`docs/ofertas-shopee.md`](docs/ofertas-shopee.md)).
+
 ## Como rodar
 
 ```bash

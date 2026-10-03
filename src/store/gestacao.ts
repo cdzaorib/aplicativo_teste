@@ -10,25 +10,48 @@ type GestacaoState = {
   dataPrevista?: string;
   /** A pessoa quer ser avisada no começo de cada fase de compras. */
   lembretes: boolean;
+  /** Próxima consulta de pré-natal ("AAAA-MM-DDTHH:MM", hora local). */
+  proximaConsulta?: string;
+  /** Perguntas que a pessoa anotou para levar à consulta. */
+  perguntasConsulta: string;
   definirDataPrevista: (dataPrevista: string | undefined) => void;
   definirLembretes: (lembretes: boolean) => void;
+  definirProximaConsulta: (quando: string | undefined) => void;
+  definirPerguntasConsulta: (perguntas: string) => void;
+  /** Apaga tudo o que está guardado aqui (ao excluir a conta). */
+  esquecerTudo: () => void;
 };
 
 /**
- * Data prevista do parto. É dado de saúde (LGPD): fica só neste aparelho, nunca vai para a nuvem
- * nem para a lista compartilhada.
+ * Data prevista do parto e próxima consulta. São dados de saúde (LGPD): ficam só neste aparelho,
+ * nunca vão para a nuvem nem para a lista compartilhada.
  */
 export const useGestacaoStore = create<GestacaoState>()(
   persist(
     (set) => ({
       lembretes: false,
+      perguntasConsulta: '',
       definirDataPrevista: (dataPrevista) => set({ dataPrevista }),
       definirLembretes: (lembretes) => set({ lembretes }),
+      definirProximaConsulta: (proximaConsulta) => set({ proximaConsulta }),
+      definirPerguntasConsulta: (perguntasConsulta) => set({ perguntasConsulta }),
+      esquecerTudo: () =>
+        set({
+          dataPrevista: undefined,
+          lembretes: false,
+          proximaConsulta: undefined,
+          perguntasConsulta: '',
+        }),
     }),
     {
       name: 'gestacao',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ dataPrevista, lembretes }) => ({ dataPrevista, lembretes }),
+      partialize: ({ dataPrevista, lembretes, proximaConsulta, perguntasConsulta }) => ({
+        dataPrevista,
+        lembretes,
+        proximaConsulta,
+        perguntasConsulta,
+      }),
       skipHydration: typeof window === 'undefined',
     },
   ),

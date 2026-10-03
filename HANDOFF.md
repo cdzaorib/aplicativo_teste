@@ -161,30 +161,20 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - colocar a versão web no ar (`vercel.json` pronto), para ter os endereços públicos;
   - uma revisão jurídica do texto.
 - **Exclusão de conta pelo app:** aba Conta → "Excluir minha conta", o que a Apple exige. Apaga
-  também a lista e a data prevista do parto guardadas no aparelho.
+  também a lista, a data prevista do parto e a próxima consulta guardadas no aparelho, e cancela
+  os avisos agendados.
 
 ## Estado atual
 
-- **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #1.
-- **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2, ainda aberto, traz:
-  - a Fase 3 (compartilhamento) e o limite de tentativas de convite;
-  - a lista em tempo real e o "Comprado por" na lista compartilhada;
-  - o filtro "Falta comprar", o puxar para atualizar, a vibração ao marcar e o "Por onde
-    começar";
-  - o "quando comprar", os avisos de fase e as faixas de preço completas;
-  - a estrutura das ofertas da Shopee (Fase 2b), com histórico;
-  - a busca no catálogo e o envio da lista por mensagem;
-  - a exclusão de conta, a política de privacidade, o "Entrar com a Apple" (desligado) e o guia
-    de publicação;
-  - a correção da volta do login no Android, ajustes de acessibilidade e de teclado, a tela de
-    erro e os tipos do banco gerados pelo Supabase;
-  - o README de portfólio e as consultas de métricas (`docs/metricas.md`).
+- **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #2.
+- **PR:** #1 (Fases 0 a 2a) e #2 (Fase 3, tempo real, lista de presentes, aba Gestação e o
+  resto do acabamento) já estão na `main`. O #3 traz a "Próxima consulta" na aba Gestação.
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
-  - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções
-    (RPC), criadas pelas migrações em `supabase/migrations/`.
+  - Tabelas `listas`, `membros_lista`, `itens`, `precos_informados`, `links_presentes` e
+    `presentes`, além das funções (RPC), criadas pelas migrações em `supabase/migrations/`.
   - `privado.tentativas_convite` conta as tentativas de código de convite.
-  - Realtime: `itens` e `membros_lista` estão na publicação `supabase_realtime`. O Realtime
+  - Realtime: `itens`, `membros_lista` e `presentes` estão na publicação `supabase_realtime`. O Realtime
     respeita o RLS, então cada pessoa só recebe as mudanças que pode ler.
   - Edge Function `excluir-conta` (`supabase/functions/`), publicada com `verify_jwt = false`. Ela
     mesma confere o token no Supabase Auth.
@@ -230,6 +220,12 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     lembretes do pré-natal da fase, curiosidade da semana e sinais de alerta (com 192 e CVV 188).
     Usa a mesma data prevista da Minha lista, que continua só no aparelho. O conteúdo fica em
     `src/domain/conteudo-gestacao.ts`, cada item com a fonte.
+  - Próxima consulta (aba Gestação, `src/components/proxima-consulta.tsx`): a pessoa anota a
+    data e a hora da próxima consulta de pré-natal e as perguntas para levar. O aparelho avisa na
+    véspera, às 19h, e 2 horas antes (`avisosDaConsulta` em `src/domain/consulta.ts`, canal
+    `consultas` no Android). Tudo fica só no aparelho, como a data prevista: é dado de saúde.
+    Quando a consulta passa, o cartão pede a próxima. Excluir a conta apaga a consulta e cancela
+    os avisos.
   - Lista de presentes do chá de bebê: quem edita a lista escolhe os itens e cria um link
     secreto; os convidados abrem no navegador, sem login, e marcam "Vou dar este" com o nome.
     Ver "Como a lista de presentes funciona".
@@ -253,7 +249,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 175 testes do
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 184 testes do
     app (inclusive de componentes, com a Testing Library) e 43 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,

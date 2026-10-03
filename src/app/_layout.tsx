@@ -45,12 +45,13 @@ function useListaCarregada() {
   return carregada;
 }
 
-/** Com os avisos de fase ligados, prepara a exibição deles com o app aberto. */
+/** Com avisos de fase ou de consulta, prepara a exibição deles com o app aberto. */
 function useLembretes() {
   const lembretes = useGestacaoStore((s) => s.lembretes);
+  const temConsulta = useGestacaoStore((s) => s.proximaConsulta !== undefined);
   useEffect(() => {
-    if (lembretes) prepararLembretes().catch(() => {});
-  }, [lembretes]);
+    if (lembretes || temConsulta) prepararLembretes().catch(() => {});
+  }, [lembretes, temConsulta]);
 }
 
 export default function RootLayout() {

@@ -1,7 +1,7 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
 
 import type { ItemLista } from '@/domain/tipos';
-import { cancelarLembretes } from '@/notificacoes/lembretes';
+import { cancelarAvisosDaConsulta, cancelarLembretes } from '@/notificacoes/lembretes';
 import { supabase } from '@/nuvem/supabase';
 import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
@@ -13,6 +13,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 jest.mock('@/notificacoes/lembretes', () => ({
   cancelarLembretes: jest.fn(() => Promise.resolve()),
+  cancelarAvisosDaConsulta: jest.fn(() => Promise.resolve()),
 }));
 
 jest.mock('expo-apple-authentication', () => ({
@@ -53,7 +54,11 @@ beforeEach(() => {
   chamarFuncao.mockReset();
   encerrarSessao.mockReset().mockResolvedValue({ error: null });
   useListaStore.setState({ itens: [itemDoAparelho], listaId: 'l1' });
-  useGestacaoStore.setState({ dataPrevista: '2027-01-15' });
+  useGestacaoStore.setState({
+    dataPrevista: '2027-01-15',
+    proximaConsulta: '2026-11-10T14:30',
+    perguntasConsulta: 'Posso tomar café?',
+  });
 });
 
 describe('excluirConta', () => {
@@ -65,8 +70,13 @@ describe('excluirConta', () => {
     expect(chamarFuncao).toHaveBeenCalledWith('excluir-conta', { method: 'POST' });
     expect(encerrarSessao).toHaveBeenCalledWith({ scope: 'local' });
     expect(useListaStore.getState().itens).toEqual([]);
-    expect(useGestacaoStore.getState().dataPrevista).toBeUndefined();
+    expect(useGestacaoStore.getState()).toMatchObject({
+      dataPrevista: undefined,
+      proximaConsulta: undefined,
+      perguntasConsulta: '',
+    });
     expect(cancelarLembretes).toHaveBeenCalled();
+    expect(cancelarAvisosDaConsulta).toHaveBeenCalled();
   });
 
   it('mantém tudo se a nuvem não excluir', async () => {

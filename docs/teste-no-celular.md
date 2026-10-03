@@ -67,6 +67,14 @@ se aparecer.
         fase (por exemplo, "Vacina dTpa" a partir da 20ª semana e "Exame de glicose" entre a 24ª
         e a 28ª).
   - [ ] Mudar a data numa aba muda na outra (Minha lista e Gestação usam a mesma data).
+  - [ ] **Próxima consulta:** digite a data e a hora (por exemplo, amanhã às 14:30) e toque em
+        "Salvar consulta". O cartão mostra "DD/MM/AAAA às 14:30", com "Alterar" e "Apagar".
+  - [ ] Uma data que já passou, ou que não existe (31/02), mostra o erro e não salva.
+  - [ ] As perguntas digitadas em "Perguntas para levar" continuam lá depois de fechar o app.
+  - [ ] No app instalado (e no iPhone pelo Expo Go), salvar a consulta pede permissão para
+        notificações. Para testar o aviso, marque a consulta para daqui a 2 horas e 5 minutos:
+        o aviso "Consulta de pré-natal hoje" chega em uns 5 minutos. O da véspera chega às 19h
+        do dia anterior.
 - [ ] **Avisos de fase (só no iPhone pelo Expo Go):** ligue "Avisar quando começar cada fase de
       compras" e permita as notificações.
   - No Android, o interruptor não aparece no Expo Go, porque o Expo Go do Android não tem

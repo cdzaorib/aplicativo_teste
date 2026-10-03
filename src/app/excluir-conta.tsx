@@ -41,8 +41,8 @@ export default function ExcluirContaScreen() {
           continuam na lista dela, sem nenhum dado seu.
         </Paragrafo>
         <Paragrafo>
-          A lista e a data prevista do parto guardadas no aparelho são apagadas ao excluir a conta
-          pelo app ou ao desinstalá-lo.
+          A lista, a data prevista do parto e a próxima consulta guardadas no aparelho são apagadas
+          ao excluir a conta pelo app ou ao desinstalá-lo.
         </Paragrafo>
       </Secao>
     </PaginaTexto>

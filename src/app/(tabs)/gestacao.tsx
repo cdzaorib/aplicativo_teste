@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Botao } from '@/components/botao';
 import { Icone } from '@/components/icone';
+import { ProximaConsulta } from '@/components/proxima-consulta';
 import { FormularioDataPrevista } from '@/components/quando-comprar';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
@@ -77,6 +78,8 @@ export default function GestacaoScreen() {
           />
         )}
       </View>
+
+      <ProximaConsulta />
 
       <View style={styles.secao}>
         <ThemedText type="smallBold" accessibilityRole="header">

@@ -8,10 +8,11 @@ jest.mock('expo-router', () => ({
 }));
 
 describe('páginas de privacidade', () => {
-  it('a política diz que a data prevista do parto não sai do aparelho', async () => {
+  it('a política diz que os dados da gestação não saem do aparelho', async () => {
     await render(<PrivacidadeScreen />);
     expect(screen.getByText('Política de privacidade')).toBeOnTheScreen();
-    expect(screen.getByText(/Nunca é enviada para a nuvem/)).toBeOnTheScreen();
+    expect(screen.getByText(/próxima consulta e as perguntas/)).toBeOnTheScreen();
+    expect(screen.getByText(/Nunca são enviados para a nuvem/)).toBeOnTheScreen();
     // Enquanto o e-mail não for definido, a página avisa em vez de inventar um.
     expect(screen.getByText(/e-mail de contato a definir/)).toBeOnTheScreen();
   });

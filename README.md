@@ -8,6 +8,8 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
   cada fase da gestação e avisa quando cada fase começa;
 - acompanha a gestação semana a semana, com lembretes do pré-natal, sinais de alerta e
   curiosidades, sempre com a fonte e o aviso de que não substitui a consulta;
+- guarda a próxima consulta de pré-natal e as perguntas para levar, e avisa na véspera e 2 horas
+  antes;
 - para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na média ou
   barato demais para ser verdade;
 - com login pelo Google, salva a lista na nuvem e sincroniza entre aparelhos;

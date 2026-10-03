@@ -38,6 +38,7 @@ describe('conversão entre item e linha da tabela', () => {
   it('volta ao mesmo item, inclusive com as datas no formato que o Supabase devolve', () => {
     const linha = {
       ...paraLinha(completo, 'lista-1'),
+      comprado_por: null,
       criado_em: '2026-10-02T12:00:00.123+00:00',
       atualizado_em: '2026-10-02T13:30:00.456+00:00',
     };
@@ -57,7 +58,7 @@ describe('conversão entre item e linha da tabela', () => {
     const linha = paraLinha(semOpcionais, 'lista-1');
 
     expect(linha).toMatchObject({ catalogo_id: null, preco_centavos: null });
-    expect(deLinha(linha)).toEqual(semOpcionais);
+    expect(deLinha({ ...linha, comprado_por: null })).toEqual(semOpcionais);
   });
 });
 

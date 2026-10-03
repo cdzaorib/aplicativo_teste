@@ -1,28 +1,16 @@
 import type { EstatisticaPrecos } from '@/domain/precos';
 import type { RegistroNuvem } from '@/domain/sincronizacao';
 import type { Categoria, Prioridade } from '@/domain/tipos';
+import type { Tables } from '@/nuvem/banco.types';
 import type { InfoLista } from '@/store/sessao';
 
-/** Linha da tabela `itens` (supabase/migrations). */
-export type LinhaItem = {
-  lista_id: string;
-  id: string;
-  catalogo_id: string | null;
-  nome: string;
-  categoria: string;
-  prioridade: string;
-  modelo: string;
-  preco_centavos: number | null;
-  quantidade: number;
-  comprado: boolean;
-  removido: boolean;
-  /** Preenchido pelo banco; o app não envia. */
-  comprado_por?: string | null;
-  criado_em: string;
-  atualizado_em: string;
-};
+/** Linha da tabela `itens`, como o banco devolve. */
+export type LinhaItem = Tables<'itens'>;
 
-export function paraLinha(registro: RegistroNuvem, listaId: string): LinhaItem {
+/** O que o app grava em `itens`: todas as colunas, menos `comprado_por`, que só o banco preenche. */
+export type NovaLinhaItem = Omit<LinhaItem, 'comprado_por'>;
+
+export function paraLinha(registro: RegistroNuvem, listaId: string): NovaLinhaItem {
   return {
     lista_id: listaId,
     id: registro.id,

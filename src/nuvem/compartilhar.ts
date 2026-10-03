@@ -10,14 +10,6 @@ export type Membro = {
   podeEditarPrecos: boolean;
 };
 
-type LinhaMembro = {
-  user_id: string;
-  nome: string | null;
-  e_dona: boolean;
-  pode_editar_lista: boolean;
-  pode_editar_precos: boolean;
-};
-
 /** Erro com mensagem pronta para mostrar na tela. */
 export class ErroCompartilhar extends Error {}
 
@@ -37,7 +29,7 @@ export async function buscarMembros(): Promise<Membro[]> {
     .select('user_id, nome, e_dona, pode_editar_lista, pode_editar_precos')
     .order('entrou_em');
   if (error) traduzirErro(error, 'Não foi possível carregar quem está na lista.');
-  return (data as LinhaMembro[]).map((linha) => ({
+  return data.map((linha) => ({
     userId: linha.user_id,
     ...(linha.nome !== null && { nome: linha.nome }),
     eDona: linha.e_dona,

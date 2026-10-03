@@ -1,11 +1,4 @@
-import {
-  deLinhaHistorico,
-  deLinhaOferta,
-  type DiaHistorico,
-  type LinhaHistorico,
-  type LinhaOferta,
-  type Oferta,
-} from '@/nuvem/linhas';
+import { deLinhaHistorico, deLinhaOferta, type DiaHistorico, type Oferta } from '@/nuvem/linhas';
 import { supabase } from '@/nuvem/supabase';
 
 /** Ofertas mais antigas que isso ficaram para trás (a coleta roda uma vez por dia). */
@@ -27,7 +20,7 @@ export async function buscarOfertas(catalogoId: string, agora = Date.now()): Pro
     .order('preco_min_centavos')
     .limit(5);
   if (error) throw error;
-  return (data as LinhaOferta[]).map(deLinhaOferta);
+  return data.map(deLinhaOferta);
 }
 
 /** Quantos dias de histórico mostrar. */
@@ -47,5 +40,5 @@ export async function buscarHistorico(
     .gte('dia', desde)
     .order('dia');
   if (error) throw error;
-  return (data as LinhaHistorico[]).map(deLinhaHistorico);
+  return data.map(deLinhaHistorico);
 }

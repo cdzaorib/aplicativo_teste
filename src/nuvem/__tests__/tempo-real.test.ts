@@ -66,6 +66,7 @@ function linha(id: string, atualizadoEm: number, dados: Partial<LinhaItem> = {})
     quantidade: 1,
     comprado: false,
     removido: false,
+    comprado_por: null,
     criado_em: new Date(1).toISOString(),
     atualizado_em: new Date(atualizadoEm).toISOString(),
     ...dados,

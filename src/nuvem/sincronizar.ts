@@ -1,13 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { Permissao } from '@/domain/sincronizacao';
-import {
-  deLinha,
-  deLinhaInfoLista,
-  paraLinha,
-  type LinhaInfoLista,
-  type LinhaItem,
-} from '@/nuvem/linhas';
+import { deLinha, deLinhaInfoLista, paraLinha, type LinhaInfoLista } from '@/nuvem/linhas';
 import {
   itensSaoDeOutraLista,
   sincronizarLista,
@@ -26,7 +20,7 @@ function repositorioSupabase(
     buscar: async () => {
       const { data, error } = await cliente.from('itens').select('*').eq('lista_id', listaId);
       if (error) throw error;
-      return (data as LinhaItem[]).map(deLinha);
+      return data.map(deLinha);
     },
     gravar: async (registros) => {
       if (permissao === 'total') {

@@ -358,6 +358,13 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   do ESLint. `npm run typecheck:funcoes` confere os tipos com o Deno (também no CI). Publique com a
   ferramenta `deploy_edge_function` do conector.
   - `coletar-ofertas` (v2) busca 4 itens por vez (`emParalelo`), para caber no tempo da função.
+- **Tipos do banco** (`src/nuvem/banco.types.ts`): gerados pelo Supabase e usados em
+  `createClient<Database>`, então o TypeScript confere tabelas, colunas e funções. Depois de cada
+  migração, gere de novo (ferramenta `generate_typescript_types` do conector ou
+  `npx supabase gen types typescript --project-id ggcocihztrpwfptnuqbc`) e rode `npm run format`.
+  - Hoje o arquivo ainda traz `itens_lista`; ela some ao gerar de novo depois do `drop` do item 3.
+  - As funções do Postgres não dizem se o retorno pode ser nulo, então `garantir_lista` continua
+    lida com `LinhaInfoLista` (que aceita `null` no código e no nome da dona).
 - **Canais do Realtime:** o `supabase.channel(nome)` devolve o canal existente se o nome se
   repetir, mesmo enquanto ele está sendo fechado. Por isso cada canal leva um número novo.
 - **Testes do banco:** `supabase/testes/supabase-local.sql` recria o mínimo do Supabase (papéis,

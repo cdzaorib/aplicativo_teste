@@ -85,8 +85,10 @@ Nenhuma das duas está em uso nem exposta.
 - **Revisar os começos de cada fase** (`INICIO_COMPRA`) com quem for revisar o catálogo. A
   semana 32 para a mala da maternidade foi uma escolha de produto, não uma recomendação médica.
 - **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
-  de busca (out/2026), porque o WebFetch está bloqueado nesta sessão. 19 itens têm faixa, e os
-  outros ficam sem faixa até haver preços informados.
+  de busca (out/2026), porque o WebFetch está bloqueado nesta sessão.
+  - Todos os 62 itens que não são "evitar" têm faixa; um teste garante isso para itens novos.
+  - Ficaram de fora os preços de marcas importadas ou artesanais muito acima do comum.
+  - Vale conferir de tempos em tempos e, quando houver uso, comparar com os preços informados.
 
 ### 6. Antes de publicar (Fase 4)
 
@@ -223,6 +225,10 @@ Nenhuma das duas está em uso nem exposta.
   - Com 5 pessoas ou mais informando, vale a faixa central (25% a 75%) do preço mais recente de
     cada pessoa nos últimos 180 dias (`referencia_precos`).
   - Antes disso, vale a faixa pesquisada.
+- **Unidade do preço:** cada item do catálogo diz como o preço é contado (`precoPor`: par, pacote,
+  frasco, caixa, kit ou conjunto; sem valor, por unidade). A faixa, o campo "Preço encontrado por
+  ..." e o "Preço por ..." da edição mostram essa unidade (`unidadeDePreco`).
+  - Protetor de tomada e trava de gaveta passaram a ser 1 kit, porque são vendidos assim.
 - **Envio:** um preço por item, por pessoa, por dia. Informar de novo substitui o anterior.
 - **Cache:** as referências ficam no aparelho (`src/store/referencias.ts`) e são atualizadas no
   máximo de hora em hora.

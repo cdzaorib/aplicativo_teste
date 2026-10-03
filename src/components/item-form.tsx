@@ -9,7 +9,13 @@ import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
 import { lerPreco, precoParaTexto } from '@/domain/lista';
 import type { Permissao } from '@/domain/sincronizacao';
-import { CATEGORIAS, PRIORIDADES, type ItemLista, type Prioridade } from '@/domain/tipos';
+import {
+  CATEGORIAS,
+  PRIORIDADES,
+  type ItemLista,
+  type Prioridade,
+  type UnidadePreco,
+} from '@/domain/tipos';
 import { useTheme } from '@/hooks/use-theme';
 
 export type ValoresItem = Pick<
@@ -22,13 +28,21 @@ type Props = {
   mostrarComprado?: boolean;
   /** Numa lista compartilhada, o que a pessoa pode alterar. */
   permissao?: Permissao;
+  /** Como o preço do item é contado (por par, por pacote...). */
+  unidadePreco?: UnidadePreco;
   onSalvar: (valores: ValoresItem) => void;
 };
 
 // "Evitar" só existe no catálogo curado; itens próprios usam as demais prioridades.
 const { evitar: _evitar, ...PRIORIDADES_ITEM_PROPRIO } = PRIORIDADES;
 
-export function ItemForm({ inicial, mostrarComprado, permissao = 'total', onSalvar }: Props) {
+export function ItemForm({
+  inicial,
+  mostrarComprado,
+  permissao = 'total',
+  unidadePreco = 'unidade',
+  onSalvar,
+}: Props) {
   const theme = useTheme();
   const editaItem = permissao === 'total';
   const editaPreco = permissao !== 'leitura';
@@ -84,7 +98,7 @@ export function ItemForm({ inicial, mostrarComprado, permissao = 'total', onSalv
         editable={editaItem}
       />
       <Campo
-        rotulo="Preço unitário (R$)"
+        rotulo={`Preço por ${unidadePreco} (R$)`}
         placeholder="0,00"
         keyboardType="decimal-pad"
         value={preco}

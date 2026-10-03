@@ -71,7 +71,7 @@ export function CatalogoCard({ item, naLista, onAdicionar, horaDeComprar }: Prop
             ]}>
             <ThemedText type="small" themeColor="textSecondary" style={styles.textoPrecos}>
               {referencia
-                ? `Costuma custar de ${formatarPreco(referencia.faixa.minCentavos)} a ${formatarPreco(referencia.faixa.maxCentavos)}`
+                ? `Costuma custar de ${formatarPreco(referencia.faixa.minCentavos)} a ${formatarPreco(referencia.faixa.maxCentavos)} por ${item.precoPor ?? 'unidade'}`
                 : 'Ver opções nas lojas'}
             </ThemedText>
             <ThemedText type="smallBold" style={{ color: theme.primary }}>

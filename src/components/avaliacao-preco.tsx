@@ -10,6 +10,7 @@ import {
   type Referencia,
 } from '@/domain/precos';
 import { PESQUISA_PRECOS_EM } from '@/domain/faixas-preco';
+import type { UnidadePreco } from '@/domain/tipos';
 import { useTheme } from '@/hooks/use-theme';
 
 const CORES: Record<Avaliacao, [ThemeColor, ThemeColor]> = {
@@ -42,7 +43,13 @@ export function AvaliacaoPreco({
 }
 
 /** Faixa de preço comum de um item e de onde ela veio. */
-export function FaixaReferencia({ referencia }: { referencia: Referencia | undefined }) {
+export function FaixaReferencia({
+  referencia,
+  unidade,
+}: {
+  referencia: Referencia | undefined;
+  unidade: UnidadePreco;
+}) {
   if (!referencia) {
     return (
       <ThemedText type="small" themeColor="textSecondary">
@@ -54,7 +61,8 @@ export function FaixaReferencia({ referencia }: { referencia: Referencia | undef
   return (
     <View style={styles.faixa}>
       <ThemedText type="smallBold">
-        Faixa comum: {formatarPreco(faixa.minCentavos)} a {formatarPreco(faixa.maxCentavos)}
+        Faixa comum: {formatarPreco(faixa.minCentavos)} a {formatarPreco(faixa.maxCentavos)} por{' '}
+        {unidade}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         {origem === 'informados'

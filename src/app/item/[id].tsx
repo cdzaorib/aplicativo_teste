@@ -8,7 +8,7 @@ import { ItemForm } from '@/components/item-form';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { CATALOGO } from '@/domain/catalogo';
-import { avaliarPreco } from '@/domain/precos';
+import { avaliarPreco, unidadeDePreco } from '@/domain/precos';
 import { useReferencia } from '@/hooks/use-referencia';
 import { useTheme } from '@/hooks/use-theme';
 import { useListaStore } from '@/store/lista';
@@ -51,7 +51,7 @@ export default function EditarItemScreen() {
 
       {doCatalogo && doCatalogo.prioridade !== 'evitar' && (
         <View style={[styles.dica, { backgroundColor: theme.backgroundElement }]}>
-          <FaixaReferencia referencia={referencia} />
+          <FaixaReferencia referencia={referencia} unidade={unidadeDePreco(doCatalogo.id)} />
           {referencia && item.precoCentavos !== undefined && (
             <AvaliacaoPreco
               avaliacao={avaliarPreco(item.precoCentavos, referencia.faixa)}
@@ -75,6 +75,7 @@ export default function EditarItemScreen() {
         inicial={item}
         mostrarComprado
         permissao={permissao}
+        unidadePreco={unidadeDePreco(item.catalogoId)}
         onSalvar={(valores) => {
           atualizar(item.id, valores);
           router.back();

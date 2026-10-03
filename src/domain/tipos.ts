@@ -10,6 +10,9 @@ export type Categoria =
   | 'maternidade'
   | 'seguranca';
 
+/** Como o preço de um item é contado: "R$ 20 por par", "R$ 15 por pacote". */
+export type UnidadePreco = 'unidade' | 'par' | 'pacote' | 'frasco' | 'caixa' | 'kit' | 'conjunto';
+
 /** Momento recomendado para comprar. */
 export type Quando = 'tri2' | 'tri3' | 'maternidade' | 'depois';
 
@@ -28,6 +31,8 @@ export type ItemCatalogo = {
   inmetro?: boolean;
   /** Termo usado para buscar o produto nas lojas (Fase 2). */
   busca: string;
+  /** Como o preço é contado nas lojas e nas faixas; sem valor, por unidade. */
+  precoPor?: UnidadePreco;
 };
 
 export type ItemLista = {

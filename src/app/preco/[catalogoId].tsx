@@ -19,6 +19,7 @@ import {
   linkDeBusca,
   type Loja,
   type OrigemPreco,
+  unidadeDePreco,
 } from '@/domain/precos';
 import { useReferencia } from '@/hooks/use-referencia';
 import { useTheme } from '@/hooks/use-theme';
@@ -99,7 +100,7 @@ export default function CompararPrecoScreen() {
       </View>
 
       <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-        <FaixaReferencia referencia={referencia} />
+        <FaixaReferencia referencia={referencia} unidade={unidadeDePreco(item.id)} />
       </View>
 
       <View style={styles.secao}>
@@ -128,7 +129,7 @@ export default function CompararPrecoScreen() {
           Dizemos se ele está caro, na média ou barato demais para ser verdade.
         </ThemedText>
         <Campo
-          rotulo="Preço encontrado (R$)"
+          rotulo={`Preço encontrado por ${unidadeDePreco(item.id)} (R$)`}
           placeholder="0,00"
           keyboardType="decimal-pad"
           value={texto}

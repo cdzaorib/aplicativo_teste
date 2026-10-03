@@ -16,7 +16,7 @@ describe('ItemForm com permissões', () => {
   it('na própria lista edita tudo', async () => {
     await render(<ItemForm inicial={inicial} mostrarComprado onSalvar={jest.fn()} />);
     expect(screen.getByLabelText('Nome')).toBeEnabled();
-    expect(screen.getByLabelText('Preço unitário (R$)')).toBeEnabled();
+    expect(screen.getByLabelText('Preço por unidade (R$)')).toBeEnabled();
   });
 
   it('quem só edita preços altera apenas o preço', async () => {
@@ -29,7 +29,7 @@ describe('ItemForm com permissões', () => {
     expect(screen.getByLabelText('Modelo ou marca')).toBeDisabled();
     expect(screen.getByLabelText('Já comprei')).toBeDisabled();
 
-    await fireEvent.changeText(screen.getByLabelText('Preço unitário (R$)'), '450,00');
+    await fireEvent.changeText(screen.getByLabelText('Preço por unidade (R$)'), '450,00');
     await fireEvent.press(screen.getByText('Salvar'));
     expect(onSalvar).toHaveBeenCalledWith({ ...inicial, precoCentavos: 45000 });
   });
@@ -38,7 +38,7 @@ describe('ItemForm com permissões', () => {
     await render(
       <ItemForm inicial={inicial} mostrarComprado permissao="leitura" onSalvar={jest.fn()} />,
     );
-    expect(screen.getByLabelText('Preço unitário (R$)')).toBeDisabled();
+    expect(screen.getByLabelText('Preço por unidade (R$)')).toBeDisabled();
     expect(screen.queryByText('Salvar')).toBeNull();
     expect(screen.getByText(/só visualizar/)).toBeOnTheScreen();
   });

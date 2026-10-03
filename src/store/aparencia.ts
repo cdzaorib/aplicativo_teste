@@ -3,13 +3,17 @@ import { Appearance, Platform } from 'react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-/** Tema escolhido pela pessoa. "automatica" segue o tema do celular. */
-export type Aparencia = 'automatica' | 'clara' | 'escura';
+/**
+ * Tema escolhido pela pessoa. "automatica" segue o tema do celular; "preta" é o escuro com fundo
+ * totalmente preto ("modo black").
+ */
+export type Aparencia = 'automatica' | 'clara' | 'escura' | 'preta';
 
 export const APARENCIAS: Record<Aparencia, string> = {
   automatica: 'Automático',
   clara: 'Claro',
   escura: 'Escuro',
+  preta: 'Preto',
 };
 
 type AparenciaState = {
@@ -26,7 +30,7 @@ type AparenciaState = {
 function aplicarNoSistema(aparencia: Aparencia) {
   if (Platform.OS === 'web') return;
   Appearance.setColorScheme(
-    aparencia === 'clara' ? 'light' : aparencia === 'escura' ? 'dark' : 'unspecified',
+    aparencia === 'automatica' ? 'unspecified' : aparencia === 'clara' ? 'light' : 'dark',
   );
 }
 
@@ -62,6 +66,6 @@ export function temaEscolhido<T extends string | null | undefined>(
   sistema: T,
 ): 'light' | 'dark' | T {
   if (aparencia === 'clara') return 'light';
-  if (aparencia === 'escura') return 'dark';
+  if (aparencia === 'escura' || aparencia === 'preta') return 'dark';
   return sistema;
 }

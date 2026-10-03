@@ -2,8 +2,9 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
-import { Colors } from '@/constants/theme';
+import type { Paleta } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/hooks/use-theme';
 import { prepararLembretes } from '@/notificacoes/lembretes';
 import { iniciarNuvem } from '@/nuvem/iniciar';
 import { useAparenciaStore } from '@/store/aparencia';
@@ -15,7 +16,7 @@ SplashScreen.preventAutoHideAsync();
 // Se uma tela quebrar, mostra uma mensagem com "Tentar de novo" em vez de uma tela branca.
 export { TelaDeErro as ErrorBoundary } from '@/components/tela-de-erro';
 
-function temaNavegacao(base: Theme, cores: (typeof Colors)['light' | 'dark']): Theme {
+function temaNavegacao(base: Theme, cores: Paleta): Theme {
   return {
     ...base,
     colors: {
@@ -54,6 +55,7 @@ function useLembretes() {
 
 export default function RootLayout() {
   const scheme = useColorScheme();
+  const cores = useTheme();
   const listaCarregada = useListaCarregada();
   // O tema escolhido já foi lido do aparelho (para não abrir no tema errado e trocar em seguida).
   const aparenciaCarregada = useAparenciaStore((s) => s.carregada);
@@ -67,10 +69,7 @@ export default function RootLayout() {
 
   if (!carregado) return null;
 
-  const tema =
-    scheme === 'dark'
-      ? temaNavegacao(DarkTheme, Colors.dark)
-      : temaNavegacao(DefaultTheme, Colors.light);
+  const tema = temaNavegacao(scheme === 'dark' ? DarkTheme : DefaultTheme, cores);
 
   return (
     <ThemeProvider value={tema}>

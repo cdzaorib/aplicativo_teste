@@ -243,8 +243,9 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     fonte. Os itens marcados ficam só no aparelho (`malaPronta` em `src/store/gestacao.ts`). Com
     a data prevista, mostra até quando deixar tudo pronto. Também lembra o direito ao
     acompanhante.
-  - Tema: aba Conta → "Aparência" (Automático, Claro ou Escuro), salvo no aparelho
-    (`src/store/aparencia.ts`). O `useColorScheme` do app usa a escolha. No celular, o
+  - Tema: aba Conta → "Aparência" (Automático, Claro, Escuro ou Preto), salvo no aparelho
+    (`src/store/aparencia.ts`). O Preto ("modo black") é o escuro com fundo totalmente preto
+    (`Colors.black`), que economiza bateria em telas OLED; para o sistema, ele conta como escuro. O `useColorScheme` do app usa a escolha. No celular, o
     `Appearance.setColorScheme` troca também as abas nativas, os alertas e o teclado. A splash
     screen espera o tema ser lido, para não abrir no tema errado.
   - Acessibilidade na web: as caixas de marcar, os chips e os botões desligados usam `aria-checked`,
@@ -274,7 +275,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 198 testes do
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 199 testes do
     app (inclusive de componentes, com a Testing Library) e 47 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
@@ -288,12 +289,12 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     - as duas contas foram excluídas pela própria função, e o banco ficou vazio de novo.
   - `expo export` gera os bundles de Android, iOS e web. O `expo-doctor` passa em 19 de 21
     checagens; as outras 2 só falham porque a rede desta sessão bloqueia os servidores do Expo.
-  - Passeio completo na web com Playwright (03/10/2026), 27 conferências, sem erro no console:
+  - Passeio completo na web com Playwright (03/10/2026), 38 conferências, sem erro no console:
     - lista, sugestões e busca;
     - marcar como comprado, filtros e edição de preço;
     - comparar preço;
     - data prevista, consulta e mala;
-    - tema escuro em todas as telas, inclusive a de página não encontrada;
+    - temas escuro e preto em todas as telas, inclusive a de página não encontrada;
     - persistência depois de recarregar;
     - página do convidado com o banco simulado.
   - Página não encontrada (`src/app/+not-found.tsx`) em português e no tema do app. Na Vercel, o

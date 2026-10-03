@@ -61,7 +61,8 @@ export default function ContaScreen() {
           onChange={useAparenciaStore.getState().definirAparencia}
         />
         <ThemedText type="small" themeColor="textSecondary">
-          No automático, o app segue o tema claro ou escuro do celular.
+          No automático, o app segue o tema claro ou escuro do celular. O preto deixa o fundo
+          totalmente preto, o que economiza bateria em telas OLED.
         </ThemedText>
       </View>
 

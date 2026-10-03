@@ -19,7 +19,7 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
   e as mudanças aparecem na hora para todos;
 - monta a lista de presentes do chá de bebê: os convidados abrem um link, sem instalar nada, e
   marcam o que vão dar, sem repetir;
-- tem tema claro, escuro ou automático (segue o celular);
+- tem tema claro, escuro, preto (fundo totalmente preto, para telas OLED) ou automático;
 - a conta pode ser excluída pelo próprio app, com todos os dados dela.
 
 Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login, banco, tempo real e Edge
@@ -56,7 +56,7 @@ Capturas da versão web (React Native Web). No celular, as abas são as nativas 
 - **Segurança revisada:** sem SQL montado com texto, RLS em todas as tabelas, permissões
   mínimas para quem não tem login e ataques testados contra o Supabase de verdade
   ([`docs/seguranca.md`](docs/seguranca.md)).
-- **Testes e CI:** 198 testes do app (Jest e Testing Library) e 47 do banco, que aplicam todas as
+- **Testes e CI:** 199 testes do app (Jest e Testing Library) e 47 do banco, que aplicam todas as
   migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
   tipos do app e das Edge Functions, Prettier e os testes em cada push.
 

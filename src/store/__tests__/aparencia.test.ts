@@ -9,6 +9,8 @@ describe('aparência', () => {
     expect(temaEscolhido('automatica', 'light')).toBe('light');
     expect(temaEscolhido('clara', 'dark')).toBe('light');
     expect(temaEscolhido('escura', 'light')).toBe('dark');
+    // O preto é o escuro com fundo totalmente preto: para o sistema, é escuro.
+    expect(temaEscolhido('preta', 'light')).toBe('dark');
   });
 
   it('no celular, troca também o tema dos componentes do sistema', () => {
@@ -21,6 +23,9 @@ describe('aparência', () => {
 
     definirAparencia('clara');
     expect(trocar).toHaveBeenLastCalledWith('light');
+
+    definirAparencia('preta');
+    expect(trocar).toHaveBeenLastCalledWith('dark');
 
     // No automático, devolve a escolha ao sistema.
     definirAparencia('automatica');

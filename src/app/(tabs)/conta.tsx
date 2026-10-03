@@ -1,17 +1,20 @@
+import * as AppleAuthentication from 'expo-apple-authentication';
 import Constants from 'expo-constants';
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 import { AvisoRevisao } from '@/components/aviso-revisao';
 import { Botao } from '@/components/botao';
 import { ExcluirConta } from '@/components/excluir-conta';
 import { ListaCompartilhada } from '@/components/lista-compartilhada';
 import { ThemedText } from '@/components/themed-text';
+import { LOGIN_APPLE_ATIVO } from '@/constants/app';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
+import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
-import { entrarComGoogle, sair } from '@/nuvem/auth';
+import { entrarComApple, entrarComGoogle, sair } from '@/nuvem/auth';
 import { sincronizar } from '@/nuvem/sincronizar';
 import { supabase } from '@/nuvem/supabase';
 import { useSessaoStore } from '@/store/sessao';
@@ -74,6 +77,7 @@ export default function ContaScreen() {
 
 function CartaoNuvem() {
   const theme = useTheme();
+  const escuro = useColorScheme() === 'dark';
   const { usuario, sincronizando, ultimaSincronizacao, erroSincronizacao } = useSessaoStore();
   const [ocupado, setOcupado] = useState(false);
   const [erro, setErro] = useState<string>();
@@ -105,6 +109,21 @@ function CartaoNuvem() {
             executar(entrarComGoogle, 'Não foi possível entrar. Tente de novo em instantes.')
           }
         />
+        {Platform.OS === 'ios' && LOGIN_APPLE_ATIVO && (
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+            buttonStyle={
+              escuro
+                ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+            }
+            cornerRadius={Radius.medium}
+            style={styles.botaoApple}
+            onPress={() =>
+              executar(entrarComApple, 'Não foi possível entrar. Tente de novo em instantes.')
+            }
+          />
+        )}
         {erro && (
           <ThemedText accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
             {erro}
@@ -183,6 +202,10 @@ const styles = StyleSheet.create({
   },
   usuario: {
     gap: Spacing.half,
+  },
+  botaoApple: {
+    height: 48,
+    width: '100%',
   },
   // Links de texto ficam com pelo menos 44 pontos de altura para tocar.
   link: {

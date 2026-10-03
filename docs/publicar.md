@@ -78,19 +78,11 @@ Com base no que o app faz hoje. Revise antes de enviar.
 - **Identificadores** (ID do usuário): ligados à pessoa, para funcionalidade do app.
 - **Rastreamento:** não.
 
-## 6. Atenção: "Entrar com a Apple"
+## 6. "Entrar com a Apple"
 
 A regra 4.8 da App Store pede que apps com login de terceiros, como o Google, ofereçam também uma
-opção de login com foco em privacidade, como **Entrar com a Apple**. Como o app tem login com
-Google, é provável que a Apple peça isso na revisão.
-
-Caminho sugerido:
-
-- ativar o provedor **Apple** no Supabase;
-- usar o `expo-apple-authentication` no iPhone;
-- mostrar o botão "Entrar com a Apple" na aba Conta, só no iOS.
-
-Precisa da conta Apple Developer para configurar e testar.
+opção de login com foco em privacidade, como **Entrar com a Apple**. O código já está pronto e
+desligado. Para ativar, siga [`login-apple.md`](login-apple.md) antes de enviar para a App Store.
 
 ## 7. Antes de enviar
 

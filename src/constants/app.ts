@@ -9,5 +9,11 @@ export const NOME_APP = 'Enxoval';
  */
 export const EMAIL_CONTATO: string | undefined = undefined;
 
+/**
+ * "Entrar com a Apple" (só no iPhone). Ligue depois de configurar o provedor Apple no Supabase
+ * (docs/login-apple.md); antes disso, o botão daria erro.
+ */
+export const LOGIN_APPLE_ATIVO = false;
+
 /** Quando a política de privacidade foi revisada pela última vez. */
 export const POLITICA_ATUALIZADA_EM = 'outubro de 2026';

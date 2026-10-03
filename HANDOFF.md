@@ -112,9 +112,10 @@ Nenhuma das duas está em uso nem exposta.
 O guia completo, com decisões, contas, builds (`eas.json`) e rascunho dos formulários de
 privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
 
-- **Risco na App Store:** a regra 4.8 pede uma opção de login com foco em privacidade quando há
-  login de terceiros. Provavelmente será preciso adicionar "Entrar com a Apple" (provedor Apple no
-  Supabase + `expo-apple-authentication`) antes de publicar no iPhone.
+- **App Store, regra 4.8:** pede uma opção de login com foco em privacidade quando há login de
+  terceiros. O "Entrar com a Apple" já está no código (`entrarComApple` e o botão na aba Conta, só
+  no iPhone), desligado em `LOGIN_APPLE_ATIVO`. Para ligar, siga
+  [`docs/login-apple.md`](docs/login-apple.md).
 - Nome definitivo, ícone e splash (hoje: "Enxoval" e ícones do template Expo).
 - Revisão profissional do catálogo (`src/domain/catalogo.ts`) e da lista de itens com selo
   Inmetro.

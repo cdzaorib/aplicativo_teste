@@ -1,3 +1,4 @@
+import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -35,6 +36,40 @@ export async function entrarComGoogle(): Promise<boolean> {
   if (!codigo) throw new Error('O Google não devolveu um código de acesso.');
 
   await concluirLogin(codigo);
+  return true;
+}
+
+/**
+ * Entra com a Apple, pelo login nativo do iPhone (só iOS). Retorna `false` se a pessoa cancelar.
+ * A Apple só manda o nome no primeiro login; ele é guardado nos dados do usuário.
+ */
+export async function entrarComApple(): Promise<boolean> {
+  if (!supabase) throw new Error('Login indisponível nesta versão do app.');
+  let credencial: AppleAuthentication.AppleAuthenticationCredential;
+  try {
+    credencial = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+  } catch (erro) {
+    if ((erro as { code?: string }).code === 'ERR_REQUEST_CANCELED') return false;
+    throw erro;
+  }
+  if (!credencial.identityToken) throw new Error('A Apple não devolveu o token de acesso.');
+
+  const { error } = await supabase.auth.signInWithIdToken({
+    provider: 'apple',
+    token: credencial.identityToken,
+  });
+  if (error) throw error;
+
+  const nome = [credencial.fullName?.givenName, credencial.fullName?.familyName]
+    .filter(Boolean)
+    .join(' ');
+  // Sem o nome, o app mostra o e-mail; não vale falhar o login por isso.
+  if (nome) await supabase.auth.updateUser({ data: { full_name: nome } }).catch(() => {});
   return true;
 }
 

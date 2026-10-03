@@ -33,6 +33,8 @@ se aparecer.
 - [ ] O app abre na aba **Minha lista**, vazia, com o cartão "Quando comprar".
 - [ ] **Sugestões:** os itens aparecem por categoria, com prioridade e fonte. "Adicionar N itens
       essenciais" coloca os essenciais na lista.
+- [ ] **Buscar no catálogo:** digitar "berco" (sem acento) acha o berço; "body longa" acha o
+      body de manga longa.
 - [ ] Filtros **Essencial / Útil / Opcional / Evitar** funcionam. Os itens "Evitar" mostram a
       fonte e não têm botão de adicionar.
 - [ ] **Minha lista:**

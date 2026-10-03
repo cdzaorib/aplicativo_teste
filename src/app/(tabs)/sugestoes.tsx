@@ -3,10 +3,12 @@ import { SectionList, StyleSheet, View } from 'react-native';
 
 import { AvisoRevisao } from '@/components/aviso-revisao';
 import { Botao } from '@/components/botao';
+import { Campo } from '@/components/campo';
 import { CatalogoCard } from '@/components/catalogo-card';
 import { Chips } from '@/components/chips';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { combinaComBusca } from '@/domain/busca';
 import { CATALOGO } from '@/domain/catalogo';
 import { eHoraDeComprar } from '@/domain/gestacao';
 import { CATEGORIAS, PRIORIDADES, type Categoria, type Prioridade } from '@/domain/tipos';
@@ -26,6 +28,7 @@ export default function SugestoesScreen() {
   const theme = useTheme();
   const insets = useScreenInsets();
   const [filtro, setFiltro] = useState<Filtro>('todas');
+  const [busca, setBusca] = useState('');
   const itens = useListaStore((s) => s.itens);
   const adicionarDoCatalogo = useListaStore((s) => s.adicionarDoCatalogo);
   const podeAdicionar = usePermissao() === 'total';
@@ -34,7 +37,9 @@ export default function SugestoesScreen() {
   const naLista = new Set(itens.map((i) => i.catalogoId));
   const essenciaisFaltando = ESSENCIAIS.filter((item) => !naLista.has(item.id));
 
-  const filtrados = CATALOGO.filter((item) => filtro === 'todas' || item.prioridade === filtro);
+  const filtrados = CATALOGO.filter(
+    (item) => (filtro === 'todas' || item.prioridade === filtro) && combinaComBusca(item, busca),
+  );
   const secoes = (Object.keys(CATEGORIAS) as Categoria[])
     .map((categoria) => ({
       titulo: CATEGORIAS[categoria],
@@ -63,6 +68,11 @@ export default function SugestoesScreen() {
         </ThemedText>
       )}
       ItemSeparatorComponent={Separador}
+      ListEmptyComponent={
+        <ThemedText themeColor="textSecondary" style={styles.secao}>
+          Nenhum item encontrado. Tente outra palavra ou adicione um item seu na aba Minha lista.
+        </ThemedText>
+      }
       ListHeaderComponent={
         <View style={styles.cabecalho}>
           <ThemedText type="subtitle">Sugestões</ThemedText>
@@ -76,6 +86,16 @@ export default function SugestoesScreen() {
               onPress={() => adicionarDoCatalogo(essenciaisFaltando)}
             />
           )}
+          <Campo
+            rotulo="Buscar no catálogo"
+            placeholder="Ex.: berço, body, fralda…"
+            value={busca}
+            onChangeText={setBusca}
+            autoCorrect={false}
+            autoComplete="off"
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+          />
           <Chips
             rotulo="Filtrar por prioridade"
             opcoes={FILTROS}

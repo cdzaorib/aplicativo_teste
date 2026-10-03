@@ -149,12 +149,17 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
 - **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #1.
 - **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2, ainda aberto, traz:
   - a Fase 3 (compartilhamento) e o limite de tentativas de convite;
+  - a lista em tempo real e o "Comprado por" na lista compartilhada;
+  - o filtro "Falta comprar", o puxar para atualizar, a vibração ao marcar e o "Por onde
+    começar";
   - o "quando comprar", os avisos de fase e as faixas de preço completas;
   - a estrutura das ofertas da Shopee (Fase 2b), com histórico;
   - a busca no catálogo e o envio da lista por mensagem;
   - a exclusão de conta, a política de privacidade, o "Entrar com a Apple" (desligado) e o guia
     de publicação;
-  - a correção da volta do login no Android e ajustes de acessibilidade.
+  - a correção da volta do login no Android, ajustes de acessibilidade e de teclado, a tela de
+    erro e os tipos do banco gerados pelo Supabase;
+  - o README de portfólio e as consultas de métricas (`docs/metricas.md`).
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
   - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções

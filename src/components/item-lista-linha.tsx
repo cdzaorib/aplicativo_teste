@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { HoraDeComprarBadge } from '@/components/hora-de-comprar-badge';
 import { Icone } from '@/components/icone';
 import { PrioridadeBadge } from '@/components/prioridade-badge';
 import { ThemedText } from '@/components/themed-text';
@@ -12,9 +13,24 @@ import { useTheme } from '@/hooks/use-theme';
 type Props = {
   item: ItemLista;
   onAlternar: () => void;
+  /** Numa lista compartilhada só de leitura (ou só de preços), não dá para marcar como comprado. */
+  podeMarcar?: boolean;
+  /** A fase de comprar o item já chegou (pela data prevista do parto). */
+  horaDeComprar?: boolean;
+  /** Numa lista compartilhada, o nome de quem comprou, se não foi a própria pessoa. */
+  compradoPor?: string;
+  /** Nome do convidado que escolheu dar o item, pela lista de presentes. */
+  presenteDe?: string;
 };
 
-export function ItemListaLinha({ item, onAlternar }: Props) {
+export function ItemListaLinha({
+  item,
+  onAlternar,
+  podeMarcar = true,
+  horaDeComprar,
+  compradoPor,
+  presenteDe,
+}: Props) {
   const theme = useTheme();
   const detalhes = [item.modelo, item.quantidade > 1 ? `${item.quantidade} un.` : '']
     .filter(Boolean)
@@ -24,10 +40,12 @@ export function ItemListaLinha({ item, onAlternar }: Props) {
     <View style={[styles.linha, { backgroundColor: theme.backgroundElement }]}>
       <Pressable
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: item.comprado }}
+        accessibilityState={{ checked: item.comprado, disabled: !podeMarcar }}
         accessibilityLabel={`Marcar ${item.nome} como comprado`}
+        disabled={!podeMarcar}
         hitSlop={8}
-        onPress={onAlternar}>
+        onPress={onAlternar}
+        style={!podeMarcar && styles.bloqueado}>
         <Icone
           nome={item.comprado ? 'marcado' : 'desmarcado'}
           cor={item.comprado ? theme.primary : theme.textSecondary}
@@ -48,7 +66,20 @@ export function ItemListaLinha({ item, onAlternar }: Props) {
                 {detalhes}
               </ThemedText>
             ) : null}
-            <PrioridadeBadge prioridade={item.prioridade} />
+            {compradoPor ? (
+              <ThemedText type="small" themeColor="textSecondary">
+                Comprado por {compradoPor}
+              </ThemedText>
+            ) : null}
+            {presenteDe ? (
+              <ThemedText type="small" style={{ color: theme.primary }}>
+                Presente de {presenteDe}
+              </ThemedText>
+            ) : null}
+            <View style={styles.selos}>
+              <PrioridadeBadge prioridade={item.prioridade} />
+              {horaDeComprar && <HoraDeComprarBadge />}
+            </View>
           </View>
           <ThemedText
             type="smallBold"
@@ -80,6 +111,14 @@ const styles = StyleSheet.create({
   textos: {
     flex: 1,
     gap: Spacing.one,
+  },
+  selos: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.one,
+  },
+  bloqueado: {
+    opacity: 0.5,
   },
   comprado: {
     textDecorationLine: 'line-through',

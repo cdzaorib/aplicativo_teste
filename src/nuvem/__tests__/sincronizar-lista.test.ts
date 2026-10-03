@@ -1,7 +1,11 @@
 import type { RegistroNuvem } from '@/domain/sincronizacao';
 import type { ItemLista } from '@/domain/tipos';
 import { useListaStore } from '@/store/lista';
-import { sincronizarLista, type RepositorioLista } from '../sincronizar-lista';
+import {
+  itensSaoDeOutraLista,
+  sincronizarLista,
+  type RepositorioLista,
+} from '../sincronizar-lista';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
@@ -36,7 +40,7 @@ function nuvemFalsa(inicial: RegistroNuvem[] = []) {
 const estado = () => useListaStore.getState();
 
 beforeEach(() => {
-  useListaStore.setState({ itens: [], removidos: {}, versaoLocal: 0 });
+  useListaStore.setState({ itens: [], removidos: {}, versaoLocal: 0, listaId: undefined });
 });
 
 describe('sincronizarLista', () => {
@@ -111,5 +115,42 @@ describe('sincronizarLista', () => {
     await expect(sincronizarLista(repositorio)).rejects.toThrow('sem internet');
     expect(estado().itens).toEqual([item('a', 10)]);
     expect(estado().removidos).toEqual({ b: 5 });
+  });
+
+  it('quem só visualiza recebe a lista compartilhada e não grava nada', async () => {
+    useListaStore.setState({ itens: [item('meu', 50)], removidos: { a: 60 } });
+    const { repositorio } = nuvemFalsa([{ ...item('a', 10), removido: false }]);
+
+    await sincronizarLista(repositorio, 'leitura');
+
+    expect(repositorio.gravar).not.toHaveBeenCalled();
+    expect(estado().itens).toEqual([item('a', 10)]);
+    expect(estado().removidos).toEqual({});
+  });
+
+  it('quem edita preços grava só o preço', async () => {
+    useListaStore.setState({ itens: [{ ...item('a', 20), precoCentavos: 999, comprado: true }] });
+    const { repositorio, registros } = nuvemFalsa([{ ...item('a', 10), removido: false }]);
+
+    await sincronizarLista(repositorio, 'precos');
+
+    expect(registros.get('a')).toMatchObject({ precoCentavos: 999, comprado: false });
+    expect(estado().itens[0]).toMatchObject({ precoCentavos: 999, comprado: false });
+  });
+});
+
+describe('itens de outra lista', () => {
+  it('lembra a lista sincronizada', async () => {
+    const { repositorio } = nuvemFalsa();
+    await sincronizarLista(repositorio, 'total', 'lista-1');
+    expect(estado().listaId).toBe('lista-1');
+  });
+
+  it('descarta itens de outra lista só quando a pessoa virou convidada', () => {
+    expect(itensSaoDeOutraLista(undefined, { id: 'l2', souDona: false })).toBe(false);
+    expect(itensSaoDeOutraLista('l2', { id: 'l2', souDona: false })).toBe(false);
+    expect(itensSaoDeOutraLista('l1', { id: 'l2', souDona: false })).toBe(true);
+    // Voltou para a própria lista: os itens ficam como cópia.
+    expect(itensSaoDeOutraLista('l1', { id: 'l2', souDona: true })).toBe(false);
   });
 });

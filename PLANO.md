@@ -3,7 +3,7 @@
 Aplicativo mobile (Android + iOS) que sugere o que comprar para o enxoval, indica o que é
 essencial, útil, opcional ou desaconselhado, e mostra onde está o melhor preço.
 
-> Nome provisório ("Enxoval"). Status: Fase 1 e Fase 2a no código; falta ativar o Google no Supabase — ver `HANDOFF.md`.
+> Nome provisório ("Enxoval"). Status: Fases 1, 2a e compartilhamento (Fase 3) no código, além do "quando comprar" pela data prevista do parto e da exclusão de conta exigida pelas lojas; falta ativar o Google no Supabase — ver `HANDOFF.md`.
 
 ## 1. Problema e público
 
@@ -44,7 +44,15 @@ Cada item do catálogo tem:
 - marcar como comprado;
 - ordenar por nome, valor, modelo, prioridade ou categoria;
 - orçamento total previsto × gasto;
-- compartilhar a lista com o parceiro/família (também ajuda a crescer).
+- compartilhar a lista com o parceiro/família (também ajuda a crescer);
+- lista de presentes do chá de bebê: os convidados abrem um link, sem instalar o app, e marcam
+  o que vão dar (feito; o link depende da versão web no ar).
+
+### 3.4 Gestação
+
+Aba com as semanas de gestação, lembretes do pré-natal por fase, sinais de alerta e curiosidades.
+O app não é médico: todo conteúdo cita a fonte (Ministério da Saúde, FEBRASGO, CDC, NHS, ACOG) e
+manda conversar com a equipe de pré-natal. Precisa de revisão profissional antes de publicar.
 
 ### 3.3 Preços
 
@@ -73,8 +81,9 @@ Por isso a Fase 2 foi dividida:
     faixa comum.
   - A faixa vem de uma pesquisa inicial (`src/domain/faixas-preco.ts`) e, quando há 5 pessoas ou
     mais, dos preços informados de forma anônima.
-- **2b (quando a Shopee aprovar):** opções com preço dentro do app, coletadas por um robô
-  (Edge Function + `pg_cron`), e histórico de preço.
+- **2b (estrutura pronta, falta a credencial da Shopee):** opções com preço dentro do app,
+  coletadas por um robô (Edge Function + `pg_cron`), e histórico de preço. Para ligar:
+  `docs/ofertas-shopee.md`.
 
 ## 5. Riscos e como tratar
 
@@ -98,14 +107,19 @@ _Já dá para mostrar em entrevista e testar com usuárias._
 
 **Fase 2 — Preços (3–4 semanas)**
 2a, feita: comparar preço digitado com a faixa comum, links de busca nas lojas, preços informados
-anônimos. 2b, depende da API da Shopee: opções com preço dentro do app, robô de coleta e
-histórico.
+anônimos. 2b, estrutura pronta (tabelas, robô de coleta e tela); falta a credencial da Shopee
+para ligar.
 
 **Fase 3 — Engajamento e receita (2 semanas)**
-Alertas push, links de afiliado e compartilhamento da lista.
+Feito: compartilhamento da lista por código de convite. A dona decide, por pessoa, quem edita a
+lista e quem edita preços, e as mudanças aparecem em tempo real para todos. Feito também: avisos
+locais no começo de cada fase de compras. Falta:
+alertas push vindos do servidor (permissão liberada, queda de preço). Links de afiliado ficaram para depois, por
+decisão do usuário.
 
 **Fase 4 — Lançamento (1–2 semanas)**
 Ícone, telas da loja, política de privacidade, Google Play (taxa única) e Apple Developer (anual), TestFlight/teste fechado.
+Já feito: exclusão de conta pelo app. Falta a página na web para pedir a exclusão, que o Google Play exige.
 
 Estimativa total: **~6–8 semanas com dedicação integral** (varia com a curva de aprendizado de React Native).
 

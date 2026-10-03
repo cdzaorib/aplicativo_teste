@@ -24,12 +24,13 @@ export function Campo({ rotulo, erro, style, ...props }: CampoProps) {
             backgroundColor: theme.backgroundElement,
             borderColor: erro ? theme.danger : theme.border,
           },
+          props.editable === false && styles.bloqueado,
           style,
         ]}
         {...props}
       />
       {erro ? (
-        <ThemedText type="small" style={{ color: theme.danger }}>
+        <ThemedText type="small" accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
           {erro}
         </ThemedText>
       ) : null}
@@ -40,6 +41,9 @@ export function Campo({ rotulo, erro, style, ...props }: CampoProps) {
 const styles = StyleSheet.create({
   campo: {
     gap: Spacing.one,
+  },
+  bloqueado: {
+    opacity: 0.6,
   },
   input: {
     minHeight: 48,

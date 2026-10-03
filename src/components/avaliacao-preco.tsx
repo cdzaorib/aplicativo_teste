@@ -10,6 +10,7 @@ import {
   type Referencia,
 } from '@/domain/precos';
 import { PESQUISA_PRECOS_EM } from '@/domain/faixas-preco';
+import type { UnidadePreco } from '@/domain/tipos';
 import { useTheme } from '@/hooks/use-theme';
 
 const CORES: Record<Avaliacao, [ThemeColor, ThemeColor]> = {
@@ -41,8 +42,27 @@ export function AvaliacaoPreco({
   );
 }
 
+/** Selo curto com o resultado da avaliação, para listas (ex.: ofertas das lojas). */
+export function SeloAvaliacao({ avaliacao }: { avaliacao: Avaliacao }) {
+  const theme = useTheme();
+  const [fundo, texto] = CORES[avaliacao];
+  return (
+    <View style={[styles.selo, { backgroundColor: theme[fundo] }]}>
+      <ThemedText type="small" style={[styles.textoSelo, { color: theme[texto] }]}>
+        {TITULOS_AVALIACAO[avaliacao]}
+      </ThemedText>
+    </View>
+  );
+}
+
 /** Faixa de preço comum de um item e de onde ela veio. */
-export function FaixaReferencia({ referencia }: { referencia: Referencia | undefined }) {
+export function FaixaReferencia({
+  referencia,
+  unidade,
+}: {
+  referencia: Referencia | undefined;
+  unidade: UnidadePreco;
+}) {
   if (!referencia) {
     return (
       <ThemedText type="small" themeColor="textSecondary">
@@ -54,7 +74,8 @@ export function FaixaReferencia({ referencia }: { referencia: Referencia | undef
   return (
     <View style={styles.faixa}>
       <ThemedText type="smallBold">
-        Faixa comum: {formatarPreco(faixa.minCentavos)} a {formatarPreco(faixa.maxCentavos)}
+        Faixa comum: {formatarPreco(faixa.minCentavos)} a {formatarPreco(faixa.maxCentavos)} por{' '}
+        {unidade}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
         {origem === 'informados'
@@ -73,5 +94,16 @@ const styles = StyleSheet.create({
   },
   faixa: {
     gap: Spacing.half,
+  },
+  selo: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.half,
+    borderRadius: Radius.small,
+  },
+  textoSelo: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: 700,
   },
 });

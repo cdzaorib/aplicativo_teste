@@ -7,6 +7,7 @@ module.exports = defineConfig([
   expoConfig,
   prettierConfig,
   {
-    ignores: ['dist/*', '.expo/*'],
+    // As Edge Functions rodam no Deno, com outro TypeScript e outras importações.
+    ignores: ['dist/*', '.expo/*', 'supabase/functions/*'],
   },
 ]);

@@ -7,6 +7,7 @@ import { AvaliacaoPreco, FaixaReferencia } from '@/components/avaliacao-preco';
 import { Botao } from '@/components/botao';
 import { Campo } from '@/components/campo';
 import { Chips } from '@/components/chips';
+import { OfertasLoja } from '@/components/ofertas-loja';
 import { PrioridadeBadge } from '@/components/prioridade-badge';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
@@ -19,12 +20,13 @@ import {
   linkDeBusca,
   type Loja,
   type OrigemPreco,
+  unidadeDePreco,
 } from '@/domain/precos';
 import { useReferencia } from '@/hooks/use-referencia';
 import { useTheme } from '@/hooks/use-theme';
 import { informarPreco } from '@/nuvem/precos';
 import { useListaStore } from '@/store/lista';
-import { useSessaoStore } from '@/store/sessao';
+import { usePermissao, useSessaoStore } from '@/store/sessao';
 
 type Envio = 'enviando' | 'enviado' | 'erro';
 
@@ -36,6 +38,9 @@ export default function CompararPrecoScreen() {
   const usuario = useSessaoStore((s) => s.usuario);
   const naLista = useListaStore((s) => s.itens.find((i) => i.catalogoId === catalogoId));
   const { adicionarDoCatalogo, atualizar } = useListaStore.getState();
+  const permissao = usePermissao();
+  // Atualizar o preço de um item que já está na lista exige permissão de preços; adicionar, de lista.
+  const podeUsarNaLista = naLista ? permissao !== 'leitura' : permissao === 'total';
 
   const [texto, setTexto] = useState('');
   const [origem, setOrigem] = useState<OrigemPreco>();
@@ -87,7 +92,8 @@ export default function CompararPrecoScreen() {
     <ScrollView
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={[styles.conteudo, styles.espacado]}
-      keyboardShouldPersistTaps="handled">
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets>
       <View style={styles.titulo}>
         <ThemedText type="smallBold" style={styles.nome}>
           {item.nome}
@@ -96,8 +102,14 @@ export default function CompararPrecoScreen() {
       </View>
 
       <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-        <FaixaReferencia referencia={referencia} />
+        <FaixaReferencia referencia={referencia} unidade={unidadeDePreco(item.id)} />
       </View>
+
+      <OfertasLoja
+        catalogoId={item.id}
+        faixa={referencia?.faixa}
+        unidade={unidadeDePreco(item.id)}
+      />
 
       <View style={styles.secao}>
         <ThemedText type="smallBold">Ver opções nas lojas</ThemedText>
@@ -125,7 +137,7 @@ export default function CompararPrecoScreen() {
           Dizemos se ele está caro, na média ou barato demais para ser verdade.
         </ThemedText>
         <Campo
-          rotulo="Preço encontrado (R$)"
+          rotulo={`Preço encontrado por ${unidadeDePreco(item.id)} (R$)`}
           placeholder="0,00"
           keyboardType="decimal-pad"
           value={texto}
@@ -191,13 +203,15 @@ export default function CompararPrecoScreen() {
               Preço de {formatarPreco(avaliado)} salvo na sua lista.
             </ThemedText>
           ) : (
-            <Botao
-              titulo={
-                naLista ? 'Usar este preço na minha lista' : 'Adicionar à lista com este preço'
-              }
-              variante="secundario"
-              onPress={() => usarNaLista(avaliado)}
-            />
+            podeUsarNaLista && (
+              <Botao
+                titulo={
+                  naLista ? 'Usar este preço na minha lista' : 'Adicionar à lista com este preço'
+                }
+                variante="secundario"
+                onPress={() => usarNaLista(avaliado)}
+              />
+            )
           )}
         </View>
       )}

@@ -1,8 +1,11 @@
+import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
+import { cancelarLembretes } from '@/notificacoes/lembretes';
 import { sincronizar } from '@/nuvem/sincronizar';
 import { supabase } from '@/nuvem/supabase';
+import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 
 /** Rota que recebe a volta do login (src/app/auth-callback.tsx). */
@@ -32,9 +35,81 @@ export async function entrarComGoogle(): Promise<boolean> {
   const codigo = parametros.get('code');
   if (!codigo) throw new Error('O Google não devolveu um código de acesso.');
 
-  const { error: erroSessao } = await supabase.auth.exchangeCodeForSession(codigo);
-  if (erroSessao) throw erroSessao;
+  await concluirLogin(codigo);
   return true;
+}
+
+/**
+ * Entra com a Apple, pelo login nativo do iPhone (só iOS). Retorna `false` se a pessoa cancelar.
+ * A Apple só manda o nome no primeiro login; ele é guardado nos dados do usuário.
+ */
+export async function entrarComApple(): Promise<boolean> {
+  if (!supabase) throw new Error('Login indisponível nesta versão do app.');
+  let credencial: AppleAuthentication.AppleAuthenticationCredential;
+  try {
+    credencial = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+  } catch (erro) {
+    if ((erro as { code?: string }).code === 'ERR_REQUEST_CANCELED') return false;
+    throw erro;
+  }
+  if (!credencial.identityToken) throw new Error('A Apple não devolveu o token de acesso.');
+
+  const { error } = await supabase.auth.signInWithIdToken({
+    provider: 'apple',
+    token: credencial.identityToken,
+  });
+  if (error) throw error;
+
+  const nome = [credencial.fullName?.givenName, credencial.fullName?.familyName]
+    .filter(Boolean)
+    .join(' ');
+  // Sem o nome, o app mostra o e-mail; não vale falhar o login por isso.
+  if (nome) await supabase.auth.updateUser({ data: { full_name: nome } }).catch(() => {});
+  return true;
+}
+
+const trocas = new Map<string, Promise<void>>();
+
+/**
+ * Troca o código da volta do login pela sessão. No Android a volta chega tanto aqui quanto à rota
+ * `auth-callback`, que também chama esta função (inclusive quando o sistema fechou o app enquanto
+ * a pessoa estava no navegador). Cada código só pode ser trocado uma vez, então as duas chamadas
+ * compartilham a mesma troca.
+ */
+export function concluirLogin(codigo: string): Promise<void> {
+  let troca = trocas.get(codigo);
+  if (!troca) {
+    troca = (async () => {
+      if (!supabase) throw new Error('Login indisponível nesta versão do app.');
+      const { error } = await supabase.auth.exchangeCodeForSession(codigo);
+      if (error) throw error;
+    })();
+    trocas.set(codigo, troca);
+  }
+  return troca;
+}
+
+/**
+ * Exclui a conta na nuvem (supabase/functions/excluir-conta): a lista, a participação em listas
+ * compartilhadas e os preços informados. Depois encerra a sessão e apaga deste aparelho a lista
+ * e a data prevista do parto.
+ */
+export async function excluirConta(): Promise<void> {
+  if (!supabase) return;
+  const { error } = await supabase.functions.invoke('excluir-conta', { method: 'POST' });
+  if (error) throw error;
+  // A conta já não existe no servidor; basta esquecer a sessão neste aparelho.
+  await supabase.auth.signOut({ scope: 'local' });
+  useListaStore.getState().limpar();
+  useGestacaoStore.getState().definirDataPrevista(undefined);
+  useGestacaoStore.getState().definirLembretes(false);
+  // Os avisos dependem da data prevista, que acabou de ser apagada.
+  await cancelarLembretes().catch(() => {});
 }
 
 /** Salva na nuvem o que falta, encerra a sessão e apaga a lista deste aparelho. */

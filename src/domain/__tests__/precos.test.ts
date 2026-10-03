@@ -6,6 +6,7 @@ import {
   linkDeBusca,
   MINIMO_INFORMADOS,
   referenciaDePreco,
+  unidadeDePreco,
 } from '../precos';
 
 const faixa = { minCentavos: 40000, maxCentavos: 100000 };
@@ -84,6 +85,13 @@ describe('faixas pesquisadas', () => {
     expect(Object.keys(FAIXAS_PESQUISADAS).filter((id) => !compraveis.has(id))).toEqual([]);
   });
 
+  it('cobrem todos os itens do catálogo que podem ser comprados', () => {
+    const semFaixa = CATALOGO.filter(
+      (item) => item.prioridade !== 'evitar' && !FAIXAS_PESQUISADAS[item.id],
+    );
+    expect(semFaixa.map((item) => item.id)).toEqual([]);
+  });
+
   it('têm mínimo positivo e menor que o máximo', () => {
     for (const [id, faixaItem] of Object.entries(FAIXAS_PESQUISADAS)) {
       expect({
@@ -91,5 +99,16 @@ describe('faixas pesquisadas', () => {
         valida: faixaItem!.minCentavos > 0 && faixaItem!.minCentavos < faixaItem!.maxCentavos,
       }).toEqual({ id, valida: true });
     }
+  });
+});
+
+describe('unidadeDePreco', () => {
+  it('usa a unidade do catálogo e, sem ela, conta por unidade', () => {
+    expect(unidadeDePreco('meias')).toBe('par');
+    expect(unidadeDePreco('fralda-p')).toBe('pacote');
+    expect(unidadeDePreco('protetor-tomada')).toBe('kit');
+    expect(unidadeDePreco('berco')).toBe('unidade');
+    expect(unidadeDePreco(undefined)).toBe('unidade');
+    expect(unidadeDePreco('item-que-nao-existe')).toBe('unidade');
   });
 });

@@ -1,36 +1,77 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-import { deLinha, paraLinha, type LinhaItem } from '@/nuvem/linhas';
-import { sincronizarLista, type RepositorioLista } from '@/nuvem/sincronizar-lista';
+import type { Permissao } from '@/domain/sincronizacao';
+import { deLinha, deLinhaInfoLista, paraLinha, type LinhaInfoLista } from '@/nuvem/linhas';
+import {
+  itensSaoDeOutraLista,
+  sincronizarLista,
+  type RepositorioLista,
+} from '@/nuvem/sincronizar-lista';
 import { supabase } from '@/nuvem/supabase';
-import { useSessaoStore } from '@/store/sessao';
+import { useListaStore } from '@/store/lista';
+import { permissaoNaLista, useSessaoStore, type InfoLista } from '@/store/sessao';
 
-function repositorioSupabase(cliente: SupabaseClient, userId: string): RepositorioLista {
+function repositorioSupabase(
+  cliente: SupabaseClient,
+  listaId: string,
+  permissao: Permissao,
+): RepositorioLista {
   return {
     buscar: async () => {
-      const { data, error } = await cliente.from('itens_lista').select('*');
+      const { data, error } = await cliente.from('itens').select('*').eq('lista_id', listaId);
       if (error) throw error;
-      return (data as LinhaItem[]).map(deLinha);
+      return data.map(deLinha);
     },
     gravar: async (registros) => {
-      const { error } = await cliente.from('itens_lista').upsert(
-        registros.map((registro) => paraLinha(registro, userId)),
-        { onConflict: 'user_id,id' },
+      if (permissao === 'total') {
+        const { error } = await cliente.from('itens').upsert(
+          registros.map((registro) => paraLinha(registro, listaId)),
+          { onConflict: 'lista_id,id' },
+        );
+        if (error) throw error;
+        return;
+      }
+      // Quem só edita preços não pode criar itens: atualiza apenas o preço dos que existem.
+      const respostas = await Promise.all(
+        registros.map((registro) =>
+          cliente
+            .from('itens')
+            .update({
+              preco_centavos: registro.precoCentavos ?? null,
+              atualizado_em: new Date(registro.atualizadoEm).toISOString(),
+            })
+            .eq('lista_id', listaId)
+            .eq('id', registro.id),
+        ),
       );
-      if (error) throw error;
+      const erro = respostas.find((resposta) => resposta.error)?.error;
+      if (erro) throw erro;
     },
   };
+}
+
+/** Busca (e cria, na primeira vez) a lista atual da pessoa e guarda na sessão. */
+async function atualizarInfoLista(cliente: SupabaseClient): Promise<InfoLista> {
+  const { data, error } = await cliente.rpc('garantir_lista').single();
+  if (error) throw error;
+  const lista = deLinhaInfoLista(data as LinhaInfoLista);
+  useSessaoStore.setState({ lista });
+  return lista;
 }
 
 async function executar() {
   if (!supabase) return;
   const { data } = await supabase.auth.getSession();
-  const usuario = data.session?.user;
-  if (!usuario) return;
+  if (!data.session?.user) return;
 
   useSessaoStore.setState({ sincronizando: true });
   try {
-    await sincronizarLista(repositorioSupabase(supabase, usuario.id));
+    const lista = await atualizarInfoLista(supabase);
+    if (itensSaoDeOutraLista(useListaStore.getState().listaId, lista)) {
+      useListaStore.getState().limpar();
+    }
+    const permissao = permissaoNaLista(lista);
+    await sincronizarLista(repositorioSupabase(supabase, lista.id, permissao), permissao, lista.id);
     useSessaoStore.setState({ ultimaSincronizacao: Date.now(), erroSincronizacao: undefined });
   } catch (erro) {
     useSessaoStore.setState({

@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { HoraDeComprarBadge } from '@/components/hora-de-comprar-badge';
 import { Icone } from '@/components/icone';
 import { PrioridadeBadge } from '@/components/prioridade-badge';
 import { ThemedText } from '@/components/themed-text';
@@ -13,10 +14,13 @@ import { useTheme } from '@/hooks/use-theme';
 type Props = {
   item: ItemCatalogo;
   naLista: boolean;
-  onAdicionar: () => void;
+  /** Ausente quando a pessoa não pode editar a lista (lista compartilhada). */
+  onAdicionar?: () => void;
+  /** A fase de comprar o item já chegou (pela data prevista do parto). */
+  horaDeComprar?: boolean;
 };
 
-export function CatalogoCard({ item, naLista, onAdicionar }: Props) {
+export function CatalogoCard({ item, naLista, onAdicionar, horaDeComprar }: Props) {
   const theme = useTheme();
   const evitar = item.prioridade === 'evitar';
   const referencia = useReferencia(evitar ? undefined : item.id);
@@ -28,6 +32,7 @@ export function CatalogoCard({ item, naLista, onAdicionar }: Props) {
           <ThemedText type="smallBold">{item.nome}</ThemedText>
           <View style={styles.etiquetas}>
             <PrioridadeBadge prioridade={item.prioridade} />
+            {horaDeComprar && !evitar && <HoraDeComprarBadge />}
             {!evitar && (
               <ThemedText type="small" themeColor="textSecondary">
                 {QUANDO[item.quando]}
@@ -66,7 +71,7 @@ export function CatalogoCard({ item, naLista, onAdicionar }: Props) {
             ]}>
             <ThemedText type="small" themeColor="textSecondary" style={styles.textoPrecos}>
               {referencia
-                ? `Costuma custar de ${formatarPreco(referencia.faixa.minCentavos)} a ${formatarPreco(referencia.faixa.maxCentavos)}`
+                ? `Costuma custar de ${formatarPreco(referencia.faixa.minCentavos)} a ${formatarPreco(referencia.faixa.maxCentavos)} por ${item.precoPor ?? 'unidade'}`
                 : 'Ver opções nas lojas'}
             </ThemedText>
             <ThemedText type="smallBold" style={{ color: theme.primary }}>
@@ -83,7 +88,7 @@ type AcaoProps = {
   evitar: boolean;
   naLista: boolean;
   nome: string;
-  onAdicionar: () => void;
+  onAdicionar?: () => void;
 };
 
 function Acao({ evitar, naLista, nome, onAdicionar }: AcaoProps) {
@@ -104,6 +109,8 @@ function Acao({ evitar, naLista, nome, onAdicionar }: AcaoProps) {
       </View>
     );
   }
+
+  if (!onAdicionar) return null;
 
   return (
     <Pressable

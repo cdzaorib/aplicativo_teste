@@ -15,6 +15,11 @@ export default function AppTabs() {
         <NativeTabs.Trigger.Icon sf="checklist" md="checklist" />
       </NativeTabs.Trigger>
 
+      <NativeTabs.Trigger name="gestacao">
+        <NativeTabs.Trigger.Label>Gestação</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="heart.text.square" md="pregnant_woman" />
+      </NativeTabs.Trigger>
+
       <NativeTabs.Trigger name="sugestoes">
         <NativeTabs.Trigger.Label>Sugestões</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="lightbulb" md="lightbulb" />

@@ -1,28 +1,19 @@
 import type { EstatisticaPrecos } from '@/domain/precos';
 import type { RegistroNuvem } from '@/domain/sincronizacao';
 import type { Categoria, Prioridade } from '@/domain/tipos';
+import type { Tables } from '@/nuvem/banco.types';
+import type { InfoLista } from '@/store/sessao';
 
-/** Linha da tabela `itens_lista` (supabase/migrations). */
-export type LinhaItem = {
-  id: string;
-  user_id: string;
-  catalogo_id: string | null;
-  nome: string;
-  categoria: string;
-  prioridade: string;
-  modelo: string;
-  preco_centavos: number | null;
-  quantidade: number;
-  comprado: boolean;
-  removido: boolean;
-  criado_em: string;
-  atualizado_em: string;
-};
+/** Linha da tabela `itens`, como o banco devolve. */
+export type LinhaItem = Tables<'itens'>;
 
-export function paraLinha(registro: RegistroNuvem, userId: string): LinhaItem {
+/** O que o app grava em `itens`: todas as colunas, menos `comprado_por`, que só o banco preenche. */
+export type NovaLinhaItem = Omit<LinhaItem, 'comprado_por'>;
+
+export function paraLinha(registro: RegistroNuvem, listaId: string): NovaLinhaItem {
   return {
+    lista_id: listaId,
     id: registro.id,
-    user_id: userId,
     catalogo_id: registro.catalogoId ?? null,
     nome: registro.nome,
     categoria: registro.categoria,
@@ -48,6 +39,7 @@ export function deLinha(linha: LinhaItem): RegistroNuvem {
     ...(linha.preco_centavos !== null && { precoCentavos: linha.preco_centavos }),
     quantidade: linha.quantidade,
     comprado: linha.comprado,
+    ...(linha.comprado_por && { compradoPor: linha.comprado_por }),
     removido: linha.removido,
     criadoEm: Date.parse(linha.criado_em),
     atualizadoEm: Date.parse(linha.atualizado_em),
@@ -73,4 +65,84 @@ export function deLinhasReferencia(linhas: LinhaReferencia[]): Record<string, Es
       },
     ]),
   );
+}
+
+/** Linha devolvida pela função `garantir_lista` (supabase/migrations). */
+export type LinhaInfoLista = {
+  lista_id: string;
+  e_dona: boolean;
+  pode_editar_lista: boolean;
+  pode_editar_precos: boolean;
+  codigo_convite: string | null;
+  nome_dona: string | null;
+};
+
+export function deLinhaInfoLista(linha: LinhaInfoLista): InfoLista {
+  return {
+    id: linha.lista_id,
+    souDona: linha.e_dona,
+    podeEditarLista: linha.pode_editar_lista,
+    podeEditarPrecos: linha.pode_editar_precos,
+    ...(linha.codigo_convite !== null && { codigoConvite: linha.codigo_convite }),
+    ...(linha.nome_dona !== null && { nomeDona: linha.nome_dona }),
+  };
+}
+
+/** Oferta de uma loja para um item do catálogo, coletada pela Edge Function `coletar-ofertas`. */
+export type Oferta = {
+  produtoId: string;
+  nome: string;
+  precoMinCentavos: number;
+  precoMaxCentavos: number;
+  link: string;
+  imagemUrl?: string;
+  avaliacao?: number;
+  vendas?: number;
+  coletadoEm: number;
+};
+
+/** Linha da tabela `ofertas` (supabase/migrations). */
+export type LinhaOferta = {
+  produto_id: string;
+  nome: string;
+  preco_min_centavos: number;
+  preco_max_centavos: number;
+  link: string;
+  imagem_url: string | null;
+  // O PostgREST devolve `numeric` como número ou texto, dependendo da configuração.
+  avaliacao: number | string | null;
+  vendas: number | null;
+  coletado_em: string;
+};
+
+export function deLinhaOferta(linha: LinhaOferta): Oferta {
+  const avaliacao = linha.avaliacao === null ? undefined : Number(linha.avaliacao);
+  return {
+    produtoId: linha.produto_id,
+    nome: linha.nome,
+    precoMinCentavos: linha.preco_min_centavos,
+    precoMaxCentavos: linha.preco_max_centavos,
+    link: linha.link,
+    ...(linha.imagem_url && { imagemUrl: linha.imagem_url }),
+    ...(avaliacao !== undefined && Number.isFinite(avaliacao) && { avaliacao }),
+    ...(linha.vendas !== null && { vendas: linha.vendas }),
+    coletadoEm: Date.parse(linha.coletado_em),
+  };
+}
+
+/** Resumo de um dia de ofertas de um item (tabela `historico_ofertas`). */
+export type DiaHistorico = { dia: string; menorPrecoCentavos: number; medianaCentavos: number };
+
+export type LinhaHistorico = {
+  dia: string;
+  menor_preco_centavos: number;
+  mediana_centavos: number;
+};
+
+export function deLinhaHistorico(linha: LinhaHistorico): DiaHistorico {
+  return {
+    dia: linha.dia,
+    menorPrecoCentavos: linha.menor_preco_centavos,
+    medianaCentavos: linha.mediana_centavos,
+  };
 }

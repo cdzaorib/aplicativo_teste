@@ -24,7 +24,8 @@ export default function NovoItemScreen() {
     <ScrollView
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={styles.conteudo}
-      keyboardShouldPersistTaps="handled">
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets>
       <ItemForm
         inicial={VAZIO}
         onSalvar={({ comprado: _comprado, ...dados }) => {

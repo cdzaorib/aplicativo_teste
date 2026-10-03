@@ -1,0 +1,498 @@
+[
+  {
+    "id": "berco",
+    "busca": "berço infantil",
+    "faixa": {
+      "minCentavos": 40000,
+      "maxCentavos": 250000
+    }
+  },
+  {
+    "id": "colchao-berco",
+    "busca": "colchão de berço",
+    "faixa": {
+      "minCentavos": 7500,
+      "maxCentavos": 17000
+    }
+  },
+  {
+    "id": "lencol-elastico",
+    "busca": "lençol de berço com elástico",
+    "faixa": {
+      "minCentavos": 2500,
+      "maxCentavos": 12000
+    }
+  },
+  {
+    "id": "capa-colchao",
+    "busca": "capa impermeável colchão berço",
+    "faixa": {
+      "minCentavos": 3000,
+      "maxCentavos": 10000
+    }
+  },
+  {
+    "id": "saco-dormir",
+    "busca": "saco de dormir bebê",
+    "faixa": {
+      "minCentavos": 4000,
+      "maxCentavos": 20000
+    }
+  },
+  {
+    "id": "comoda-trocador",
+    "busca": "cômoda com trocador",
+    "faixa": {
+      "minCentavos": 32000,
+      "maxCentavos": 75000
+    }
+  },
+  {
+    "id": "mosquiteiro",
+    "busca": "mosquiteiro berço",
+    "faixa": {
+      "minCentavos": 2500,
+      "maxCentavos": 10000
+    }
+  },
+  {
+    "id": "luz-noturna",
+    "busca": "luz noturna quarto bebê",
+    "faixa": {
+      "minCentavos": 1500,
+      "maxCentavos": 6000
+    }
+  },
+  {
+    "id": "baba-eletronica",
+    "busca": "babá eletrônica",
+    "faixa": {
+      "minCentavos": 17000,
+      "maxCentavos": 70000
+    }
+  },
+  {
+    "id": "berco-portatil",
+    "busca": "berço portátil",
+    "faixa": {
+      "minCentavos": 37000,
+      "maxCentavos": 92000
+    }
+  },
+  {
+    "id": "bebe-conforto",
+    "busca": "bebê conforto",
+    "faixa": {
+      "minCentavos": 25000,
+      "maxCentavos": 90000
+    }
+  },
+  {
+    "id": "base-bebe-conforto",
+    "busca": "base bebê conforto",
+    "faixa": {
+      "minCentavos": 40000,
+      "maxCentavos": 120000
+    }
+  },
+  {
+    "id": "carrinho",
+    "busca": "carrinho de bebê",
+    "faixa": {
+      "minCentavos": 40000,
+      "maxCentavos": 200000
+    }
+  },
+  {
+    "id": "canguru",
+    "busca": "canguru ergonômico bebê",
+    "faixa": {
+      "minCentavos": 6000,
+      "maxCentavos": 30000
+    }
+  },
+  {
+    "id": "bolsa-maternidade",
+    "busca": "mochila maternidade",
+    "faixa": {
+      "minCentavos": 6000,
+      "maxCentavos": 30000
+    }
+  },
+  {
+    "id": "trocador-portatil",
+    "busca": "trocador portátil bebê",
+    "faixa": {
+      "minCentavos": 2800,
+      "maxCentavos": 10000
+    }
+  },
+  {
+    "id": "banheira",
+    "busca": "banheira bebê",
+    "faixa": {
+      "minCentavos": 3000,
+      "maxCentavos": 18000
+    }
+  },
+  {
+    "id": "suporte-banheira",
+    "busca": "suporte banheira bebê",
+    "faixa": {
+      "minCentavos": 6000,
+      "maxCentavos": 25000
+    }
+  },
+  {
+    "id": "toalha-capuz",
+    "busca": "toalha com capuz bebê",
+    "faixa": {
+      "minCentavos": 2700,
+      "maxCentavos": 9000
+    }
+  },
+  {
+    "id": "sabonete-neutro",
+    "busca": "sabonete líquido bebê",
+    "faixa": {
+      "minCentavos": 1500,
+      "maxCentavos": 3500
+    }
+  },
+  {
+    "id": "shampoo",
+    "busca": "shampoo infantil",
+    "faixa": {
+      "minCentavos": 1200,
+      "maxCentavos": 3000
+    }
+  },
+  {
+    "id": "algodao",
+    "busca": "algodão bolas",
+    "faixa": {
+      "minCentavos": 700,
+      "maxCentavos": 1500
+    }
+  },
+  {
+    "id": "alcool-70",
+    "busca": "álcool 70 líquido",
+    "faixa": {
+      "minCentavos": 800,
+      "maxCentavos": 2500
+    }
+  },
+  {
+    "id": "tesoura-unha",
+    "busca": "tesoura unha bebê",
+    "faixa": {
+      "minCentavos": 1000,
+      "maxCentavos": 4500
+    }
+  },
+  {
+    "id": "escova-cabelo",
+    "busca": "escova cabelo bebê",
+    "faixa": {
+      "minCentavos": 1500,
+      "maxCentavos": 5000
+    }
+  },
+  {
+    "id": "lenco-umedecido",
+    "busca": "lenço umedecido bebê",
+    "faixa": {
+      "minCentavos": 800,
+      "maxCentavos": 2000
+    }
+  },
+  {
+    "id": "pomada-assadura",
+    "busca": "pomada assadura",
+    "faixa": {
+      "minCentavos": 2000,
+      "maxCentavos": 4500
+    }
+  },
+  {
+    "id": "fralda-rn",
+    "busca": "fralda descartável RN",
+    "faixa": {
+      "minCentavos": 2000,
+      "maxCentavos": 4000
+    }
+  },
+  {
+    "id": "fralda-p",
+    "busca": "fralda descartável P",
+    "faixa": {
+      "minCentavos": 3500,
+      "maxCentavos": 7500
+    }
+  },
+  {
+    "id": "fralda-pano",
+    "busca": "fralda de pano",
+    "faixa": {
+      "minCentavos": 400,
+      "maxCentavos": 1200
+    }
+  },
+  {
+    "id": "lixeira-fralda",
+    "busca": "lixeira com tampa",
+    "faixa": {
+      "minCentavos": 3500,
+      "maxCentavos": 15000
+    }
+  },
+  {
+    "id": "almofada-amamentacao",
+    "busca": "almofada de amamentação",
+    "faixa": {
+      "minCentavos": 5000,
+      "maxCentavos": 25000
+    }
+  },
+  {
+    "id": "sutia-amamentacao",
+    "busca": "sutiã de amamentação",
+    "faixa": {
+      "minCentavos": 2500,
+      "maxCentavos": 15000
+    }
+  },
+  {
+    "id": "absorvente-seio",
+    "busca": "absorvente para seios",
+    "faixa": {
+      "minCentavos": 2000,
+      "maxCentavos": 9000
+    }
+  },
+  {
+    "id": "bomba-leite",
+    "busca": "bomba tira leite",
+    "faixa": {
+      "minCentavos": 4500,
+      "maxCentavos": 35000
+    }
+  },
+  {
+    "id": "mamadeira",
+    "busca": "mamadeira",
+    "faixa": {
+      "minCentavos": 2000,
+      "maxCentavos": 12000
+    }
+  },
+  {
+    "id": "chupeta",
+    "busca": "chupeta",
+    "faixa": {
+      "minCentavos": 1000,
+      "maxCentavos": 6000
+    }
+  },
+  {
+    "id": "esterilizador",
+    "busca": "esterilizador de mamadeira",
+    "faixa": {
+      "minCentavos": 1500,
+      "maxCentavos": 25000
+    }
+  },
+  {
+    "id": "babador",
+    "busca": "babador bebê",
+    "faixa": {
+      "minCentavos": 600,
+      "maxCentavos": 2500
+    }
+  },
+  {
+    "id": "cadeira-alimentacao",
+    "busca": "cadeira de alimentação bebê",
+    "faixa": {
+      "minCentavos": 15000,
+      "maxCentavos": 75000
+    }
+  },
+  {
+    "id": "body-curto",
+    "busca": "body bebê manga curta",
+    "faixa": {
+      "minCentavos": 1000,
+      "maxCentavos": 4000
+    }
+  },
+  {
+    "id": "body-longo",
+    "busca": "body bebê manga longa",
+    "faixa": {
+      "minCentavos": 1200,
+      "maxCentavos": 4500
+    }
+  },
+  {
+    "id": "mijao",
+    "busca": "mijão bebê",
+    "faixa": {
+      "minCentavos": 800,
+      "maxCentavos": 3000
+    }
+  },
+  {
+    "id": "macacao",
+    "busca": "macacão bebê",
+    "faixa": {
+      "minCentavos": 3000,
+      "maxCentavos": 11000
+    }
+  },
+  {
+    "id": "meias",
+    "busca": "meia bebê",
+    "faixa": {
+      "minCentavos": 400,
+      "maxCentavos": 1500
+    }
+  },
+  {
+    "id": "casaquinho",
+    "busca": "casaquinho bebê",
+    "faixa": {
+      "minCentavos": 3000,
+      "maxCentavos": 12000
+    }
+  },
+  {
+    "id": "touca",
+    "busca": "touca recém-nascido",
+    "faixa": {
+      "minCentavos": 500,
+      "maxCentavos": 3000
+    }
+  },
+  {
+    "id": "luvas",
+    "busca": "luva recém-nascido",
+    "faixa": {
+      "minCentavos": 500,
+      "maxCentavos": 2000
+    }
+  },
+  {
+    "id": "manta",
+    "busca": "manta bebê",
+    "faixa": {
+      "minCentavos": 2000,
+      "maxCentavos": 8000
+    }
+  },
+  {
+    "id": "saida-maternidade",
+    "busca": "saída de maternidade",
+    "faixa": {
+      "minCentavos": 6000,
+      "maxCentavos": 25000
+    }
+  },
+  {
+    "id": "sapatinho",
+    "busca": "sapatinho bebê",
+    "faixa": {
+      "minCentavos": 1500,
+      "maxCentavos": 7000
+    }
+  },
+  {
+    "id": "termometro",
+    "busca": "termômetro digital",
+    "faixa": {
+      "minCentavos": 1700,
+      "maxCentavos": 13000
+    }
+  },
+  {
+    "id": "soro-fisiologico",
+    "busca": "soro fisiológico 0,9%",
+    "faixa": {
+      "minCentavos": 500,
+      "maxCentavos": 1600
+    }
+  },
+  {
+    "id": "aspirador-nasal",
+    "busca": "aspirador nasal bebê",
+    "faixa": {
+      "minCentavos": 1500,
+      "maxCentavos": 10000
+    }
+  },
+  {
+    "id": "umidificador",
+    "busca": "umidificador de ar",
+    "faixa": {
+      "minCentavos": 9000,
+      "maxCentavos": 25000
+    }
+  },
+  {
+    "id": "absorvente-pos-parto",
+    "busca": "absorvente pós-parto",
+    "faixa": {
+      "minCentavos": 1300,
+      "maxCentavos": 4500
+    }
+  },
+  {
+    "id": "camisola-abertura",
+    "busca": "camisola amamentação",
+    "faixa": {
+      "minCentavos": 5500,
+      "maxCentavos": 10000
+    }
+  },
+  {
+    "id": "calcinha-pos-parto",
+    "busca": "calcinha pós-parto",
+    "faixa": {
+      "minCentavos": 1700,
+      "maxCentavos": 6500
+    }
+  },
+  {
+    "id": "cinta-pos-parto",
+    "busca": "cinta pós-parto",
+    "faixa": {
+      "minCentavos": 4000,
+      "maxCentavos": 25000
+    }
+  },
+  {
+    "id": "protetor-tomada",
+    "busca": "protetor de tomada",
+    "faixa": {
+      "minCentavos": 1000,
+      "maxCentavos": 3000
+    }
+  },
+  {
+    "id": "trava-gaveta",
+    "busca": "trava de gaveta bebê",
+    "faixa": {
+      "minCentavos": 1800,
+      "maxCentavos": 6000
+    }
+  },
+  {
+    "id": "portao-seguranca",
+    "busca": "portão de segurança escada",
+    "faixa": {
+      "minCentavos": 9000,
+      "maxCentavos": 35000
+    }
+  }
+]

@@ -1,4 +1,4 @@
-import { mesclarListas, type RegistroNuvem } from '../sincronizacao';
+import { mesclarListas, mudancaJaConhecida, type RegistroNuvem } from '../sincronizacao';
 import type { ItemLista } from '../tipos';
 
 function item(id: string, atualizadoEm: number, dados: Partial<ItemLista> = {}): ItemLista {
@@ -95,5 +95,78 @@ describe('mesclarListas', () => {
       registro('antigo', 10, { criadoEm: 1 }),
     ]);
     expect(itens.map((i) => i.id)).toEqual(['antigo', 'novo']);
+  });
+});
+
+describe('mesclarListas sem permissão de editar a lista', () => {
+  const nuvem = [
+    registro('a', 10, { precoCentavos: 5000 }),
+    registro('b', 10),
+    registro('c', 10, { removido: true }),
+  ];
+
+  it('quem só visualiza recebe a lista da nuvem e não envia nada', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('a', 20, { precoCentavos: 1, comprado: true }), item('novo', 20)],
+      { b: 30 },
+      nuvem,
+      'leitura',
+    );
+    expect(itens).toEqual([item('a', 10, { precoCentavos: 5000 }), item('b', 10)]);
+    expect(enviar).toEqual([]);
+  });
+
+  it('quem edita preços envia só o preço alterado no aparelho', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('a', 20, { precoCentavos: 4500, comprado: true, modelo: 'outro' })],
+      {},
+      nuvem,
+      'precos',
+    );
+    expect(itens).toEqual([item('a', 20, { precoCentavos: 4500 }), item('b', 10)]);
+    expect(enviar).toEqual([registro('a', 20, { precoCentavos: 4500 })]);
+  });
+
+  it('quem edita preços descarta itens novos, remoções e mudanças que não são de preço', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('b', 20, { comprado: true }), item('novo', 20)],
+      { a: 30 },
+      nuvem,
+      'precos',
+    );
+    expect(itens).toEqual([item('a', 10, { precoCentavos: 5000 }), item('b', 10)]);
+    expect(enviar).toEqual([]);
+  });
+
+  it('um preço mais novo na nuvem vence o do aparelho', () => {
+    const { itens, enviar } = mesclarListas(
+      [item('a', 5, { precoCentavos: 4500 })],
+      {},
+      nuvem,
+      'precos',
+    );
+    expect(itens[0]).toEqual(item('a', 10, { precoCentavos: 5000 }));
+    expect(enviar).toEqual([]);
+  });
+});
+
+describe('mudancaJaConhecida', () => {
+  it('ignora o eco do que o aparelho gravou', () => {
+    expect(mudancaJaConhecida(registro('a', 10), [item('a', 10)], {})).toBe(true);
+    expect(mudancaJaConhecida(registro('a', 10, { removido: true }), [], { a: 10 })).toBe(true);
+  });
+
+  it('sincroniza quando outra pessoa mudou, criou ou removeu um item', () => {
+    expect(mudancaJaConhecida(registro('a', 20), [item('a', 10)], {})).toBe(false);
+    expect(mudancaJaConhecida(registro('b', 20), [item('a', 10)], {})).toBe(false);
+    expect(mudancaJaConhecida(registro('a', 20, { removido: true }), [item('a', 10)], {})).toBe(
+      false,
+    );
+    // Alterado em outro aparelho depois de removido neste: volta para a lista.
+    expect(mudancaJaConhecida(registro('a', 20), [], { a: 10 })).toBe(false);
+  });
+
+  it('ignora a remoção de um item que o aparelho já não tem', () => {
+    expect(mudancaJaConhecida(registro('a', 20, { removido: true }), [], {})).toBe(true);
   });
 });

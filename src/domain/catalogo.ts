@@ -282,6 +282,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 1,
     porque: 'Fórmulas suaves, sem perfume forte, para a pele sensível do recém-nascido.',
     busca: 'sabonete líquido bebê',
+    precoPor: 'frasco',
   },
   {
     id: 'shampoo',
@@ -292,6 +293,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 1,
     porque: 'No começo, o sabonete neutro costuma ser suficiente também para o cabelo.',
     busca: 'shampoo infantil',
+    precoPor: 'frasco',
   },
   {
     id: 'algodao',
@@ -302,6 +304,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 2,
     porque: 'Para limpar o bebê nas trocas com água morna nas primeiras semanas.',
     busca: 'algodão bolas',
+    precoPor: 'pacote',
   },
   {
     id: 'alcool-70',
@@ -312,6 +315,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 1,
     porque: 'Usado na higiene do coto umbilical. Siga a orientação da maternidade e do pediatra.',
     busca: 'álcool 70 líquido',
+    precoPor: 'frasco',
   },
   {
     id: 'tesoura-unha',
@@ -342,6 +346,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 3,
     porque: 'Prático fora de casa. Em casa, algodão com água costuma irritar menos a pele.',
     busca: 'lenço umedecido bebê',
+    precoPor: 'pacote',
   },
   {
     id: 'pomada-assadura',
@@ -362,6 +367,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 2,
     porque: 'Compre pouco no tamanho RN: o bebê cresce rápido e o P é o mais usado.',
     busca: 'fralda descartável RN',
+    precoPor: 'pacote',
   },
   {
     id: 'fralda-p',
@@ -372,6 +378,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 4,
     porque: 'Tamanho mais usado nos primeiros meses. Bom item para pedir no chá de bebê.',
     busca: 'fralda descartável P',
+    precoPor: 'pacote',
   },
   {
     id: 'fralda-pano',
@@ -425,6 +432,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 1,
     porque: 'Evita manchas na roupa quando o leite vaza.',
     busca: 'absorvente para seios',
+    precoPor: 'caixa',
   },
   {
     id: 'bomba-leite',
@@ -543,6 +551,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 6,
     porque: 'Os pés do recém-nascido perdem calor com facilidade.',
     busca: 'meia bebê',
+    precoPor: 'par',
   },
   {
     id: 'casaquinho',
@@ -573,6 +582,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 2,
     porque: 'Evitam arranhões no rosto, mas manter as unhas curtas também resolve.',
     busca: 'luva recém-nascido',
+    precoPor: 'par',
   },
   {
     id: 'manta',
@@ -594,6 +604,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 1,
     porque: 'Conjunto confortável e adequado ao clima do dia da alta.',
     busca: 'saída de maternidade',
+    precoPor: 'conjunto',
   },
   {
     id: 'sapatinho',
@@ -604,6 +615,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 1,
     porque: 'O bebê ainda não anda. Meias costumam bastar nos primeiros meses.',
     busca: 'sapatinho bebê',
+    precoPor: 'par',
   },
 
   // Saúde
@@ -627,6 +639,7 @@ export const CATALOGO: ItemCatalogo[] = [
     quantidade: 2,
     porque: 'Usado na higiene do nariz. Siga a orientação do pediatra.',
     busca: 'soro fisiológico 0,9%',
+    precoPor: 'frasco',
   },
   {
     id: 'aspirador-nasal',
@@ -660,6 +673,7 @@ export const CATALOGO: ItemCatalogo[] = [
     porque:
       'O sangramento pós-parto é normal nas primeiras semanas. Confira a lista da sua maternidade.',
     busca: 'absorvente pós-parto',
+    precoPor: 'pacote',
   },
   {
     id: 'camisola-abertura',
@@ -699,9 +713,10 @@ export const CATALOGO: ItemCatalogo[] = [
     categoria: 'seguranca',
     prioridade: 'util',
     quando: 'depois',
-    quantidade: 10,
-    porque: 'Necessário quando o bebê começar a engatinhar.',
+    quantidade: 1,
+    porque: 'Necessário quando o bebê começar a engatinhar. Costuma vir em kits com várias peças.',
     busca: 'protetor de tomada',
+    precoPor: 'kit',
   },
   {
     id: 'trava-gaveta',
@@ -709,9 +724,11 @@ export const CATALOGO: ItemCatalogo[] = [
     categoria: 'seguranca',
     prioridade: 'util',
     quando: 'depois',
-    quantidade: 6,
-    porque: 'Impede o acesso a produtos de limpeza e objetos perigosos.',
+    quantidade: 1,
+    porque:
+      'Impede o acesso a produtos de limpeza e objetos perigosos. Costuma vir em kits com várias peças.',
     busca: 'trava de gaveta bebê',
+    precoPor: 'kit',
   },
   {
     id: 'portao-seguranca',

@@ -1,13 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 
+import type { Database } from '@/nuvem/banco.types';
+
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const chave = process.env.EXPO_PUBLIC_SUPABASE_KEY;
 
-/** Cliente do Supabase, ou `null` se o app foi gerado sem as variáveis do `.env`. */
+/**
+ * Cliente do Supabase, ou `null` se o app foi gerado sem as variáveis do `.env`. Os tipos do banco
+ * (`banco.types.ts`) fazem o TypeScript conferir nomes de tabelas, colunas e funções.
+ */
 export const supabase =
   url && chave
-    ? createClient(url, chave, {
+    ? createClient<Database>(url, chave, {
         auth: {
           storage: AsyncStorage,
           autoRefreshToken: true,

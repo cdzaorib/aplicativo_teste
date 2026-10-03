@@ -1,5 +1,5 @@
 import type { OrigemPreco } from '@/domain/precos';
-import { deLinhasReferencia, type LinhaReferencia } from '@/nuvem/linhas';
+import { deLinhasReferencia } from '@/nuvem/linhas';
 import { supabase } from '@/nuvem/supabase';
 import { useReferenciasStore } from '@/store/referencias';
 
@@ -15,7 +15,7 @@ export async function atualizarReferencias(forcar = false): Promise<void> {
   const { data, error } = await supabase.rpc('referencia_precos');
   if (error) throw error;
   useReferenciasStore.setState({
-    informados: deLinhasReferencia((data ?? []) as LinhaReferencia[]),
+    informados: deLinhasReferencia(data ?? []),
     atualizadoEm: Date.now(),
   });
 }

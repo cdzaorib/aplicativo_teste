@@ -1,4 +1,7 @@
-/** Faixa de preço comum de um item, por unidade (ou por pacote, quando o item é um pacote). */
+import { CATALOGO } from './catalogo';
+import type { UnidadePreco } from './tipos';
+
+/** Faixa de preço comum de um item, na unidade do item (ver `unidadeDePreco`). */
 export type FaixaPreco = { minCentavos: number; maxCentavos: number };
 
 /** Resumo dos preços informados por quem usa o app (vem do Supabase, só agregado). */
@@ -35,6 +38,13 @@ export function referenciaDePreco(
   }
   if (pesquisada) return { faixa: pesquisada, origem: 'pesquisa' };
   return undefined;
+}
+
+const UNIDADE_DO_CATALOGO = new Map(CATALOGO.map((item) => [item.id, item.precoPor]));
+
+/** Como o preço do item é contado (por par, por pacote...). Itens próprios contam por unidade. */
+export function unidadeDePreco(catalogoId: string | undefined): UnidadePreco {
+  return (catalogoId && UNIDADE_DO_CATALOGO.get(catalogoId)) || 'unidade';
 }
 
 export function avaliarPreco(precoCentavos: number, faixa: FaixaPreco): Avaliacao {

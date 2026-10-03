@@ -20,7 +20,16 @@ type IconeProps = {
   tamanho?: number;
 };
 
+/** Ícone decorativo: o significado vem do texto ou do rótulo do botão em volta. */
 export function Icone({ nome, cor, tamanho = 20 }: IconeProps) {
   const { ios, android } = ICONES[nome];
-  return <SymbolView name={{ ios, android, web: android }} tintColor={cor} size={tamanho} />;
+  return (
+    <SymbolView
+      name={{ ios, android, web: android }}
+      tintColor={cor}
+      size={tamanho}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    />
+  );
 }

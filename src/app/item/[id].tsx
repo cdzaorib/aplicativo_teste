@@ -9,6 +9,7 @@ import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { CATALOGO } from '@/domain/catalogo';
 import { avaliarPreco, unidadeDePreco } from '@/domain/precos';
+import { useNomeDoComprador } from '@/hooks/use-nomes-da-lista';
 import { useReferencia } from '@/hooks/use-referencia';
 import { useTheme } from '@/hooks/use-theme';
 import { useListaStore } from '@/store/lista';
@@ -22,6 +23,7 @@ export default function EditarItemScreen() {
   const remover = useListaStore((s) => s.remover);
   const referencia = useReferencia(item?.catalogoId);
   const permissao = usePermissao();
+  const nomeDoComprador = useNomeDoComprador();
 
   if (!item) {
     return (
@@ -32,6 +34,7 @@ export default function EditarItemScreen() {
   }
 
   const doCatalogo = CATALOGO.find((c) => c.id === item.catalogoId);
+  const comprador = nomeDoComprador(item);
 
   return (
     <ScrollView
@@ -39,6 +42,7 @@ export default function EditarItemScreen() {
       contentContainerStyle={[styles.conteudo, styles.espacado]}
       keyboardShouldPersistTaps="handled"
       automaticallyAdjustKeyboardInsets>
+      {comprador && <ThemedText themeColor="textSecondary">Comprado por {comprador}</ThemedText>}
       {doCatalogo && (
         <View style={[styles.dica, { backgroundColor: theme.backgroundElement }]}>
           <ThemedText type="small">{doCatalogo.porque}</ThemedText>

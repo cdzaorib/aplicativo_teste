@@ -197,7 +197,11 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - Lista em tempo real: o que outra pessoa (ou outro aparelho) muda na lista aparece em poucos
     segundos; a permissão nova vale na hora; a dona vê quem entrou sem sair da tela.
   - Quem comprou: numa lista compartilhada, o item comprado por outra pessoa mostra "Comprado por
-    Paulo", para ninguém comprar duas vezes. Ver "Como o compartilhamento funciona".
+    Paulo" na lista e na edição, para ninguém comprar duas vezes. Ver "Como o compartilhamento
+    funciona".
+  - Acabamento da Minha lista: puxar para baixo sincroniza (com login) e marcar como comprado dá
+    uma vibração leve (`src/components/vibrar.ts`, com `expo-haptics`; no Android usa o retorno
+    tátil do sistema, que não pede permissão).
   - Tela de erro (`src/components/tela-de-erro.tsx`): se uma tela quebrar, aparece "Algo deu
     errado" com "Tentar de novo", em vez de uma tela branca. É o `ErrorBoundary` exportado em
     `src/app/_layout.tsx`. Conferida na web com uma rota temporária que quebra.
@@ -211,7 +215,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 156 testes do
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 157 testes do
     app (inclusive de componentes, com a Testing Library) e 32 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,

@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { FlatList, Share, StyleSheet, View } from 'react-native';
 
 import { Botao } from '@/components/botao';
@@ -7,14 +8,16 @@ import { ItemListaLinha } from '@/components/item-lista-linha';
 import { QuandoComprar } from '@/components/quando-comprar';
 import { ResumoCard } from '@/components/resumo-card';
 import { ThemedText } from '@/components/themed-text';
+import { vibrarAoMarcar } from '@/components/vibrar';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { eHoraDeComprar, quandoDoItem } from '@/domain/gestacao';
 import { ordenarLista, resumirLista } from '@/domain/lista';
 import { listaComoTexto } from '@/domain/texto-lista';
 import { ORDENS } from '@/domain/tipos';
-import { useNomesDaLista } from '@/hooks/use-nomes-da-lista';
+import { useNomeDoComprador } from '@/hooks/use-nomes-da-lista';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
+import { sincronizar } from '@/nuvem/sincronizar';
 import { useSemanasDeGestacao } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 import { usePermissao, useSessaoStore } from '@/store/sessao';
@@ -30,8 +33,16 @@ export default function MinhaListaScreen() {
   const lista = useSessaoStore((s) => (s.usuario ? s.lista : undefined));
   const compartilhada = lista && !lista.souDona;
   const semanas = useSemanasDeGestacao();
-  const meuId = useSessaoStore((s) => s.usuario?.id);
-  const nomes = useNomesDaLista();
+  const nomeDoComprador = useNomeDoComprador();
+  const conectado = useSessaoStore((s) => s.usuario !== null);
+  const [atualizando, setAtualizando] = useState(false);
+
+  // Puxar a lista para baixo sincroniza na hora. Um erro aparece na aba Conta.
+  async function atualizar() {
+    setAtualizando(true);
+    await sincronizar().catch(() => {});
+    setAtualizando(false);
+  }
 
   const vazia = itens.length === 0;
 
@@ -43,19 +54,20 @@ export default function MinhaListaScreen() {
       automaticallyAdjustKeyboardInsets
       data={ordenarLista(itens, ordem)}
       keyExtractor={(item) => item.id}
+      refreshing={atualizando}
+      onRefresh={conectado ? atualizar : undefined}
       renderItem={({ item }) => (
         <ItemListaLinha
           item={item}
-          onAlternar={() => alternarComprado(item.id)}
+          onAlternar={() => {
+            vibrarAoMarcar(!item.comprado);
+            alternarComprado(item.id);
+          }}
           podeMarcar={permissao === 'total'}
           horaDeComprar={
             semanas !== undefined && !item.comprado && eHoraDeComprar(quandoDoItem(item), semanas)
           }
-          compradoPor={
-            item.comprado && item.compradoPor && item.compradoPor !== meuId
-              ? nomes[item.compradoPor]
-              : undefined
-          }
+          compradoPor={nomeDoComprador(item)}
         />
       )}
       ItemSeparatorComponent={Separador}

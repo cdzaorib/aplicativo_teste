@@ -38,7 +38,7 @@ se aparecer.
 - [ ] Filtros **Essencial / Útil / Opcional / Evitar** funcionam. Os itens "Evitar" mostram a
       fonte e não têm botão de adicionar.
 - [ ] **Minha lista:**
-  - [ ] marcar e desmarcar "comprado";
+  - [ ] marcar e desmarcar "comprado", com uma vibração leve;
   - [ ] a barra de progresso e o total mudam;
   - [ ] as ordenações funcionam, inclusive "Quando comprar".
 - [ ] Tocar num item abre a edição.
@@ -80,6 +80,8 @@ precisa estar em **Test users**.
 - [ ] A lista que você montou sem login continua lá. No painel do Supabase, em **Table Editor →
       itens**, os itens aparecem.
 - [ ] Mude algo na lista. Em poucos segundos, o horário de "Lista salva na nuvem" muda.
+- [ ] Na **Minha lista**, puxe a lista para baixo: aparece o indicador de carregamento e a lista
+      sincroniza.
 - [ ] **Dois aparelhos com a mesma conta:** entre no outro celular e confira se a lista aparece
       igual.
   - [ ] Com os dois abertos na **Minha lista**, marque um item como comprado num deles. Em
@@ -112,6 +114,7 @@ estar em **Test users** no Google.
   - [ ] **B** marca um item como comprado e ele aparece marcado para **A** sem **A** tocar em
         nada, com "Comprado por B" embaixo do nome.
   - [ ] No aparelho de **B**, o mesmo item aparece marcado, sem "Comprado por" (foi ele mesmo).
+  - [ ] **A** toca no item: a tela de edição também mostra "Comprado por B".
 - [ ] **B** toca em "Sair da lista compartilhada" e volta para a própria lista, com uma cópia dos
       itens.
 - [ ] **B** entra de novo e **A** usa "Remover": **B** volta para a própria lista.

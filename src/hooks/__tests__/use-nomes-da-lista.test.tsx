@@ -1,14 +1,34 @@
 import { act, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
+import type { ItemLista } from '@/domain/tipos';
 import { buscarMembros } from '@/nuvem/compartilhar';
 import { useSessaoStore } from '@/store/sessao';
-import { useNomesDaLista } from '../use-nomes-da-lista';
+import { useNomeDoComprador, useNomesDaLista } from '../use-nomes-da-lista';
 
 jest.mock('@/nuvem/compartilhar', () => ({ buscarMembros: jest.fn() }));
 
 function Nomes() {
   return <Text>{JSON.stringify(useNomesDaLista())}</Text>;
+}
+
+const item = (compradoPor: string, comprado = true): ItemLista => ({
+  id: compradoPor,
+  nome: 'Berço',
+  categoria: 'quarto',
+  prioridade: 'essencial',
+  modelo: '',
+  quantidade: 1,
+  comprado,
+  compradoPor,
+  criadoEm: 1,
+  atualizadoEm: 1,
+});
+
+function Compradores() {
+  const nomeDoComprador = useNomeDoComprador();
+  const itens = [item('paulo'), item('gabi'), item('paulo', false), item('saiu-da-lista')];
+  return <Text>{itens.map((i) => nomeDoComprador(i) ?? '-').join(',')}</Text>;
 }
 
 const lista = (id: string) => ({
@@ -41,5 +61,21 @@ describe('useNomesDaLista', () => {
 
     await act(async () => useSessaoStore.setState({ mudancasMembros: 1 }));
     expect(buscarMembros).toHaveBeenCalledTimes(2);
+  });
+
+  it('diz quem comprou só quando foi outra pessoa que ainda está na lista', async () => {
+    jest.mocked(buscarMembros).mockResolvedValue([
+      { userId: 'gabi', nome: 'Gabi', eDona: true, podeEditarLista: true, podeEditarPrecos: true },
+      {
+        userId: 'paulo',
+        nome: 'Paulo',
+        eDona: false,
+        podeEditarLista: true,
+        podeEditarPrecos: true,
+      },
+    ]);
+    useSessaoStore.setState({ usuario: { id: 'gabi' }, lista: lista('l1') });
+    await render(<Compradores />);
+    expect(await screen.findByText('Paulo,-,-,-')).toBeOnTheScreen();
   });
 });

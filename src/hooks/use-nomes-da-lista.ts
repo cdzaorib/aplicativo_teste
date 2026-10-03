@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import type { ItemLista } from '@/domain/tipos';
 import { buscarMembros } from '@/nuvem/compartilhar';
 import { useSessaoStore } from '@/store/sessao';
 
@@ -30,4 +31,17 @@ export function useNomesDaLista(): Record<string, string> {
   }, [listaId, mudancasMembros]);
 
   return buscados && buscados.listaId === listaId ? buscados.nomes : {};
+}
+
+/**
+ * Função que diz quem comprou o item, quando foi outra pessoa da lista compartilhada. Para a
+ * própria pessoa, para itens não comprados e para quem já saiu da lista, devolve `undefined`.
+ */
+export function useNomeDoComprador(): (item: ItemLista) => string | undefined {
+  const nomes = useNomesDaLista();
+  const meuId = useSessaoStore((s) => s.usuario?.id);
+  return (item) =>
+    item.comprado && item.compradoPor && item.compradoPor !== meuId
+      ? nomes[item.compradoPor]
+      : undefined;
 }

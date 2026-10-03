@@ -78,6 +78,9 @@ export default function RootLayout() {
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
         <Stack.Screen name="privacidade" options={{ title: 'Privacidade' }} />
         <Stack.Screen name="excluir-conta" options={{ title: 'Excluir conta' }} />
+        <Stack.Screen name="presentes" options={{ title: 'Lista de presentes' }} />
+        {/* Página que os convidados abrem pelo link, sem login. */}
+        <Stack.Screen name="presente/[codigo]" options={{ headerShown: false }} />
       </Stack>
     </ThemeProvider>
   );

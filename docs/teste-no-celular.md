@@ -124,7 +124,34 @@ estar em **Test users** no Google.
 - [ ] **Código errado** mostra "Código de convite inválido". Depois de 10 tentativas erradas na
       mesma hora, aparece "Muitas tentativas".
 
-## 4. Excluir conta (use uma conta de teste)
+## 4. Lista de presentes do chá de bebê
+
+No app, com login:
+
+- [ ] Na **Minha lista**, toque em "Lista de presentes do chá de bebê".
+- [ ] Ligue alguns itens em "O que entra na lista de presentes", ou toque em "Incluir os N
+      itens que faltam comprar".
+- [ ] Toque em "Criar link". Enquanto a versão web não estiver no ar (`docs/publicar.md`, passo
+      4), o app avisa que o link fica pronto depois, em vez de mostrar um link quebrado.
+
+Para testar o lado dos convidados antes de publicar, use a versão web no computador:
+
+1. Rode `npm run web`, abra `http://localhost:8081`, entre com o Google e abra a lista de
+   presentes. Lá o link aparece (`http://localhost:8081/presente/…`).
+2. Abra o link numa janela anônima do navegador (como um convidado, sem login).
+   - [ ] Aparece "Chá de bebê de" com o seu primeiro nome e os itens escolhidos, com a faixa de
+         preço.
+   - [ ] "Vou dar este", com um nome, marca o presente. Recarregar a página mantém o "Você
+         escolheu este presente" e o "Desfazer".
+   - [ ] Numa segunda janela anônima, o mesmo item aparece como "Já escolhido por alguém", sem
+         o nome.
+3. No celular, com a mesma conta:
+   - [ ] Em poucos segundos, o item mostra "Presente de" com o nome que o convidado digitou, na
+         Minha lista e na tela da lista de presentes.
+   - [ ] "Liberar" deixa o presente livre de novo.
+   - [ ] "Gerar novo link" faz o link antigo mostrar "Este link não vale mais".
+
+## 5. Excluir conta (use uma conta de teste)
 
 - [ ] **Conta → Excluir minha conta** pede confirmação.
   - [ ] Depois de excluir, o app volta para a tela de entrar, com a lista vazia.

@@ -344,7 +344,7 @@ describe('tempo real', () => {
     );
     assert.deepEqual(
       rows.map((linha) => linha.tabela),
-      ['public.itens', 'public.membros_lista'],
+      ['public.itens', 'public.membros_lista', 'public.presentes'],
     );
   });
 });
@@ -402,5 +402,213 @@ describe('quem comprou', () => {
       "select comprado, comprado_por from public.itens where id = 'berco-dona'",
     );
     assert.deepEqual(rows, [{ comprado: true, comprado_por: null }]);
+  });
+});
+
+describe('lista de presentes', () => {
+  /** Dona com dois itens na lista de presentes, um fora dela, e o link criado. */
+  async function listaDePresentes() {
+    const compartilhada = await listaCompartilhada();
+    const { dona, listaDona } = compartilhada;
+    await item(listaDona.lista_id, 'banheira', 'banheira', 'Banheira');
+    await item(listaDona.lista_id, 'absorvente', 'absorvente-pos-parto', 'Absorvente pós-parto');
+    await como(
+      dona,
+      `insert into public.presentes (lista_id, item_id) values ($1, 'berco-dona'), ($1, 'banheira')`,
+      [listaDona.lista_id],
+    );
+    const [{ codigo }] = await como(dona, 'select public.criar_link_presentes() as codigo');
+    return { ...compartilhada, codigo };
+  }
+  const ver = async (codigo) =>
+    (await como(null, 'select public.ver_lista_presentes($1) as lista', [codigo]))[0].lista;
+  const reservar = async (codigo, itemId, nome) =>
+    (
+      await como(null, 'select public.reservar_presente($1, $2, $3) as chave', [
+        codigo,
+        itemId,
+        nome,
+      ])
+    )[0].chave;
+
+  it('cria um link secreto, o mesmo da segunda vez, só para quem edita a lista', async () => {
+    const { dona, convidado, codigo } = await listaDePresentes();
+    assert.match(codigo, /^[A-HJ-NP-Z2-9]{16}$/);
+    assert.equal(
+      (await como(dona, 'select public.criar_link_presentes() as codigo'))[0].codigo,
+      codigo,
+    );
+    assert.equal(await falhaComo(convidado, 'select public.criar_link_presentes()'), '42501');
+    assert.equal(await falhaComo(null, 'select public.criar_link_presentes()'), '42501');
+  });
+
+  it('o convidado sem login vê só os itens escolhidos e o primeiro nome da dona', async () => {
+    const { codigo } = await listaDePresentes();
+    const lista = await ver(`${codigo.slice(0, 8).toLowerCase()}-${codigo.slice(8)}`);
+    assert.equal(lista.nome, 'Gabi');
+    assert.deepEqual(
+      lista.itens.map((i) => [i.nome, i.situacao]),
+      [
+        ['Banheira', 'livre'],
+        ['berco-dona', 'livre'],
+      ],
+    );
+    assert.equal(JSON.stringify(lista).includes('@'), false); // nenhum e-mail
+  });
+
+  it('um código inventado não abre a lista de ninguém', async () => {
+    await listaDePresentes();
+    assert.equal(await ver('AAAAAAAAAAAAAAAA'), null);
+    assert.equal(await ver(''), null);
+    assert.equal(await ver(null), null);
+    assert.equal(
+      await falhaComo(
+        null,
+        "select public.reservar_presente('AAAAAAAAAAAAAAAA', 'banheira', 'Tia')",
+      ),
+      'P0001',
+    );
+  });
+
+  it('cada presente só pode ser escolhido uma vez, e só os da lista', async () => {
+    const { codigo } = await listaDePresentes();
+    assert.ok(await reservar(codigo, 'banheira', '  Tia Maria  '));
+    const lista = await ver(codigo);
+    assert.equal(lista.itens.find((i) => i.id === 'banheira').situacao, 'reservado');
+    // O convidado não vê quem escolheu.
+    assert.equal(JSON.stringify(lista).includes('Maria'), false);
+
+    for (const [itemId, nome] of [
+      ['banheira', 'Tio João'], // já escolhido
+      ['absorvente', 'Tio João'], // fora da lista de presentes
+      ['berco-dona', '   '], // sem nome
+      ['berco-dona', 'x'.repeat(61)], // nome longo demais
+    ]) {
+      assert.equal(
+        await falhaComo(null, 'select public.reservar_presente($1, $2, $3)', [
+          codigo,
+          itemId,
+          nome,
+        ]),
+        'P0001',
+      );
+    }
+  });
+
+  it('quem está na lista vê quem escolheu; quem é de fora não vê nada', async () => {
+    const { dona, convidado, codigo } = await listaDePresentes();
+    await reservar(codigo, 'banheira', 'Tia Maria');
+    const daDona = await como(
+      dona,
+      "select reservado_por from public.presentes where item_id = 'banheira'",
+    );
+    assert.deepEqual(daDona, [{ reservado_por: 'Tia Maria' }]);
+    assert.equal((await como(convidado, 'select * from public.presentes')).length, 2);
+    const estranho = await pessoa('Estranho');
+    assert.equal((await como(estranho, 'select * from public.presentes')).length, 0);
+    assert.equal((await como(estranho, 'select * from public.links_presentes')).length, 0);
+    assert.equal((await como(null, 'select * from public.presentes')).length, 0);
+  });
+
+  it('desfaz com a chave certa; com outra chave, não', async () => {
+    const { codigo } = await listaDePresentes();
+    const chave = await reservar(codigo, 'banheira', 'Tia Maria');
+    assert.equal(
+      await falhaComo(null, 'select public.desfazer_reserva_presente($1, $2, $3)', [
+        codigo,
+        'banheira',
+        randomUUID(),
+      ]),
+      'P0001',
+    );
+    await como(null, 'select public.desfazer_reserva_presente($1, $2, $3)', [
+      codigo,
+      'banheira',
+      chave,
+    ]);
+    assert.equal((await ver(codigo)).itens.find((i) => i.id === 'banheira').situacao, 'livre');
+  });
+
+  it('pela API, ninguém reserva nem muda o link direto na tabela', async () => {
+    const { dona, convidado, listaDona } = await listaDePresentes();
+    await como(dona, 'select public.definir_permissoes($1, true, false)', [convidado]);
+    assert.equal(
+      await falhaComo(convidado, "update public.presentes set reservado_por = 'Eu'"),
+      '42501',
+    );
+    assert.equal(
+      await falhaComo(
+        convidado,
+        `insert into public.presentes (lista_id, item_id, reservado_por) values ($1, 'absorvente', 'Eu')`,
+        [listaDona.lista_id],
+      ),
+      '42501',
+    );
+    assert.equal(
+      await falhaComo(dona, "update public.links_presentes set codigo = 'FACIL'"),
+      '42501',
+    );
+  });
+
+  it('quem não edita a lista não inclui, não tira nem libera presentes', async () => {
+    const { convidado, listaDona, codigo } = await listaDePresentes();
+    await reservar(codigo, 'banheira', 'Tia Maria');
+    assert.equal(
+      await falhaComo(
+        convidado,
+        `insert into public.presentes (lista_id, item_id) values ($1, 'absorvente')`,
+        [listaDona.lista_id],
+      ),
+      '42501',
+    );
+    const tirados = await como(convidado, 'delete from public.presentes returning item_id');
+    assert.equal(tirados.length, 0);
+    assert.equal(await falhaComo(convidado, "select public.liberar_presente('banheira')"), '42501');
+  });
+
+  it('a dona libera um presente e troca o link; o link antigo para de funcionar', async () => {
+    const { dona, codigo } = await listaDePresentes();
+    await reservar(codigo, 'banheira', 'Brincadeira');
+    await como(dona, "select public.liberar_presente('banheira')");
+    await reservar(codigo, 'berco-dona', 'Vovó');
+
+    const [{ novo }] = await como(dona, 'select public.trocar_link_presentes() as novo');
+    assert.notEqual(novo, codigo);
+    assert.equal(await ver(codigo), null);
+    const lista = await ver(novo);
+    assert.deepEqual(
+      lista.itens.map((i) => [i.id, i.situacao]),
+      [
+        ['banheira', 'livre'],
+        ['berco-dona', 'reservado'],
+      ],
+    );
+  });
+
+  it('item comprado ou removido não pode ser escolhido', async () => {
+    const { dona, codigo } = await listaDePresentes();
+    await como(dona, "update public.itens set comprado = true where id = 'banheira'");
+    await como(dona, "update public.itens set removido = true where id = 'berco-dona'");
+    const lista = await ver(codigo);
+    assert.deepEqual(
+      lista.itens.map((i) => [i.id, i.situacao]),
+      [['banheira', 'comprado']],
+    );
+    assert.equal(
+      await falhaComo(null, 'select public.reservar_presente($1, $2, $3)', [
+        codigo,
+        'banheira',
+        'Tia',
+      ]),
+      'P0001',
+    );
+  });
+
+  it('excluir a conta da dona apaga o link e a lista de presentes', async () => {
+    const { dona, codigo } = await listaDePresentes();
+    await db.query('delete from auth.users where id = $1', [dona]);
+    assert.equal(await ver(codigo), null);
+    const { rows } = await db.query('select count(*)::int as n from public.presentes');
+    assert.equal(rows[0].n, 0);
   });
 });

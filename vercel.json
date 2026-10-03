@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npx expo export -p web",
+  "outputDirectory": "dist",
+  "devCommand": "npx expo start --web",
+  "cleanUrls": true,
+  "framework": null,
+  "rewrites": [
+    { "source": "/presente/:codigo", "destination": "/presente/[codigo].html" },
+    { "source": "/item/:id", "destination": "/item/[id].html" },
+    { "source": "/preco/:catalogoId", "destination": "/preco/[catalogoId].html" }
+  ]
+}

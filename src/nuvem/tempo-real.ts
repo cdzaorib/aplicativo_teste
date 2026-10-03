@@ -10,7 +10,8 @@ let canais = 0;
 
 /**
  * Escuta, pelo Supabase Realtime, as mudanças feitas por outras pessoas ou por outro aparelho:
- * nos itens da lista atual e na própria participação (permissões, ser removido da lista).
+ * nos itens da lista atual, na própria participação (permissões, ser removido da lista) e nas
+ * escolhas dos convidados na lista de presentes.
  * Chama `aoMudar` quando é preciso sincronizar. Retorna a função que para de escutar.
  *
  * O Realtime respeita o RLS: só chegam mudanças de linhas que a pessoa pode ler.
@@ -45,6 +46,12 @@ export function acompanharLista(
       { event: '*', schema: 'public', table: 'membros_lista', filter: `lista_id=eq.${listaId}` },
       // Alguém entrou na lista ou mudou de permissão: a tela Conta recarrega as pessoas.
       () => useSessaoStore.setState((s) => ({ mudancasMembros: s.mudancasMembros + 1 })),
+    )
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'presentes', filter: `lista_id=eq.${listaId}` },
+      // Um convidado escolheu ou desfez um presente: as telas recarregam a lista de presentes.
+      () => useSessaoStore.setState((s) => ({ mudancasPresentes: s.mudancasPresentes + 1 })),
     )
     .subscribe();
 

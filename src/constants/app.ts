@@ -17,3 +17,10 @@ export const LOGIN_APPLE_ATIVO = false;
 
 /** Quando a política de privacidade foi revisada pela última vez. */
 export const POLITICA_ATUALIZADA_EM = 'outubro de 2026';
+
+/**
+ * Endereço da versão web no ar (por exemplo, https://enxoval.vercel.app), sem barra no fim. É de
+ * lá que os convidados abrem a lista de presentes. Sem ele, o app no celular não tem link para
+ * enviar; na própria versão web, usa o endereço da página aberta.
+ */
+export const ENDERECO_WEB: string | undefined = undefined;

@@ -11,6 +11,8 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
 - com login pelo Google, salva a lista na nuvem e sincroniza entre aparelhos;
 - a lista pode ser compartilhada com parceiro e família, com permissões definidas pela gestante,
   e as mudanças aparecem na hora para todos;
+- monta a lista de presentes do chá de bebê: os convidados abrem um link, sem instalar nada, e
+  marcam o que vão dar, sem repetir;
 - a conta pode ser excluída pelo próprio app, com todos os dados dela.
 
 Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login, banco, tempo real e Edge
@@ -39,9 +41,12 @@ Capturas da versão web (React Native Web). No celular, as abas são as nativas 
   faixa central (25% a 75%), que resiste a um valor distorcido.
 - **Coleta de ofertas:** Edge Function (Deno) que assina as chamadas à API da Shopee e busca 4
   itens por vez. As regras ficam num arquivo puro, testado também no Node.
+- **Lista de presentes sem login:** os convidados usam só funções do banco que exigem um código
+  secreto de 16 caracteres; quem escolheu fica visível só para a família, e desfazer exige uma
+  chave guardada no aparelho do convidado (o banco guarda só o hash).
 - **Privacidade:** a data prevista do parto (dado de saúde, LGPD) nunca sai do aparelho, e a
   exclusão de conta apaga tudo em cascata.
-- **Testes e CI:** 158 testes do app (Jest e Testing Library) e 32 do banco, que aplicam todas as
+- **Testes e CI:** 167 testes do app (Jest e Testing Library) e 43 do banco, que aplicam todas as
   migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
   tipos do app e das Edge Functions, Prettier e os testes em cada push.
 
@@ -109,6 +114,7 @@ src/
     (tabs)/     abas: Minha lista, Sugestões, Conta
     item/       modais de criar e editar item
     preco/      modal de comparar preço
+    presente/   página que os convidados abrem pelo link da lista de presentes (sem login)
   components/   componentes visuais reutilizáveis
   domain/       regras de negócio sem React: catálogo, faixas de preço, avaliação, mesclagem
   nuvem/        Supabase: cliente, login, sincronização, tempo real, compartilhamento e preços

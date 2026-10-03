@@ -15,6 +15,7 @@ import { filtrarLista, ordenarLista, resumirLista } from '@/domain/lista';
 import { listaComoTexto } from '@/domain/texto-lista';
 import { FILTROS, ORDENS, type FiltroLista } from '@/domain/tipos';
 import { useNomeDoComprador } from '@/hooks/use-nomes-da-lista';
+import { usePresentes } from '@/hooks/use-presentes';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
 import { sincronizar } from '@/nuvem/sincronizar';
@@ -41,6 +42,7 @@ export default function MinhaListaScreen() {
   const compartilhada = lista && !lista.souDona;
   const semanas = useSemanasDeGestacao();
   const nomeDoComprador = useNomeDoComprador();
+  const { presentes } = usePresentes();
   const conectado = useSessaoStore((s) => s.usuario !== null);
   const [atualizando, setAtualizando] = useState(false);
   // Não fica salvo: ao abrir o app de novo, a lista aparece inteira.
@@ -77,6 +79,7 @@ export default function MinhaListaScreen() {
             semanas !== undefined && !item.comprado && eHoraDeComprar(quandoDoItem(item), semanas)
           }
           compradoPor={nomeDoComprador(item)}
+          presenteDe={presentes[item.id]?.reservadoPor}
         />
       )}
       ItemSeparatorComponent={Separador}
@@ -151,6 +154,13 @@ export default function MinhaListaScreen() {
               titulo="Adicionar item próprio"
               variante="secundario"
               onPress={() => router.push('/item/novo')}
+            />
+          )}
+          {!vazia && (
+            <Botao
+              titulo="Lista de presentes do chá de bebê"
+              variante="secundario"
+              onPress={() => router.push('/presentes')}
             />
           )}
           {!vazia && (

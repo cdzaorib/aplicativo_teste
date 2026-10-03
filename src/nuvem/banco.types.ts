@@ -147,6 +147,32 @@ export type Database = {
         };
         Relationships: [];
       };
+      links_presentes: {
+        Row: {
+          codigo: string;
+          criado_em: string;
+          lista_id: string;
+        };
+        Insert: {
+          codigo: string;
+          criado_em?: string;
+          lista_id: string;
+        };
+        Update: {
+          codigo?: string;
+          criado_em?: string;
+          lista_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'links_presentes_lista_id_fkey';
+            columns: ['lista_id'];
+            isOneToOne: true;
+            referencedRelation: 'listas';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       listas: {
         Row: {
           codigo_convite: string;
@@ -278,13 +304,53 @@ export type Database = {
         };
         Relationships: [];
       };
+      presentes: {
+        Row: {
+          chave_reserva_hash: string | null;
+          incluido_em: string;
+          item_id: string;
+          lista_id: string;
+          reservado_em: string | null;
+          reservado_por: string | null;
+        };
+        Insert: {
+          chave_reserva_hash?: string | null;
+          incluido_em?: string;
+          item_id: string;
+          lista_id: string;
+          reservado_em?: string | null;
+          reservado_por?: string | null;
+        };
+        Update: {
+          chave_reserva_hash?: string | null;
+          incluido_em?: string;
+          item_id?: string;
+          lista_id?: string;
+          reservado_em?: string | null;
+          reservado_por?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'presentes_lista_id_item_id_fkey';
+            columns: ['lista_id', 'item_id'];
+            isOneToOne: true;
+            referencedRelation: 'itens';
+            referencedColumns: ['lista_id', 'id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
+      criar_link_presentes: { Args: never; Returns: string };
       definir_permissoes: {
         Args: { editar_lista: boolean; editar_precos: boolean; membro: string };
+        Returns: undefined;
+      };
+      desfazer_reserva_presente: {
+        Args: { chave: string; codigo_link: string; item: string };
         Returns: undefined;
       };
       entrar_na_lista: { Args: { codigo: string }; Returns: string };
@@ -299,6 +365,7 @@ export type Database = {
           pode_editar_precos: boolean;
         }[];
       };
+      liberar_presente: { Args: { item: string }; Returns: undefined };
       novo_codigo_convite: { Args: never; Returns: string };
       referencia_precos: {
         Args: never;
@@ -310,7 +377,13 @@ export type Database = {
         }[];
       };
       remover_membro: { Args: { membro: string }; Returns: undefined };
+      reservar_presente: {
+        Args: { codigo_link: string; item: string; nome_convidado: string };
+        Returns: string;
+      };
       sair_da_lista: { Args: never; Returns: undefined };
+      trocar_link_presentes: { Args: never; Returns: string };
+      ver_lista_presentes: { Args: { codigo_link: string }; Returns: Json };
     };
     Enums: {
       [_ in never]: never;

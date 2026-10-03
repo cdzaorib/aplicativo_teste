@@ -75,7 +75,7 @@ function linha(id: string, atualizadoEm: number, dados: Partial<LinhaItem> = {})
 
 beforeEach(() => {
   useListaStore.setState({ itens: [item('a', 1000)], removidos: {} });
-  useSessaoStore.setState({ mudancasMembros: 0 });
+  useSessaoStore.setState({ mudancasMembros: 0, mudancasPresentes: 0 });
 });
 
 describe('acompanharLista', () => {
@@ -86,6 +86,7 @@ describe('acompanharLista', () => {
       ['itens', 'lista_id=eq.lista-1'],
       ['membros_lista', 'user_id=eq.eu'],
       ['membros_lista', 'lista_id=eq.lista-1'],
+      ['presentes', 'lista_id=eq.lista-1'],
     ]);
     expect(canal.subscribe).toHaveBeenCalled();
   });
@@ -113,6 +114,9 @@ describe('acompanharLista', () => {
 
     avisar('membros_lista', 'lista_id=eq.lista-1', { user_id: 'convidado' });
     expect(useSessaoStore.getState().mudancasMembros).toBe(1);
+
+    avisar('presentes', 'lista_id=eq.lista-1', { item_id: 'banheira' });
+    expect(useSessaoStore.getState().mudancasPresentes).toBe(1);
   });
 
   it('para de escutar e usa um canal novo a cada vez', () => {

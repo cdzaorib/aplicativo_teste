@@ -44,7 +44,9 @@ Cada item do catálogo tem:
 - marcar como comprado;
 - ordenar por nome, valor, modelo, prioridade ou categoria;
 - orçamento total previsto × gasto;
-- compartilhar a lista com o parceiro/família (também ajuda a crescer).
+- compartilhar a lista com o parceiro/família (também ajuda a crescer);
+- lista de presentes do chá de bebê: os convidados abrem um link, sem instalar o app, e marcam
+  o que vão dar (feito; o link depende da versão web no ar).
 
 ### 3.3 Preços
 

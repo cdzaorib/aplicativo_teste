@@ -19,6 +19,8 @@ type Props = {
   horaDeComprar?: boolean;
   /** Numa lista compartilhada, o nome de quem comprou, se não foi a própria pessoa. */
   compradoPor?: string;
+  /** Nome do convidado que escolheu dar o item, pela lista de presentes. */
+  presenteDe?: string;
 };
 
 export function ItemListaLinha({
@@ -27,6 +29,7 @@ export function ItemListaLinha({
   podeMarcar = true,
   horaDeComprar,
   compradoPor,
+  presenteDe,
 }: Props) {
   const theme = useTheme();
   const detalhes = [item.modelo, item.quantidade > 1 ? `${item.quantidade} un.` : '']
@@ -66,6 +69,11 @@ export function ItemListaLinha({
             {compradoPor ? (
               <ThemedText type="small" themeColor="textSecondary">
                 Comprado por {compradoPor}
+              </ThemedText>
+            ) : null}
+            {presenteDe ? (
+              <ThemedText type="small" style={{ color: theme.primary }}>
+                Presente de {presenteDe}
               </ThemedText>
             ) : null}
             <View style={styles.selos}>

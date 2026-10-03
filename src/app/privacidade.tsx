@@ -55,8 +55,27 @@ export default function PrivacidadeScreen() {
         </Topico>
         <Topico>
           quantas vezes você tentou um código de convite na última hora, para impedir que alguém
-          descubra listas de outras pessoas.
+          descubra listas de outras pessoas;
         </Topico>
+        <Topico>
+          se você criar a lista de presentes do chá de bebê, quais itens estão nela e o nome que
+          cada convidado digitou ao escolher um presente.
+        </Topico>
+      </Secao>
+
+      <Secao titulo="Lista de presentes do chá de bebê">
+        <Paragrafo>
+          Quem tem o link da lista de presentes vê, sem login, o seu primeiro nome e os itens que
+          você colocou nela, com nome, modelo e quantidade. Não vê seu e-mail, preços, a data
+          prevista nem o resto da lista. Você pode gerar um novo link a qualquer momento, e o antigo
+          para de funcionar.
+        </Paragrafo>
+        <Paragrafo>
+          O convidado que escolhe um presente digita um nome. Só as pessoas da sua lista veem esse
+          nome; os outros convidados veem apenas que o presente já foi escolhido. O aparelho do
+          convidado guarda uma chave para ele poder desfazer a escolha. Esses dados são apagados
+          quando o item sai da lista de presentes ou quando a sua conta é excluída.
+        </Paragrafo>
       </Secao>
 
       <Secao titulo="Com quem os dados ficam">

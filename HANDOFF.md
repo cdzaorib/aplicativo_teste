@@ -121,6 +121,14 @@ Nenhuma das duas está em uso nem exposta.
   informados e itens mais escolhidos). São só somas; o app não tem analytics. Foram rodadas no
   banco real e funcionam, mas hoje dão zero.
 
+- **Lista de presentes:** pronta no app e no banco, mas o link para os convidados depende da
+  versão web no ar. Falta (ação do usuário, ou pedir para fazer pela Vercel):
+  - publicar a versão web (o `vercel.json` já está pronto; ver `docs/publicar.md`, passo 4);
+  - colocar o endereço em `ENDERECO_WEB` (`src/constants/app.ts`) e nas Redirect URLs do
+    Supabase.
+  - Até lá, dá para testar com `npm run web`: na versão web, o link usa o próprio endereço
+    aberto (`http://localhost:8081/presente/...`).
+
 ### 6. Antes de publicar (Fase 4)
 
 O guia completo, com decisões, contas, builds (`eas.json`) e rascunho dos formulários de
@@ -139,7 +147,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   pedem. Falta:
   - definir o **e-mail de contato** em `src/constants/app.ts` (sem ele, as páginas mostram "e-mail
     de contato a definir");
-  - colocar a versão web no ar, por exemplo na Vercel, para ter os endereços públicos;
+  - colocar a versão web no ar (`vercel.json` pronto), para ter os endereços públicos;
   - uma revisão jurídica do texto.
 - **Exclusão de conta pelo app:** aba Conta → "Excluir minha conta", o que a Apple exige. Apaga
   também a lista e a data prevista do parto guardadas no aparelho.
@@ -172,7 +180,10 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - `itens_lista` não é mais usada (ver item 3).
   - O advisor de segurança aponta as funções SECURITY DEFINER chamáveis pela API. É intencional:
     - `referencia_precos` devolve só agregados de 5 pessoas ou mais;
-    - as operações de lista conferem dentro delas quem é dona ou membro.
+    - as operações de lista conferem dentro delas quem é dona ou membro;
+    - as funções da lista de presentes para convidados (`ver_lista_presentes`,
+      `reservar_presente`, `desfazer_reserva_presente`) são para quem não tem login e exigem o
+      código secreto do link; as de montar a lista conferem quem pode editar.
   - O advisor também avisa que `privado.tentativas_convite` tem RLS sem política. É intencional:
     só a função `entrar_na_lista` mexe nela, e o esquema `privado` não é publicado.
 - **Feito:**
@@ -204,6 +215,9 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - Quem comprou: numa lista compartilhada, o item comprado por outra pessoa mostra "Comprado por
     Paulo" na lista e na edição, para ninguém comprar duas vezes. Ver "Como o compartilhamento
     funciona".
+  - Lista de presentes do chá de bebê: quem edita a lista escolhe os itens e cria um link
+    secreto; os convidados abrem no navegador, sem login, e marcam "Vou dar este" com o nome.
+    Ver "Como a lista de presentes funciona".
   - "Por onde começar": com a lista vazia, a Minha lista mostra os 3 primeiros passos
     (sugestões, data prevista e login para compartilhar).
   - Filtro "Mostrar: Tudo · Falta comprar · Comprados" na Minha lista (`filtrarLista`). Não fica
@@ -224,8 +238,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 158 testes do
-    app (inclusive de componentes, com a Testing Library) e 32 testes do banco e da coleta de
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 167 testes do
+    app (inclusive de componentes, com a Testing Library) e 43 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
     ordenação e a data mantida depois de recarregar.
@@ -300,6 +314,36 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
 - **Outro aparelho:** a lista do aparelho guarda `listaId`. Se a pessoa virou convidada numa lista
   por outro celular, os itens locais, que são de outra lista, são descartados antes de
   sincronizar (`itensSaoDeOutraLista`). Voltando para a própria lista, eles ficam como cópia.
+
+## Como a lista de presentes funciona
+
+- **Banco** (migração `lista_presentes`):
+  - `links_presentes`: um código secreto de 16 caracteres por lista (80 bits; não dá para
+    adivinhar). Diferente do código de convite, que dá acesso à lista inteira.
+  - `presentes`: os itens que entram na lista de presentes e, se alguém escolheu, o nome
+    (`reservado_por`) e o hash da chave para desfazer.
+  - Quem está na lista lê as duas tabelas (RLS). Quem edita a lista inclui e tira itens direto
+    pela API; reservar e trocar o link, só pelas funções.
+- **Convidados, sem login** (funções liberadas para `anon`, todas exigem o código):
+  - `ver_lista_presentes`: o primeiro nome da dona e os itens (nome, modelo, quantidade,
+    situação livre/reservado/comprado). Nunca o e-mail, os preços nem quem escolheu.
+  - `reservar_presente`: grava o nome (1 a 60 letras) se o item estiver livre e devolve uma
+    chave. Dois convidados ao mesmo tempo: só um consegue.
+  - `desfazer_reserva_presente`: só com a chave certa. O banco guarda só o hash dela.
+- **Quem edita a lista:** `criar_link_presentes`, `trocar_link_presentes` (o link antigo para de
+  funcionar) e `liberar_presente`.
+- **App:**
+  - Tela `src/app/presentes.tsx` (botão no fim da Minha lista): o link, "Enviar link", os itens
+    com um interruptor cada, "Incluir os N itens que faltam comprar" e "Liberar".
+  - Página dos convidados `src/app/presente/[codigo].tsx`, que funciona na versão web. A chave de
+    cada escolha fica no aparelho do convidado (`src/store/escolhas-presentes.ts`).
+  - Na Minha lista, o item escolhido mostra "Presente de Tia Maria". As escolhas chegam em tempo
+    real (`presentes` está na publicação do Realtime).
+- **Limite conhecido:** quem tem o link pode marcar presentes com nomes falsos. A dona libera o
+  que for brincadeira e, se precisar, gera um novo link.
+- **Erro evitado e testado:** numa função SQL, um parâmetro com o mesmo nome de uma coluna
+  (`codigo`) perde para a coluna, e qualquer código acharia uma lista. Por isso os parâmetros se
+  chamam `codigo_link`; o teste "um código inventado não abre a lista de ninguém" pega isso.
 
 ## Como a exclusão de conta funciona
 

@@ -47,13 +47,28 @@ npx eas-cli@latest submit --platform ios                        # envia para a A
 No build do app instalado, a volta do login usa `enxoval://auth-callback`, que já está nas
 Redirect URLs do Supabase (`docs/login-google.md`).
 
-## 4. Endereços que as lojas pedem
+## 4. Versão web no ar (privacidade, exclusão e lista de presentes)
 
-A versão web do app tem as duas páginas. Coloque a versão web no ar, por exemplo na Vercel com
-`npx expo export --platform web` e o conteúdo da pasta `dist`. Os endereços ficam assim:
+A versão web do app serve para três coisas: as duas páginas que as lojas pedem e a lista de
+presentes do chá de bebê, que os convidados abrem pelo link sem instalar nada.
+
+O `vercel.json` já está pronto: ele monta a versão web e faz os endereços com código (como
+`/presente/K7P2…`) abrirem a página certa. Na Vercel, importe o repositório do GitHub (ou rode
+`npx vercel` na pasta do projeto) e publique.
+
+Depois de publicar:
+
+1. Coloque o endereço em `ENDERECO_WEB`, em `src/constants/app.ts` (por exemplo,
+   `'https://enxoval.vercel.app'`). Sem ele, o app no celular não tem link de presentes para
+   enviar.
+2. No Supabase, em **Authentication → URL Configuration → Redirect URLs**, adicione
+   `https://SEU-ENDERECO/**`, para o login funcionar também na versão web publicada.
+
+Os endereços ficam assim:
 
 - política de privacidade: `https://SEU-ENDERECO/privacidade`;
-- exclusão de conta (Google Play): `https://SEU-ENDERECO/excluir-conta`.
+- exclusão de conta (Google Play): `https://SEU-ENDERECO/excluir-conta`;
+- lista de presentes: `https://SEU-ENDERECO/presente/CÓDIGO` (o app monta e envia).
 
 ## 5. Formulários de privacidade (rascunho)
 
@@ -63,8 +78,8 @@ Com base no que o app faz hoje. Revise antes de enviar.
 
 - **Dados coletados:**
   - **Informações pessoais:** nome e e-mail, para a conta (funcionalidade do app);
-  - **Conteúdo gerado pelo usuário:** a lista do enxoval e os preços informados
-    (funcionalidade do app).
+  - **Conteúdo gerado pelo usuário:** a lista do enxoval, os preços informados e, na lista de
+    presentes, o nome que cada convidado digita (funcionalidade do app).
 - **Dados compartilhados com terceiros:** nenhum. Supabase e Google atuam como prestadores de
   serviço, o que não conta como compartilhamento.
 - **Data prevista do parto:** não é coletada; fica só no aparelho.

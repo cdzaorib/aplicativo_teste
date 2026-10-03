@@ -199,6 +199,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - Quem comprou: numa lista compartilhada, o item comprado por outra pessoa mostra "Comprado por
     Paulo" na lista e na edição, para ninguém comprar duas vezes. Ver "Como o compartilhamento
     funciona".
+  - Filtro "Mostrar: Tudo · Falta comprar · Comprados" na Minha lista (`filtrarLista`). Não fica
+    salvo, para a lista sempre abrir inteira.
   - Acabamento da Minha lista: puxar para baixo sincroniza (com login) e marcar como comprado dá
     uma vibração leve (`src/components/vibrar.ts`, com `expo-haptics`; no Android usa o retorno
     tátil do sistema, que não pede permissão).
@@ -215,7 +217,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 157 testes do
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 158 testes do
     app (inclusive de componentes, com a Testing Library) e 32 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,

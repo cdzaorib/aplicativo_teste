@@ -11,9 +11,9 @@ import { ThemedText } from '@/components/themed-text';
 import { vibrarAoMarcar } from '@/components/vibrar';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { eHoraDeComprar, quandoDoItem } from '@/domain/gestacao';
-import { ordenarLista, resumirLista } from '@/domain/lista';
+import { filtrarLista, ordenarLista, resumirLista } from '@/domain/lista';
 import { listaComoTexto } from '@/domain/texto-lista';
-import { ORDENS } from '@/domain/tipos';
+import { FILTROS, ORDENS, type FiltroLista } from '@/domain/tipos';
 import { useNomeDoComprador } from '@/hooks/use-nomes-da-lista';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
@@ -36,6 +36,8 @@ export default function MinhaListaScreen() {
   const nomeDoComprador = useNomeDoComprador();
   const conectado = useSessaoStore((s) => s.usuario !== null);
   const [atualizando, setAtualizando] = useState(false);
+  // Não fica salvo: ao abrir o app de novo, a lista aparece inteira.
+  const [mostrar, setMostrar] = useState<FiltroLista>('todos');
 
   // Puxar a lista para baixo sincroniza na hora. Um erro aparece na aba Conta.
   async function atualizar() {
@@ -52,7 +54,7 @@ export default function MinhaListaScreen() {
       contentContainerStyle={[styles.conteudo, insets]}
       keyboardShouldPersistTaps="handled"
       automaticallyAdjustKeyboardInsets
-      data={ordenarLista(itens, ordem)}
+      data={filtrarLista(ordenarLista(itens, ordem), mostrar)}
       keyExtractor={(item) => item.id}
       refreshing={atualizando}
       onRefresh={conectado ? atualizar : undefined}
@@ -96,6 +98,12 @@ export default function MinhaListaScreen() {
               <ResumoCard resumo={resumirLista(itens)} />
               <View style={styles.ordenacao}>
                 <ThemedText type="small" themeColor="textSecondary">
+                  Mostrar
+                </ThemedText>
+                <Chips rotulo="Mostrar" opcoes={FILTROS} valor={mostrar} onChange={setMostrar} />
+              </View>
+              <View style={styles.ordenacao}>
+                <ThemedText type="small" themeColor="textSecondary">
                   Ordenar por
                 </ThemedText>
                 <Chips rotulo="Ordenar por" opcoes={ORDENS} valor={ordem} onChange={definirOrdem} />
@@ -105,14 +113,22 @@ export default function MinhaListaScreen() {
         </View>
       }
       ListEmptyComponent={
-        <View style={styles.vazia}>
+        vazia ? (
+          <View style={styles.vazia}>
+            <ThemedText themeColor="textSecondary">
+              {permissao === 'total'
+                ? 'Sua lista está vazia. Comece pelas sugestões de enxoval ou adicione um item seu.'
+                : 'A lista ainda está vazia.'}
+            </ThemedText>
+            <Botao titulo="Ver sugestões" onPress={() => router.navigate('/sugestoes')} />
+          </View>
+        ) : (
           <ThemedText themeColor="textSecondary">
-            {permissao === 'total'
-              ? 'Sua lista está vazia. Comece pelas sugestões de enxoval ou adicione um item seu.'
-              : 'A lista ainda está vazia.'}
+            {mostrar === 'falta'
+              ? 'Tudo comprado! Não falta nenhum item da lista.'
+              : 'Nenhum item comprado ainda.'}
           </ThemedText>
-          <Botao titulo="Ver sugestões" onPress={() => router.navigate('/sugestoes')} />
-        </View>
+        )
       }
       ListFooterComponent={
         <View style={styles.rodape}>

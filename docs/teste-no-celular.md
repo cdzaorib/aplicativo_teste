@@ -40,7 +40,9 @@ se aparecer.
 - [ ] **Minha lista:**
   - [ ] marcar e desmarcar "comprado", com uma vibração leve;
   - [ ] a barra de progresso e o total mudam;
-  - [ ] as ordenações funcionam, inclusive "Quando comprar".
+  - [ ] as ordenações funcionam, inclusive "Quando comprar";
+  - [ ] "Mostrar: Falta comprar" esconde os comprados e "Comprados" mostra só eles. Ao fechar e
+        abrir o app, volta para "Tudo".
 - [ ] Tocar num item abre a edição.
   - [ ] Mudar modelo, preço ("Preço por …") e quantidade e salvar.
   - [ ] O total "Previsto" muda.

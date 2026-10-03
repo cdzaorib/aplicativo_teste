@@ -1,4 +1,11 @@
-import { formatarPreco, lerPreco, ordenarLista, precoParaTexto, resumirLista } from '../lista';
+import {
+  filtrarLista,
+  formatarPreco,
+  lerPreco,
+  ordenarLista,
+  precoParaTexto,
+  resumirLista,
+} from '../lista';
 import type { ItemLista } from '../tipos';
 
 function item(dados: Partial<ItemLista> & Pick<ItemLista, 'id' | 'nome'>): ItemLista {
@@ -99,6 +106,21 @@ describe('ordenarLista', () => {
     const copia = [...itens];
     ordenarLista(itens, 'valor');
     expect(itens).toEqual(copia);
+  });
+});
+
+describe('filtrarLista', () => {
+  const itens = [
+    item({ id: 'a', nome: 'Berço', comprado: true }),
+    item({ id: 'b', nome: 'Banheira' }),
+    item({ id: 'c', nome: 'Body', comprado: true }),
+  ];
+  const ids = (lista: ItemLista[]) => lista.map((i) => i.id);
+
+  it('mostra tudo, só o que falta comprar ou só o que já foi comprado', () => {
+    expect(ids(filtrarLista(itens, 'todos'))).toEqual(['a', 'b', 'c']);
+    expect(ids(filtrarLista(itens, 'falta'))).toEqual(['b']);
+    expect(ids(filtrarLista(itens, 'comprados'))).toEqual(['a', 'c']);
   });
 });
 

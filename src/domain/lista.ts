@@ -1,5 +1,11 @@
 import { INICIO_COMPRA, quandoDoItem } from './gestacao';
-import { CATEGORIAS, type ItemLista, type OrdemLista, type Prioridade } from './tipos';
+import {
+  CATEGORIAS,
+  type FiltroLista,
+  type ItemLista,
+  type OrdemLista,
+  type Prioridade,
+} from './tipos';
 
 const PESO_PRIORIDADE: Record<Prioridade, number> = {
   essencial: 0,
@@ -41,6 +47,12 @@ export function ordenarLista(itens: ItemLista[], ordem: OrdemLista): ItemLista[]
       COMPARADORES[ordem](a, b) ||
       comparaTexto(a.nome, b.nome),
   );
+}
+
+/** Deixa só os itens que ainda faltam comprar, só os comprados, ou todos. */
+export function filtrarLista(itens: ItemLista[], filtro: FiltroLista): ItemLista[] {
+  if (filtro === 'todos') return itens;
+  return itens.filter((item) => item.comprado === (filtro === 'comprados'));
 }
 
 export type ResumoLista = {

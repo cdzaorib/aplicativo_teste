@@ -84,6 +84,15 @@ export const QUANDO: Record<Quando, string> = {
   depois: 'Depois do nascimento',
 };
 
+/** Quais itens da lista mostrar. */
+export type FiltroLista = 'todos' | 'falta' | 'comprados';
+
+export const FILTROS: Record<FiltroLista, string> = {
+  todos: 'Tudo',
+  falta: 'Falta comprar',
+  comprados: 'Comprados',
+};
+
 export const ORDENS: Record<OrdemLista, string> = {
   prioridade: 'Prioridade',
   nome: 'Nome',

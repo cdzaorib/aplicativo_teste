@@ -1,5 +1,5 @@
 import type { RegistroNuvem } from '@/domain/sincronizacao';
-import { deLinha, deLinhaInfoLista, deLinhasReferencia, paraLinha } from '../linhas';
+import { deLinha, deLinhaInfoLista, deLinhaOferta, deLinhasReferencia, paraLinha } from '../linhas';
 
 const completo: RegistroNuvem = {
   id: 'abc',
@@ -95,5 +95,31 @@ describe('dados da lista vindos do banco', () => {
         nome_dona: null,
       }),
     ).toEqual({ id: 'l1', souDona: false, podeEditarLista: false, podeEditarPrecos: true });
+  });
+});
+
+describe('deLinhaOferta', () => {
+  it('converte a linha do banco, aceitando avaliação como texto e campos vazios', () => {
+    expect(
+      deLinhaOferta({
+        produto_id: '1',
+        nome: 'Berço',
+        preco_min_centavos: 89990,
+        preco_max_centavos: 99990,
+        link: 'https://shopee.com.br/berco-1',
+        imagem_url: null,
+        avaliacao: '4.9',
+        vendas: null,
+        coletado_em: '2026-10-03T12:00:00.000Z',
+      }),
+    ).toEqual({
+      produtoId: '1',
+      nome: 'Berço',
+      precoMinCentavos: 89990,
+      precoMaxCentavos: 99990,
+      link: 'https://shopee.com.br/berco-1',
+      avaliacao: 4.9,
+      coletadoEm: Date.UTC(2026, 9, 3, 12),
+    });
   });
 });

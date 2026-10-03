@@ -7,6 +7,7 @@ import { AvaliacaoPreco, FaixaReferencia } from '@/components/avaliacao-preco';
 import { Botao } from '@/components/botao';
 import { Campo } from '@/components/campo';
 import { Chips } from '@/components/chips';
+import { OfertasLoja } from '@/components/ofertas-loja';
 import { PrioridadeBadge } from '@/components/prioridade-badge';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
@@ -102,6 +103,12 @@ export default function CompararPrecoScreen() {
       <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
         <FaixaReferencia referencia={referencia} unidade={unidadeDePreco(item.id)} />
       </View>
+
+      <OfertasLoja
+        catalogoId={item.id}
+        faixa={referencia?.faixa}
+        unidade={unidadeDePreco(item.id)}
+      />
 
       <View style={styles.secao}>
         <ThemedText type="smallBold">Ver opções nas lojas</ThemedText>

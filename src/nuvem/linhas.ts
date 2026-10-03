@@ -96,3 +96,45 @@ export function deLinhaInfoLista(linha: LinhaInfoLista): InfoLista {
     ...(linha.nome_dona !== null && { nomeDona: linha.nome_dona }),
   };
 }
+
+/** Oferta de uma loja para um item do catálogo, coletada pela Edge Function `coletar-ofertas`. */
+export type Oferta = {
+  produtoId: string;
+  nome: string;
+  precoMinCentavos: number;
+  precoMaxCentavos: number;
+  link: string;
+  imagemUrl?: string;
+  avaliacao?: number;
+  vendas?: number;
+  coletadoEm: number;
+};
+
+/** Linha da tabela `ofertas` (supabase/migrations). */
+export type LinhaOferta = {
+  produto_id: string;
+  nome: string;
+  preco_min_centavos: number;
+  preco_max_centavos: number;
+  link: string;
+  imagem_url: string | null;
+  // O PostgREST devolve `numeric` como número ou texto, dependendo da configuração.
+  avaliacao: number | string | null;
+  vendas: number | null;
+  coletado_em: string;
+};
+
+export function deLinhaOferta(linha: LinhaOferta): Oferta {
+  const avaliacao = linha.avaliacao === null ? undefined : Number(linha.avaliacao);
+  return {
+    produtoId: linha.produto_id,
+    nome: linha.nome,
+    precoMinCentavos: linha.preco_min_centavos,
+    precoMaxCentavos: linha.preco_max_centavos,
+    link: linha.link,
+    ...(linha.imagem_url && { imagemUrl: linha.imagem_url }),
+    ...(avaliacao !== undefined && Number.isFinite(avaliacao) && { avaliacao }),
+    ...(linha.vendas !== null && { vendas: linha.vendas }),
+    coletadoEm: Date.parse(linha.coletado_em),
+  };
+}

@@ -27,15 +27,16 @@ precisa estar ativado no projeto: veja [`docs/login-google.md`](docs/login-googl
 
 ## Scripts
 
-| Comando              | O que faz                                                                  |
-| -------------------- | -------------------------------------------------------------------------- |
-| `npm start`          | Inicia o servidor de desenvolvimento                                       |
-| `npm test`           | Roda os testes do app (Jest)                                               |
-| `npm run test:banco` | Aplica as migrações num Postgres local (PGlite) e testa as regras do banco |
-| `npm run lint`       | Verifica o código com ESLint                                               |
-| `npm run typecheck`  | Verifica os tipos com TypeScript                                           |
-| `npm run format`     | Formata o código com Prettier                                              |
-| `npm run check`      | Roda tudo acima, como o CI faz em cada push e PR                           |
+| Comando                         | O que faz                                                                              |
+| ------------------------------- | -------------------------------------------------------------------------------------- |
+| `npm start`                     | Inicia o servidor de desenvolvimento                                                   |
+| `npm test`                      | Roda os testes do app (Jest)                                                           |
+| `npm run test:supabase`         | Testa as regras do banco (migrações num Postgres local, PGlite) e da coleta de ofertas |
+| `npm run gerar:catalogo-coleta` | Atualiza a lista de itens da coleta de ofertas depois de mudar o catálogo              |
+| `npm run lint`                  | Verifica o código com ESLint                                                           |
+| `npm run typecheck`             | Verifica os tipos com TypeScript                                                       |
+| `npm run format`                | Formata o código com Prettier                                                          |
+| `npm run check`                 | Roda tudo acima, como o CI faz em cada push e PR                                       |
 
 ## Estrutura
 
@@ -53,8 +54,9 @@ src/
   constants/    cores e espaçamentos
 supabase/
   migrations/   estrutura do banco (listas, membros, itens, preços e regras de acesso)
-  functions/    Edge Functions (Deno): excluir-conta
-  testes/       testes do banco com PGlite (npm run test:banco)
+  functions/    Edge Functions (Deno): excluir-conta e coletar-ofertas
+  testes/       testes do banco (PGlite) e da coleta de ofertas (npm run test:supabase)
+scripts/        geração do catálogo da coleta de ofertas
 ```
 
 ## Documentos
@@ -63,3 +65,4 @@ supabase/
 - [`HANDOFF.md`](HANDOFF.md) — o que já foi feito e o que falta.
 - [`docs/login-google.md`](docs/login-google.md) — como ativar o login com Google.
 - [`docs/teste-no-celular.md`](docs/teste-no-celular.md) — roteiro de teste no Android e no iPhone.
+- [`docs/ofertas-shopee.md`](docs/ofertas-shopee.md) — como ligar as ofertas da Shopee.

@@ -1,6 +1,6 @@
 // Testes das regras do banco: aplica todas as migrações num Postgres local (PGlite) e simula
 // pessoas usando a API, com o papel `authenticated` e o usuário no token, como o Supabase faz.
-// Cada teste roda numa transação desfeita no fim. Rode com `npm run test:banco`.
+// Cada teste roda numa transação desfeita no fim. Rode com `npm run test:supabase`.
 import { PGlite } from '@electric-sql/pglite';
 import { pgcrypto } from '@electric-sql/pglite/contrib/pgcrypto';
 import assert from 'node:assert/strict';
@@ -286,5 +286,52 @@ describe('limite de tentativas de convite', () => {
     const paulo = await pessoa('Paulo');
     await entrar(paulo, 'ZZZZZZZZ');
     assert.equal(await falhaComo(paulo, 'select * from privado.tentativas_convite'), '42501');
+  });
+});
+
+describe('ofertas', () => {
+  /** Oferta gravada como a coleta grava (com a chave secreta, fora das regras de acesso). */
+  async function oferta(catalogoId, produtoId, precoCentavos) {
+    await db.query(
+      `insert into public.ofertas (catalogo_id, loja, produto_id, nome, preco_min_centavos,
+         preco_max_centavos, link)
+       values ($1, 'shopee', $2, 'Produto', $3, $3, 'https://shopee.com.br/produto')`,
+      [catalogoId, produtoId, precoCentavos],
+    );
+  }
+
+  it('qualquer pessoa vê as ofertas, com ou sem login', async () => {
+    await oferta('berco', '1', 89900);
+    const gabi = await pessoa('Gabi');
+    assert.equal((await como(null, 'select * from public.ofertas')).length, 1);
+    assert.equal((await como(gabi, 'select * from public.ofertas')).length, 1);
+  });
+
+  it('só a coleta grava: pela API ninguém cria, muda ou apaga ofertas', async () => {
+    await oferta('berco', '1', 89900);
+    const gabi = await pessoa('Gabi');
+    const inserir = `insert into public.ofertas (catalogo_id, loja, produto_id, nome,
+        preco_min_centavos, preco_max_centavos, link)
+      values ('berco', 'shopee', '2', 'Falsa', 100, 100, 'https://exemplo.com')`;
+    assert.equal(await falhaComo(null, inserir), '42501');
+    assert.equal(await falhaComo(gabi, inserir), '42501');
+    assert.equal(
+      await falhaComo(gabi, 'update public.ofertas set preco_min_centavos = 1'),
+      '42501',
+    );
+    assert.equal(await falhaComo(gabi, 'delete from public.ofertas'), '42501');
+    assert.equal(
+      await falhaComo(
+        gabi,
+        "insert into public.historico_ofertas values ('berco', 'shopee', current_date, 1, 1, 1)",
+      ),
+      '42501',
+    );
+  });
+
+  it('recusa oferta com preço inválido', async () => {
+    await db.exec('savepoint antes');
+    await assert.rejects(oferta('berco', '3', 0));
+    await db.exec('rollback to savepoint antes');
   });
 });

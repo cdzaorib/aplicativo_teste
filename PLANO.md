@@ -73,8 +73,9 @@ Por isso a Fase 2 foi dividida:
     faixa comum.
   - A faixa vem de uma pesquisa inicial (`src/domain/faixas-preco.ts`) e, quando há 5 pessoas ou
     mais, dos preços informados de forma anônima.
-- **2b (quando a Shopee aprovar):** opções com preço dentro do app, coletadas por um robô
-  (Edge Function + `pg_cron`), e histórico de preço.
+- **2b (estrutura pronta, falta a credencial da Shopee):** opções com preço dentro do app,
+  coletadas por um robô (Edge Function + `pg_cron`), e histórico de preço. Para ligar:
+  `docs/ofertas-shopee.md`.
 
 ## 5. Riscos e como tratar
 
@@ -98,8 +99,8 @@ _Já dá para mostrar em entrevista e testar com usuárias._
 
 **Fase 2 — Preços (3–4 semanas)**
 2a, feita: comparar preço digitado com a faixa comum, links de busca nas lojas, preços informados
-anônimos. 2b, depende da API da Shopee: opções com preço dentro do app, robô de coleta e
-histórico.
+anônimos. 2b, estrutura pronta (tabelas, robô de coleta e tela); falta a credencial da Shopee
+para ligar.
 
 **Fase 3 — Engajamento e receita (2 semanas)**
 Feito: compartilhamento da lista por código de convite. A dona decide, por pessoa, quem edita a

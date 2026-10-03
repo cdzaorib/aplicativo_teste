@@ -73,12 +73,21 @@ Nenhuma das duas está em uso nem exposta.
 
 ### 5. Próximas funcionalidades
 
-- **Fase 2b: opções com preço dentro do app.** Depende da aprovação da Shopee Affiliate Open
-  API, que o usuário vai pedir.
-  - Quando sair, criar uma tabela `ofertas` e uma Edge Function agendada (`pg_cron` + `pg_net`)
-    que busca pelo campo `busca` de cada item.
-  - As credenciais da Shopee vão em segredos da Edge Function, nunca no app.
-  - O usuário decidiu não usar links de afiliado por enquanto.
+- **Fase 2b: opções com preço dentro do app.** A estrutura está pronta e publicada; falta a
+  credencial da Shopee Affiliate Open API, que o usuário vai pedir. Para ligar, siga
+  [`docs/ofertas-shopee.md`](docs/ofertas-shopee.md).
+  - **Banco:** `ofertas` e `historico_ofertas`. Qualquer pessoa lê; só a coleta grava.
+  - **Edge Function `coletar-ofertas`:**
+    - é publicada com `verify_jwt = false` e só atende quem manda o cabeçalho `x-chave-coleta`;
+    - as credenciais ficam nos segredos `SHOPEE_APP_ID`, `SHOPEE_SEGREDO` e `CHAVE_COLETA`;
+    - as regras puras ficam em `regras.ts`, testadas em `supabase/testes/coleta.test.mjs`;
+    - a lista de itens (`catalogo.json`) é gerada do catálogo do app com
+      `npm run gerar:catalogo-coleta`, e um teste avisa se ficar desatualizada.
+  - **App:** a seção "Ofertas na Shopee" (`src/components/ofertas-loja.tsx`) aparece na tela
+    "Comparar preço" quando há ofertas dos últimos 3 dias.
+  - O usuário decidiu não usar links de afiliado por enquanto: a oferta leva ao `productLink`.
+  - **Falta depois de ligar:** mostrar o histórico de preço (`historico_ofertas`) no app e
+    conferir se os filtros de preço deixam passar só produtos certos.
 - **Fase 3 restante:**
   - Alertas push, por exemplo quando a dona libera uma permissão ou um preço cai. Os de preço
     dependem da Fase 2b.
@@ -161,7 +170,7 @@ Nenhuma das duas está em uso nem exposta.
     com a Testing Library, e 14 testes do banco).
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
     ordenação e a data mantida depois de recarregar.
-  - `npm run test:banco` (também no CI) aplica todas as migrações num Postgres local (PGlite) e
+  - `npm run test:supabase` (também no CI) aplica todas as migrações num Postgres local (PGlite) e
     testa compartilhamento, permissões, exclusão de conta e limite de convites. Sem as migrações
     novas, os testes delas falham.
   - Exclusão de conta testada de ponta a ponta no Supabase real:
@@ -269,7 +278,7 @@ Nenhuma das duas está em uso nem exposta.
   - Instale pacotes com `EXPO_OFFLINE=1 npx expo install <pacote>` e confira as APIs nos tipos em
     `node_modules`.
   - Teste o banco pelas ferramentas `mcp__Supabase__*`, em transação desfeita. Comandos com
-    `delete` ou `drop` travam no conector; para esses cenários, use `npm run test:banco`.
+    `delete` ou `drop` travam no conector; para esses cenários, use `npm run test:supabase`.
   - Enquanto a extensão `http` existir, dá para chamar a API e as Edge Functions de dentro do
     banco (`extensions.http`). Foi assim que a exclusão de conta foi testada.
 - **`.env` versionado:** só contém valores públicos (URL e chave publishable). A proteção dos

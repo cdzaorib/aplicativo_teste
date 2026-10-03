@@ -19,7 +19,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run format:check
       - run: npm test -- --ci
-      - name: Testes do banco (migrações num Postgres local)
-        run: npm run test:banco
+      - name: Testes do banco e da coleta de ofertas (Postgres local)
+        run: npm run test:supabase
       - name: Gerar bundles (Android, iOS e web)
         run: npx expo export --platform android --platform ios --platform web --output-dir dist

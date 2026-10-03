@@ -42,6 +42,19 @@ export function AvaliacaoPreco({
   );
 }
 
+/** Selo curto com o resultado da avaliação, para listas (ex.: ofertas das lojas). */
+export function SeloAvaliacao({ avaliacao }: { avaliacao: Avaliacao }) {
+  const theme = useTheme();
+  const [fundo, texto] = CORES[avaliacao];
+  return (
+    <View style={[styles.selo, { backgroundColor: theme[fundo] }]}>
+      <ThemedText type="small" style={[styles.textoSelo, { color: theme[texto] }]}>
+        {TITULOS_AVALIACAO[avaliacao]}
+      </ThemedText>
+    </View>
+  );
+}
+
 /** Faixa de preço comum de um item e de onde ela veio. */
 export function FaixaReferencia({
   referencia,
@@ -81,5 +94,16 @@ const styles = StyleSheet.create({
   },
   faixa: {
     gap: Spacing.half,
+  },
+  selo: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.half,
+    borderRadius: Radius.small,
+  },
+  textoSelo: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: 700,
   },
 });

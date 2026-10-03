@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Share, StyleSheet, View } from 'react-native';
 
 import { Botao } from '@/components/botao';
 import { Chips } from '@/components/chips';
@@ -10,6 +10,7 @@ import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
 import { eHoraDeComprar, quandoDoItem } from '@/domain/gestacao';
 import { ordenarLista, resumirLista } from '@/domain/lista';
+import { listaComoTexto } from '@/domain/texto-lista';
 import { ORDENS } from '@/domain/tipos';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
@@ -92,15 +93,25 @@ export default function MinhaListaScreen() {
         </View>
       }
       ListFooterComponent={
-        permissao === 'total' ? (
-          <View style={styles.rodape}>
+        <View style={styles.rodape}>
+          {permissao === 'total' && (
             <Botao
               titulo="Adicionar item próprio"
               variante="secundario"
               onPress={() => router.push('/item/novo')}
             />
-          </View>
-        ) : null
+          )}
+          {!vazia && (
+            <Botao
+              titulo="Enviar a lista por mensagem"
+              variante="secundario"
+              onPress={() =>
+                // Sem a folha de compartilhamento (ex.: alguns navegadores), não faz nada.
+                Share.share({ message: listaComoTexto(itens) }).catch(() => {})
+              }
+            />
+          )}
+        </View>
       }
     />
   );
@@ -133,6 +144,7 @@ const styles = StyleSheet.create({
   },
   rodape: {
     marginTop: Spacing.three,
+    gap: Spacing.two,
   },
   separador: {
     height: Spacing.two,

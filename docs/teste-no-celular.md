@@ -44,6 +44,9 @@ se aparecer.
   - [ ] O total "Previsto" muda.
 - [ ] **Item próprio:** "Adicionar item próprio" cria um item fora do catálogo.
 - [ ] **Remover** um item, na tela de edição, pede confirmação.
+- [ ] **Enviar a lista por mensagem**, no fim da lista, abre o compartilhamento com a lista em
+      texto ("Falta comprar", "Já comprado" e os totais). Mande para você mesmo no WhatsApp e
+      confira.
 - [ ] **Comparar preço:** num item das sugestões, toque em "Comparar preços".
   - [ ] Aparece a faixa comum, com a unidade ("por par", "por pacote"…).
   - [ ] Os botões das lojas abrem a busca.

@@ -154,6 +154,8 @@ Nenhuma das duas está em uso nem exposta.
     - O convidado pode sair, e a dona pode removê-lo. Nos dois casos ele volta para a própria
       lista.
     - Código de convite: no máximo 10 tentativas por pessoa por hora.
+  - "Enviar a lista por mensagem" (fim da Minha lista): a lista em texto para WhatsApp, com o que
+    falta, o que já foi comprado e os totais (`src/domain/texto-lista.ts`).
   - Excluir conta (aba Conta): apaga a conta e os dados dela. Os convidados da dona voltam para
     as próprias listas.
   - Quando comprar:

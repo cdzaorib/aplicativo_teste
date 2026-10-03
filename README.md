@@ -1,14 +1,49 @@
 # Enxoval
 
-Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê: sugere o que comprar,
-indica o que é essencial ou desaconselhado (com fonte oficial) e organiza a lista de compras com
-orçamento. Com a data prevista do parto (guardada só no aparelho), mostra o que já é hora de
-comprar em cada fase da gestação. Para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na
-média ou barato demais para ser verdade. Com login pelo Google, a lista fica salva na nuvem e
-sincroniza entre aparelhos e pode ser compartilhada com parceiro e família, com permissões
-definidas pela gestante. A conta pode ser excluída pelo próprio app, com todos os dados dela.
+Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
 
-Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login e banco de dados).
+- sugere o que comprar e indica o que é essencial ou desaconselhado, com fonte oficial;
+- organiza a lista de compras com orçamento;
+- com a data prevista do parto (guardada só no aparelho), mostra o que já é hora de comprar em
+  cada fase da gestação e avisa quando cada fase começa;
+- para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na média ou
+  barato demais para ser verdade;
+- com login pelo Google, salva a lista na nuvem e sincroniza entre aparelhos;
+- a lista pode ser compartilhada com parceiro e família, com permissões definidas pela gestante,
+  e as mudanças aparecem na hora para todos;
+- a conta pode ser excluída pelo próprio app, com todos os dados dela.
+
+Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login, banco, tempo real e Edge
+Functions).
+
+## Telas
+
+<p>
+  <img src="docs/imagens/lista.jpg" width="240" alt="Minha lista: semanas de gestação, itens comprados e selos Hora de comprar" />
+  <img src="docs/imagens/sugestoes.jpg" width="240" alt="Sugestões: itens do catálogo com prioridade, fonte e faixa de preço" />
+  <img src="docs/imagens/comparar-preco.jpg" width="240" alt="Comparar preço: faixa comum, lojas e avaliação do preço encontrado" />
+</p>
+
+Capturas da versão web (React Native Web). No celular, as abas são as nativas de cada sistema.
+
+## Destaques técnicos
+
+- **Funciona sem internet:** a lista fica no aparelho (Zustand + AsyncStorage) e sincroniza com
+  o Supabase por item, vencendo a alteração mais recente, com remoções lógicas
+  (`src/domain/sincronizacao.ts`).
+- **Permissões no banco, não só na tela:** RLS por lista, funções auxiliares num esquema que a
+  API não publica e um gatilho que impede quem só edita preços de mudar o resto do item.
+- **Tempo real:** Supabase Realtime, que respeita o RLS. O app ignora o eco das próprias
+  gravações para não sincronizar à toa.
+- **Preços informados de forma anônima:** a referência só aparece com 5 pessoas ou mais e usa a
+  faixa central (25% a 75%), que resiste a um valor distorcido.
+- **Coleta de ofertas:** Edge Function (Deno) que assina as chamadas à API da Shopee e busca 4
+  itens por vez. As regras ficam num arquivo puro, testado também no Node.
+- **Privacidade:** a data prevista do parto (dado de saúde, LGPD) nunca sai do aparelho, e a
+  exclusão de conta apaga tudo em cascata.
+- **Testes e CI:** 150 testes do app (Jest e Testing Library) e 29 do banco, que aplicam todas as
+  migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
+  tipos do app e das Edge Functions, Prettier e os testes em cada push.
 
 ## Como rodar
 
@@ -49,7 +84,8 @@ src/
     preco/      modal de comparar preço
   components/   componentes visuais reutilizáveis
   domain/       regras de negócio sem React: catálogo, faixas de preço, avaliação, mesclagem
-  nuvem/        Supabase: cliente, login, sincronização, compartilhamento e preços informados
+  nuvem/        Supabase: cliente, login, sincronização, tempo real, compartilhamento e preços
+  notificacoes/ avisos locais do começo de cada fase de compras
   store/        estado da lista, da sessão e das referências de preço (Zustand)
   hooks/        hooks de tema e layout
   constants/    cores e espaçamentos

@@ -45,7 +45,9 @@ npx expo start
 
 No Expo Go, abra **Conta → Entrar com Google**. Depois de entrar, a tela mostra seu nome e
 "Lista salva na nuvem às …". Para conferir os dados: painel do Supabase → **Table Editor →
-itens_lista**.
+itens** (e **listas** / **membros_lista** para o compartilhamento).
+
+O roteiro completo de teste no celular está em [`teste-no-celular.md`](teste-no-celular.md).
 
 Se o navegador mostrar um erro e voltar para o app sem entrar:
 

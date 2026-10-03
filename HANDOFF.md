@@ -22,6 +22,8 @@ acessa o banco.
 
 ### 2. Testar em aparelho físico
 
+O roteiro para o usuário está em [`docs/teste-no-celular.md`](docs/teste-no-celular.md).
+
 Nunca foi rodado em celular. O usuário tem Android e iPhone e testa com o Expo Go
 (`npx expo start`, ou `npx expo start --tunnel` se o celular não estiver na mesma rede). Rode no
 computador do usuário: a rede da sessão na nuvem bloqueia o ngrok (`tunnel.us.ngrok.com`), o

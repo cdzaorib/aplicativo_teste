@@ -62,3 +62,4 @@ supabase/
 - [`PLANO.md`](PLANO.md) — produto, decisões, fases e riscos.
 - [`HANDOFF.md`](HANDOFF.md) — o que já foi feito e o que falta.
 - [`docs/login-google.md`](docs/login-google.md) — como ativar o login com Google.
+- [`docs/teste-no-celular.md`](docs/teste-no-celular.md) — roteiro de teste no Android e no iPhone.

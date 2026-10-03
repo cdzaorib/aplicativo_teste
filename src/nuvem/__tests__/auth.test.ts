@@ -1,4 +1,5 @@
 import type { ItemLista } from '@/domain/tipos';
+import { cancelarLembretes } from '@/notificacoes/lembretes';
 import { supabase } from '@/nuvem/supabase';
 import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
@@ -7,6 +8,10 @@ import { concluirLogin, excluirConta } from '../auth';
 jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+
+jest.mock('@/notificacoes/lembretes', () => ({
+  cancelarLembretes: jest.fn(() => Promise.resolve()),
+}));
 
 jest.mock('@/nuvem/supabase', () => ({
   supabase: {
@@ -49,6 +54,7 @@ describe('excluirConta', () => {
     expect(encerrarSessao).toHaveBeenCalledWith({ scope: 'local' });
     expect(useListaStore.getState().itens).toEqual([]);
     expect(useGestacaoStore.getState().dataPrevista).toBeUndefined();
+    expect(cancelarLembretes).toHaveBeenCalled();
   });
 
   it('mantém tudo se a nuvem não excluir', async () => {

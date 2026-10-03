@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { prepararLembretes } from '@/notificacoes/lembretes';
 import { iniciarNuvem } from '@/nuvem/iniciar';
+import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 
 SplashScreen.preventAutoHideAsync();
@@ -40,9 +42,18 @@ function useListaCarregada() {
   return carregada;
 }
 
+/** Com os avisos de fase ligados, prepara a exibição deles com o app aberto. */
+function useLembretes() {
+  const lembretes = useGestacaoStore((s) => s.lembretes);
+  useEffect(() => {
+    if (lembretes) prepararLembretes().catch(() => {});
+  }, [lembretes]);
+}
+
 export default function RootLayout() {
   const scheme = useColorScheme();
   const carregada = useListaCarregada();
+  useLembretes();
 
   if (!carregada) return null;
 

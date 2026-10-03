@@ -104,7 +104,8 @@ para ligar.
 
 **Fase 3 — Engajamento e receita (2 semanas)**
 Feito: compartilhamento da lista por código de convite. A dona decide, por pessoa, quem edita a
-lista e quem edita preços. Falta: alertas push. Links de afiliado ficaram para depois, por
+lista e quem edita preços. Feito também: avisos locais no começo de cada fase de compras. Falta:
+alertas push vindos do servidor (permissão liberada, queda de preço). Links de afiliado ficaram para depois, por
 decisão do usuário.
 
 **Fase 4 — Lançamento (1–2 semanas)**

@@ -7,7 +7,10 @@ import { semanasDeGestacao } from '@/domain/gestacao';
 type GestacaoState = {
   /** Data prevista do parto (AAAA-MM-DD). */
   dataPrevista?: string;
+  /** A pessoa quer ser avisada no começo de cada fase de compras. */
+  lembretes: boolean;
   definirDataPrevista: (dataPrevista: string | undefined) => void;
+  definirLembretes: (lembretes: boolean) => void;
 };
 
 /**
@@ -17,12 +20,14 @@ type GestacaoState = {
 export const useGestacaoStore = create<GestacaoState>()(
   persist(
     (set) => ({
+      lembretes: false,
       definirDataPrevista: (dataPrevista) => set({ dataPrevista }),
+      definirLembretes: (lembretes) => set({ lembretes }),
     }),
     {
       name: 'gestacao',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: ({ dataPrevista }) => ({ dataPrevista }),
+      partialize: ({ dataPrevista, lembretes }) => ({ dataPrevista, lembretes }),
       skipHydration: typeof window === 'undefined',
     },
   ),

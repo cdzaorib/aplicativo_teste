@@ -1,12 +1,23 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import type { ItemLista } from '@/domain/tipos';
+import {
+  agendarLembretes,
+  cancelarLembretes,
+  pedirPermissaoDeAvisos,
+} from '@/notificacoes/lembretes';
 import { useGestacaoStore } from '@/store/gestacao';
 import { QuandoComprar } from '../quando-comprar';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+jest.mock('@/notificacoes/lembretes', () => ({
+  LEMBRETES_DISPONIVEIS: true,
+  agendarLembretes: jest.fn(() => Promise.resolve(3)),
+  cancelarLembretes: jest.fn(() => Promise.resolve()),
+  pedirPermissaoDeAvisos: jest.fn(),
+}));
 
 /** Data daqui a `dias` dias, como a pessoa digitaria (DD/MM/AAAA). */
 function daquiA(dias: number): string {
@@ -32,7 +43,10 @@ function item(catalogoId: string, comprado = false): ItemLista {
 }
 
 beforeEach(() => {
-  useGestacaoStore.setState({ dataPrevista: undefined });
+  useGestacaoStore.setState({ dataPrevista: undefined, lembretes: false });
+  jest.mocked(agendarLembretes).mockClear();
+  jest.mocked(cancelarLembretes).mockClear();
+  jest.mocked(pedirPermissaoDeAvisos).mockReset();
 });
 
 describe('QuandoComprar', () => {
@@ -72,5 +86,50 @@ describe('QuandoComprar', () => {
 
     expect(useGestacaoStore.getState().dataPrevista).toBeUndefined();
     expect(screen.getByText('Salvar data')).toBeOnTheScreen();
+  });
+
+  it('liga os avisos de fase com a permissão do celular', async () => {
+    useGestacaoStore.setState({ dataPrevista: '2027-01-15' });
+    jest.mocked(pedirPermissaoDeAvisos).mockResolvedValue(true);
+    await render(<QuandoComprar itens={[]} />);
+
+    await fireEvent(
+      screen.getByLabelText('Avisar quando começar cada fase de compras'),
+      'valueChange',
+      true,
+    );
+
+    expect(agendarLembretes).toHaveBeenCalledWith('2027-01-15');
+    expect(useGestacaoStore.getState().lembretes).toBe(true);
+  });
+
+  it('explica o que fazer se a pessoa não permitir notificações', async () => {
+    useGestacaoStore.setState({ dataPrevista: '2027-01-15' });
+    jest.mocked(pedirPermissaoDeAvisos).mockResolvedValue(false);
+    await render(<QuandoComprar itens={[]} />);
+
+    await fireEvent(
+      screen.getByLabelText('Avisar quando começar cada fase de compras'),
+      'valueChange',
+      true,
+    );
+
+    expect(screen.getByText(/permita as notificações do app nos ajustes/)).toBeOnTheScreen();
+    expect(agendarLembretes).not.toHaveBeenCalled();
+    expect(useGestacaoStore.getState().lembretes).toBe(false);
+  });
+
+  it('reagenda os avisos quando a data muda e cancela quando é apagada', async () => {
+    useGestacaoStore.setState({ dataPrevista: '2027-01-15', lembretes: true });
+    await render(<QuandoComprar itens={[]} />);
+
+    await fireEvent.press(screen.getByText('Alterar'));
+    await fireEvent.changeText(screen.getByLabelText('Data prevista do parto'), daquiA(100));
+    await fireEvent.press(screen.getByText('Salvar data'));
+    expect(agendarLembretes).toHaveBeenCalledWith(useGestacaoStore.getState().dataPrevista);
+
+    await fireEvent.press(screen.getByText('Alterar'));
+    await fireEvent.press(screen.getByText('Apagar data'));
+    expect(cancelarLembretes).toHaveBeenCalled();
   });
 });

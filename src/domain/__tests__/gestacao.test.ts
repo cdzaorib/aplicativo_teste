@@ -1,6 +1,7 @@
 import type { ItemLista } from '../tipos';
 import {
   eHoraDeComprar,
+  lembretesDasFases,
   faseDaGestacao,
   formatarData,
   itensParaComprarAgora,
@@ -98,5 +99,23 @@ describe('data prevista', () => {
     });
     // O bebê já nasceu há alguns meses: ainda vale, para as compras de depois do nascimento.
     expect(lerDataPrevista('01/06/2026', HOJE)).toEqual({ data: '2026-06-01' });
+  });
+});
+
+describe('lembretesDasFases', () => {
+  it('agenda o começo de cada fase que ainda não chegou, às 10h', () => {
+    // 15/01/2027 menos 280 dias = 10/04/2026 (início da gestação). Hoje: 25 semanas.
+    const lembretes = lembretesDasFases('2027-01-15', HOJE);
+    expect(lembretes.map((l) => [l.quando, l.data.toLocaleDateString('pt-BR')])).toEqual([
+      ['tri3', '23/10/2026'], // semana 28
+      ['maternidade', '20/11/2026'], // semana 32
+      ['depois', '15/01/2027'], // semana 40, a própria data prevista
+    ]);
+    expect(lembretes.every((l) => l.data.getHours() === 10)).toBe(true);
+    expect(lembretes[0].titulo).toBe('Começou o 3º trimestre');
+  });
+
+  it('não agenda nada se todas as fases já começaram', () => {
+    expect(lembretesDasFases('2026-09-01', HOJE)).toEqual([]);
   });
 });

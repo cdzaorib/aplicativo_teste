@@ -95,3 +95,45 @@ export function lerDataPrevista(texto: string, agora = new Date()): LeituraData 
   if (diasAteAData < -365) return { erro: 'Essa data já passou há mais de um ano.' };
   return { data };
 }
+
+/** Aviso agendado no aparelho para o começo de uma fase de compras. */
+export type LembreteFase = { quando: Quando; data: Date; titulo: string; corpo: string };
+
+const TEXTOS_LEMBRETE: Record<Quando, { titulo: string; corpo: string }> = {
+  tri2: {
+    titulo: 'Começou o 2º trimestre',
+    corpo:
+      'É hora de comprar os itens maiores do enxoval. Veja na sua lista o que é hora de comprar.',
+  },
+  tri3: {
+    titulo: 'Começou o 3º trimestre',
+    corpo: 'Chegou a vez de mais itens do enxoval. Veja na sua lista o que é hora de comprar.',
+  },
+  maternidade: {
+    titulo: 'Hora de preparar a mala da maternidade',
+    corpo: 'Veja na sua lista os itens da mala e o que ainda falta comprar.',
+  },
+  depois: {
+    titulo: 'A data prevista do parto chegou',
+    corpo: 'Veja na sua lista os itens para depois do nascimento.',
+  },
+};
+
+/** Hora do dia em que os avisos aparecem. */
+const HORA_DO_LEMBRETE = 10;
+
+/**
+ * Avisos para o começo de cada fase de compras que ainda não chegou, às 10h do dia em que a fase
+ * começa (pelo relógio do aparelho).
+ */
+export function lembretesDasFases(dataPrevista: string, agora = new Date()): LembreteFase[] {
+  const [ano, mes, dia] = dataPrevista.split('-').map(Number);
+  return (Object.keys(INICIO_COMPRA) as Quando[])
+    .map((quando) => {
+      // A gestação começa 280 dias antes da data prevista; a fase começa N semanas depois disso.
+      const data = new Date(ano, mes - 1, dia - DIAS_GESTACAO + INICIO_COMPRA[quando] * 7);
+      data.setHours(HORA_DO_LEMBRETE, 0, 0, 0);
+      return { quando, data, ...TEXTOS_LEMBRETE[quando] };
+    })
+    .filter((lembrete) => lembrete.data.getTime() > agora.getTime());
+}

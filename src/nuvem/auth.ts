@@ -1,6 +1,7 @@
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
+import { cancelarLembretes } from '@/notificacoes/lembretes';
 import { sincronizar } from '@/nuvem/sincronizar';
 import { supabase } from '@/nuvem/supabase';
 import { useGestacaoStore } from '@/store/gestacao';
@@ -71,6 +72,9 @@ export async function excluirConta(): Promise<void> {
   await supabase.auth.signOut({ scope: 'local' });
   useListaStore.getState().limpar();
   useGestacaoStore.getState().definirDataPrevista(undefined);
+  useGestacaoStore.getState().definirLembretes(false);
+  // Os avisos dependem da data prevista, que acabou de ser apagada.
+  await cancelarLembretes().catch(() => {});
 }
 
 /** Salva na nuvem o que falta, encerra a sessão e apaga a lista deste aparelho. */

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Switch, View } from 'react-native';
 
 import { Botao } from '@/components/botao';
 import { Campo } from '@/components/campo';
@@ -15,6 +15,12 @@ import {
 } from '@/domain/gestacao';
 import type { ItemLista } from '@/domain/tipos';
 import { useTheme } from '@/hooks/use-theme';
+import {
+  agendarLembretes,
+  cancelarLembretes,
+  LEMBRETES_DISPONIVEIS,
+  pedirPermissaoDeAvisos,
+} from '@/notificacoes/lembretes';
 import { useGestacaoStore } from '@/store/gestacao';
 
 /** Cartão da lista que mostra a fase da gestação e quantos itens já é hora de comprar. */
@@ -70,6 +76,55 @@ function Resumo({
         </ThemedText>
         <Botao titulo="Alterar" variante="secundario" onPress={onAlterar} />
       </View>
+      {LEMBRETES_DISPONIVEIS && <Lembretes dataPrevista={dataPrevista} />}
+    </>
+  );
+}
+
+/** Liga ou desliga os avisos no começo de cada fase, agendados no próprio aparelho. */
+function Lembretes({ dataPrevista }: { dataPrevista: string }) {
+  const theme = useTheme();
+  const lembretes = useGestacaoStore((s) => s.lembretes);
+  const definirLembretes = useGestacaoStore((s) => s.definirLembretes);
+  const [aviso, setAviso] = useState<string>();
+
+  async function alternar(ligar: boolean) {
+    setAviso(undefined);
+    try {
+      if (!ligar) {
+        await cancelarLembretes();
+        definirLembretes(false);
+        return;
+      }
+      if (!(await pedirPermissaoDeAvisos())) {
+        setAviso('Para receber os avisos, permita as notificações do app nos ajustes do celular.');
+        return;
+      }
+      await agendarLembretes(dataPrevista);
+      definirLembretes(true);
+    } catch {
+      setAviso('Não foi possível mudar os avisos agora. Tente de novo.');
+    }
+  }
+
+  return (
+    <>
+      <View style={styles.linha}>
+        <ThemedText type="small" style={styles.expandir}>
+          Avisar quando começar cada fase de compras
+        </ThemedText>
+        <Switch
+          accessibilityLabel="Avisar quando começar cada fase de compras"
+          value={lembretes}
+          onValueChange={alternar}
+          trackColor={{ true: theme.primary }}
+        />
+      </View>
+      {aviso && (
+        <ThemedText type="small" accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
+          {aviso}
+        </ThemedText>
+      )}
     </>
   );
 }
@@ -84,6 +139,7 @@ function Formulario({
   onConcluir: () => void;
 }) {
   const definirDataPrevista = useGestacaoStore((s) => s.definirDataPrevista);
+  const lembretes = useGestacaoStore((s) => s.lembretes);
   const [texto, setTexto] = useState(dataPrevista ? formatarData(dataPrevista) : '');
   const [erro, setErro] = useState<string>();
 
@@ -94,6 +150,8 @@ function Formulario({
       return;
     }
     definirDataPrevista(leitura.data);
+    // Com outra data, os avisos mudam de dia. Se não der para reagendar, a lista segue igual.
+    if (lembretes) agendarLembretes(leitura.data).catch(() => {});
     onConcluir();
   }
 
@@ -125,6 +183,7 @@ function Formulario({
             variante="perigo"
             onPress={() => {
               definirDataPrevista(undefined);
+              cancelarLembretes().catch(() => {});
               onConcluir();
             }}
           />

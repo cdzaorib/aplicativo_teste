@@ -57,6 +57,13 @@ se aparecer.
   - [ ] O cartão mostra as semanas e o trimestre.
   - [ ] Os itens da fase ganham o selo "Hora de comprar".
   - [ ] "Alterar" e "Apagar data" funcionam.
+- [ ] **Avisos de fase (só no iPhone pelo Expo Go):** ligue "Avisar quando começar cada fase de
+      compras" e permita as notificações.
+  - No Android, o interruptor não aparece no Expo Go, porque o Expo Go do Android não tem
+    notificações. Ele aparece no app instalado.
+  - Para ver um aviso sem esperar semanas, informe uma data prevista que faça uma fase começar
+    amanhã. Por exemplo, para o 3º trimestre (semana 28), use uma data daqui a 12 semanas mais 1
+    dia. O aviso chega às 10h.
 - [ ] Feche o app de vez e abra de novo: a lista e a data continuam lá.
 
 ## 2. Login com Google

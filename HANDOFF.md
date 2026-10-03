@@ -89,8 +89,14 @@ Nenhuma das duas está em uso nem exposta.
   - **Falta depois de ligar:** mostrar o histórico de preço (`historico_ofertas`) no app e
     conferir se os filtros de preço deixam passar só produtos certos.
 - **Fase 3 restante:**
-  - Alertas push, por exemplo quando a dona libera uma permissão ou um preço cai. Os de preço
-    dependem da Fase 2b.
+  - **Feito, avisos locais:** com a data prevista e o interruptor ligado, o aparelho avisa às 10h
+    do dia em que começa cada fase de compras. Ver `src/notificacoes/lembretes.ts` e
+    `lembretesDasFases`.
+    - Nada vai para o servidor.
+    - O módulo `expo-notifications` só carrega quando é usado: no Expo Go do Android ele dá erro
+      ao carregar, por isso lá o interruptor não aparece.
+  - **Falta, alertas push (do servidor):** por exemplo quando a dona libera uma permissão ou um
+    preço cai. Os de preço dependem da Fase 2b ligada.
   - No Android, o Expo Go não recebe push desde o SDK 53. Testar exige um development build
     (`eas build --profile development`), além de conta no Expo e credenciais do Firebase (FCM).
 - **Revisar os começos de cada fase** (`INICIO_COMPRA`) com quem for revisar o catálogo. A
@@ -162,6 +168,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     - Código de convite: no máximo 10 tentativas por pessoa por hora.
   - Busca no catálogo (aba Sugestões), sem diferenciar acentos e maiúsculas
     (`src/domain/busca.ts`).
+  - Avisos no começo de cada fase de compras, agendados no aparelho (cartão "Quando comprar").
   - "Enviar a lista por mensagem" (fim da Minha lista): a lista em texto para WhatsApp, com o que
     falta, o que já foi comprado e os totais (`src/domain/texto-lista.ts`).
   - Excluir conta (aba Conta): apaga a conta e os dados dela. Os convidados da dona voltam para

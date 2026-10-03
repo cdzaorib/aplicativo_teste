@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import { Link } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
@@ -53,6 +54,16 @@ export default function ContaScreen() {
       </View>
 
       {conectado && <ExcluirConta />}
+
+      <View style={styles.secao}>
+        <ThemedText type="smallBold">Privacidade</ThemedText>
+        <Link href="/privacidade">
+          <ThemedText type="linkPrimary">Política de privacidade</ThemedText>
+        </Link>
+        <Link href="/excluir-conta">
+          <ThemedText type="linkPrimary">Como excluir a conta</ThemedText>
+        </Link>
+      </View>
 
       <ThemedText type="small" themeColor="textSecondary">
         Versão {Constants.expoConfig?.version}

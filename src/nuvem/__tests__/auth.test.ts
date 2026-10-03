@@ -1,5 +1,6 @@
 import type { ItemLista } from '@/domain/tipos';
 import { supabase } from '@/nuvem/supabase';
+import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 import { concluirLogin, excluirConta } from '../auth';
 
@@ -35,10 +36,11 @@ beforeEach(() => {
   chamarFuncao.mockReset();
   encerrarSessao.mockReset().mockResolvedValue({ error: null });
   useListaStore.setState({ itens: [itemDoAparelho], listaId: 'l1' });
+  useGestacaoStore.setState({ dataPrevista: '2027-01-15' });
 });
 
 describe('excluirConta', () => {
-  it('exclui na nuvem, encerra a sessão e apaga a lista do aparelho', async () => {
+  it('exclui na nuvem, encerra a sessão e apaga a lista e a data prevista do aparelho', async () => {
     chamarFuncao.mockResolvedValue({ data: { ok: true }, error: null } as never);
 
     await excluirConta();
@@ -46,6 +48,7 @@ describe('excluirConta', () => {
     expect(chamarFuncao).toHaveBeenCalledWith('excluir-conta', { method: 'POST' });
     expect(encerrarSessao).toHaveBeenCalledWith({ scope: 'local' });
     expect(useListaStore.getState().itens).toEqual([]);
+    expect(useGestacaoStore.getState().dataPrevista).toBeUndefined();
   });
 
   it('mantém tudo se a nuvem não excluir', async () => {
@@ -55,6 +58,7 @@ describe('excluirConta', () => {
 
     expect(encerrarSessao).not.toHaveBeenCalled();
     expect(useListaStore.getState().itens).toEqual([itemDoAparelho]);
+    expect(useGestacaoStore.getState().dataPrevista).toBe('2027-01-15');
   });
 });
 

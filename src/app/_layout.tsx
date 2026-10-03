@@ -62,6 +62,8 @@ export default function RootLayout() {
           options={{ presentation: 'modal', title: 'Comparar preço' }}
         />
         <Stack.Screen name="auth-callback" options={{ headerShown: false }} />
+        <Stack.Screen name="privacidade" options={{ title: 'Privacidade' }} />
+        <Stack.Screen name="excluir-conta" options={{ title: 'Excluir conta' }} />
       </Stack>
     </ThemeProvider>
   );

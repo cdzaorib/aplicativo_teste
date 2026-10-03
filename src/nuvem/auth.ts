@@ -3,6 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { sincronizar } from '@/nuvem/sincronizar';
 import { supabase } from '@/nuvem/supabase';
+import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 
 /** Rota que recebe a volta do login (src/app/auth-callback.tsx). */
@@ -59,7 +60,8 @@ export function concluirLogin(codigo: string): Promise<void> {
 
 /**
  * Exclui a conta na nuvem (supabase/functions/excluir-conta): a lista, a participação em listas
- * compartilhadas e os preços informados. Depois encerra a sessão e apaga a lista deste aparelho.
+ * compartilhadas e os preços informados. Depois encerra a sessão e apaga deste aparelho a lista
+ * e a data prevista do parto.
  */
 export async function excluirConta(): Promise<void> {
   if (!supabase) return;
@@ -68,6 +70,7 @@ export async function excluirConta(): Promise<void> {
   // A conta já não existe no servidor; basta esquecer a sessão neste aparelho.
   await supabase.auth.signOut({ scope: 'local' });
   useListaStore.getState().limpar();
+  useGestacaoStore.getState().definirDataPrevista(undefined);
 }
 
 /** Salva na nuvem o que falta, encerra a sessão e apaga a lista deste aparelho. */

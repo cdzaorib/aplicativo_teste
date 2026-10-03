@@ -97,18 +97,24 @@ Nenhuma das duas está em uso nem exposta.
 - Nome definitivo, ícone e splash (hoje: "Enxoval" e ícones do template Expo).
 - Revisão profissional do catálogo (`src/domain/catalogo.ts`) e da lista de itens com selo
   Inmetro.
-- Política de privacidade: o app guarda nome, e-mail e a lista na nuvem, além dos preços
-  informados. Esses ficam ligados ao usuário só para limite e exclusão, nunca expostos.
-- Exclusão de conta:
-  - Pelo app já existe (aba Conta → "Excluir minha conta"), o que a Apple exige.
-  - O Google Play também pede um link na web para pedir a exclusão sem o app. Falta criar essa
-    página, que pode ficar junto da política de privacidade.
+- **Política de privacidade e exclusão de conta:** já existem como telas do app
+  (`src/app/privacidade.tsx` e `src/app/excluir-conta.tsx`), com links na aba Conta. Na versão
+  web viram as páginas `/privacidade` e `/excluir-conta`, que são os endereços que as lojas
+  pedem. Falta:
+  - definir o **e-mail de contato** em `src/constants/app.ts` (sem ele, as páginas mostram "e-mail
+    de contato a definir");
+  - colocar a versão web no ar, por exemplo na Vercel, para ter os endereços públicos;
+  - uma revisão jurídica do texto.
+- **Exclusão de conta pelo app:** aba Conta → "Excluir minha conta", o que a Apple exige. Apaga
+  também a lista e a data prevista do parto guardadas no aparelho.
 
 ## Estado atual
 
 - **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #1.
-- **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2 traz a Fase 3 (compartilhamento), a exclusão
-  de conta, o limite de tentativas de convite e a correção da volta do login no Android.
+- **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2 traz:
+  - a Fase 3 (compartilhamento) e o limite de tentativas de convite;
+  - o "quando comprar" e as faixas de preço completas;
+  - a exclusão de conta, a política de privacidade e a correção da volta do login no Android.
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
   - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções

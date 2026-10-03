@@ -17,7 +17,7 @@ export function ExcluirConta() {
   async function excluir() {
     const confirmado = await confirmar(
       'Excluir minha conta',
-      'Sua conta, sua lista (na nuvem e neste aparelho) e os preços que você informou serão apagados. Se você convidou pessoas, elas voltam para as próprias listas. Não dá para desfazer.',
+      'Sua conta, sua lista (na nuvem e neste aparelho), a data prevista do parto e os preços que você informou serão apagados. Se você convidou pessoas, elas voltam para as próprias listas. Não dá para desfazer.',
       'Excluir',
     );
     if (!confirmado) return;

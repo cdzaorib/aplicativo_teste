@@ -44,6 +44,14 @@ describe('conversão entre item e linha da tabela', () => {
     expect(deLinha(linha)).toEqual(completo);
   });
 
+  it('traz quem comprou, que só o banco preenche', () => {
+    const linha = { ...paraLinha(completo, 'lista-1'), comprado_por: 'pessoa-1' };
+    expect(deLinha(linha)).toEqual({ ...completo, compradoPor: 'pessoa-1' });
+    expect(paraLinha({ ...completo, compradoPor: 'pessoa-1' }, 'lista-1')).not.toHaveProperty(
+      'comprado_por',
+    );
+  });
+
   it('trata campos opcionais vazios', () => {
     const { catalogoId: _c, precoCentavos: _p, ...semOpcionais } = completo;
     const linha = paraLinha(semOpcionais, 'lista-1');

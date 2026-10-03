@@ -47,6 +47,11 @@ export type ItemLista = {
   precoCentavos?: number;
   quantidade: number;
   comprado: boolean;
+  /**
+   * Quem marcou como comprado (id da pessoa), quando a marcação veio da nuvem. O banco preenche;
+   * numa lista compartilhada, o app mostra o nome.
+   */
+  compradoPor?: string;
   criadoEm: number;
   /** Momento da última alteração; decide qual versão vence na sincronização. */
   atualizadoEm: number;

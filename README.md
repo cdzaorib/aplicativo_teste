@@ -41,7 +41,7 @@ Capturas da versão web (React Native Web). No celular, as abas são as nativas 
   itens por vez. As regras ficam num arquivo puro, testado também no Node.
 - **Privacidade:** a data prevista do parto (dado de saúde, LGPD) nunca sai do aparelho, e a
   exclusão de conta apaga tudo em cascata.
-- **Testes e CI:** 150 testes do app (Jest e Testing Library) e 29 do banco, que aplicam todas as
+- **Testes e CI:** 156 testes do app (Jest e Testing Library) e 32 do banco, que aplicam todas as
   migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
   tipos do app e das Edge Functions, Prettier e os testes em cada push.
 

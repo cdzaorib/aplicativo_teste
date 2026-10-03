@@ -196,6 +196,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     as próprias listas.
   - Lista em tempo real: o que outra pessoa (ou outro aparelho) muda na lista aparece em poucos
     segundos; a permissão nova vale na hora; a dona vê quem entrou sem sair da tela.
+  - Quem comprou: numa lista compartilhada, o item comprado por outra pessoa mostra "Comprado por
+    Paulo", para ninguém comprar duas vezes. Ver "Como o compartilhamento funciona".
   - Tela de erro (`src/components/tela-de-erro.tsx`): se uma tela quebrar, aparece "Algo deu
     errado" com "Tentar de novo", em vez de uma tela branca. É o `ErrorBoundary` exportado em
     `src/app/_layout.tsx`. Conferida na web com uma rota temporária que quebra.
@@ -209,8 +211,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 150 testes do
-    app (inclusive de componentes, com a Testing Library) e 29 testes do banco e da coleta de
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 156 testes do
+    app (inclusive de componentes, com a Testing Library) e 32 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
     ordenação e a data mantida depois de recarregar.
@@ -260,6 +262,16 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - As telas usam `usePermissao()` para esconder ou travar o que não pode.
 - **Entrar:** sincroniza, chama `entrar_na_lista`, que junta os itens no servidor, limpa a lista
   do aparelho e sincroniza de novo.
+- **Quem comprou** (`itens.comprado_por`): o gatilho `registrar_comprador` grava quem marcou o
+  item como comprado (`auth.uid()`), apaga ao desmarcar e ignora o valor que vier da API. O app
+  nunca envia o campo; só lê (`compradoPor`).
+  - Marcar ou desmarcar no aparelho esquece o comprador local até a próxima sincronização; a
+    linha só mostra "Comprado por" quando não foi a própria pessoa.
+  - Os nomes vêm de `membros_lista` (`useNomesDaLista`), buscados de novo quando a lista muda ou
+    alguém entra. Quem saiu da lista deixa de ter nome, e o "Comprado por" some.
+  - A chave estrangeira usa `on delete set null`. O gatilho só aceita o campo vazio quando a conta
+    do comprador não existe mais (por isso é SECURITY DEFINER: precisa olhar `auth.users`). Um
+    teste do banco garante que excluir a conta do comprador não trava.
 - **Tempo real** (`src/nuvem/tempo-real.ts`, ligado em `iniciarNuvem`): um canal do Supabase
   Realtime por usuário e lista atual, trocado quando a lista muda.
   - Mudança em `itens` da lista: sincroniza 0,5 s depois, juntando avisos seguidos. O eco do que

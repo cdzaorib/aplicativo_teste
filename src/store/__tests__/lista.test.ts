@@ -92,6 +92,23 @@ describe('dados para sincronização', () => {
     expect(estado().itens[0]).toMatchObject({ atualizadoEm: 3000 });
   });
 
+  it('esquece quem comprou quando a pessoa marca ou desmarca o item aqui', () => {
+    estado().adicionarDoCatalogo([catalogo('berco'), catalogo('banheira')]);
+    const [berco, banheira] = estado().itens;
+    useListaStore.setState({
+      itens: [berco, banheira].map((i) => ({ ...i, comprado: true, compradoPor: 'paulo' })),
+    });
+
+    // Mudar outra coisa mantém o comprador; mudar o "comprado" troca pelo registro do banco.
+    estado().atualizar(berco.id, { precoCentavos: 59900 });
+    expect(estado().itens[0].compradoPor).toBe('paulo');
+    estado().atualizar(berco.id, { comprado: false });
+    expect(estado().itens[0].compradoPor).toBeUndefined();
+
+    estado().alternarComprado(banheira.id);
+    expect(estado().itens[1]).not.toHaveProperty('compradoPor');
+  });
+
   it('guarda a remoção para enviar à nuvem', () => {
     jest.useFakeTimers({ now: 5000 });
     estado().adicionarDoCatalogo([catalogo('berco')]);

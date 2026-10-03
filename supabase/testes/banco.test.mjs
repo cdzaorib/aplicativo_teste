@@ -348,3 +348,59 @@ describe('tempo real', () => {
     );
   });
 });
+
+describe('quem comprou', () => {
+  const comprador = async (id) =>
+    (await db.query('select comprado_por from public.itens where id = $1', [id])).rows[0]
+      .comprado_por;
+
+  it('registra quem marcou como comprado e apaga ao desmarcar', async () => {
+    const { dona, convidado } = await listaCompartilhada();
+    await como(dona, 'select public.definir_permissoes($1, true, false)', [convidado]);
+
+    await como(convidado, "update public.itens set comprado = true where id = 'berco-dona'");
+    assert.equal(await comprador('berco-dona'), convidado);
+
+    await como(dona, "update public.itens set comprado = false where id = 'berco-dona'");
+    assert.equal(await comprador('berco-dona'), null);
+
+    await como(dona, "update public.itens set comprado = true where id = 'berco-dona'");
+    assert.equal(await comprador('berco-dona'), dona);
+  });
+
+  it('ninguém troca o comprador pela API, nem ao editar o preço', async () => {
+    const { dona, convidado } = await listaCompartilhada();
+    await como(dona, "update public.itens set comprado = true where id = 'berco-dona'");
+    await como(dona, 'select public.definir_permissoes($1, true, false)', [convidado]);
+
+    await como(convidado, "update public.itens set comprado_por = $1 where id = 'berco-dona'", [
+      convidado,
+    ]);
+    await como(convidado, "update public.itens set preco_centavos = 59900 where id = 'berco-dona'");
+    assert.equal(await comprador('berco-dona'), dona);
+
+    // Item novo já marcado: vale quem criou, não o valor enviado.
+    await como(
+      convidado,
+      `insert into public.itens (lista_id, id, nome, categoria, prioridade, comprado, comprado_por,
+         criado_em, atualizado_em)
+       select lista_id, 'banheira', 'Banheira', 'higiene', 'util', true, $1, now(), now()
+       from public.membros_lista where user_id = $2`,
+      [dona, convidado],
+    );
+    assert.equal(await comprador('banheira'), convidado);
+  });
+
+  it('esquece o comprador que excluiu a conta, sem mexer no item', async () => {
+    const { dona, convidado } = await listaCompartilhada();
+    await como(dona, 'select public.definir_permissoes($1, true, false)', [convidado]);
+    await como(convidado, "update public.itens set comprado = true where id = 'berco-dona'");
+
+    await db.query('delete from auth.users where id = $1', [convidado]);
+
+    const { rows } = await db.query(
+      "select comprado, comprado_por from public.itens where id = 'berco-dona'",
+    );
+    assert.deepEqual(rows, [{ comprado: true, comprado_por: null }]);
+  });
+});

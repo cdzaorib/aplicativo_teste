@@ -110,7 +110,8 @@ estar em **Test users** no Google.
   - [ ] A mudança aparece para **A** em poucos segundos.
 - [ ] **A** liga "Pode editar a lista" para **B**: **B** passa a editar tudo.
   - [ ] **B** marca um item como comprado e ele aparece marcado para **A** sem **A** tocar em
-        nada.
+        nada, com "Comprado por B" embaixo do nome.
+  - [ ] No aparelho de **B**, o mesmo item aparece marcado, sem "Comprado por" (foi ele mesmo).
 - [ ] **B** toca em "Sair da lista compartilhada" e volta para a própria lista, com uma cópia dos
       itens.
 - [ ] **B** entra de novo e **A** usa "Remover": **B** volta para a própria lista.

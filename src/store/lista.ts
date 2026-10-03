@@ -50,6 +50,11 @@ export function migrarListaSalva(salva: unknown, versao: number): ListaSalva {
 
 const alterado = (s: ListaState) => ({ versaoLocal: s.versaoLocal + 1 });
 
+/** Ao marcar ou desmarcar aqui, quem comprou passa a ser esta pessoa: o banco registra de novo. */
+function semComprador({ compradoPor: _compradoPor, ...item }: ItemLista): ItemLista {
+  return item;
+}
+
 /** Lista de compras do usuário, salva no aparelho. */
 export const useListaStore = create<ListaState>()(
   persist(
@@ -97,16 +102,20 @@ export const useListaStore = create<ListaState>()(
       atualizar: (id, alteracao) =>
         set((s) => ({
           ...alterado(s),
-          itens: s.itens.map((i) =>
-            i.id === id ? { ...i, ...alteracao, atualizadoEm: Date.now() } : i,
-          ),
+          itens: s.itens.map((i) => {
+            if (i.id !== id) return i;
+            const novo = { ...i, ...alteracao, atualizadoEm: Date.now() };
+            return novo.comprado === i.comprado ? novo : semComprador(novo);
+          }),
         })),
 
       alternarComprado: (id) =>
         set((s) => ({
           ...alterado(s),
           itens: s.itens.map((i) =>
-            i.id === id ? { ...i, comprado: !i.comprado, atualizadoEm: Date.now() } : i,
+            i.id === id
+              ? { ...semComprador(i), comprado: !i.comprado, atualizadoEm: Date.now() }
+              : i,
           ),
         })),
 

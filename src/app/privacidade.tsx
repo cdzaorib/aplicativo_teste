@@ -45,8 +45,8 @@ export default function PrivacidadeScreen() {
           você usar em outro aparelho;
         </Topico>
         <Topico>
-          se você compartilhar a lista, quem participa dela e o que cada pessoa pode editar. Seu
-          nome aparece para as pessoas da mesma lista;
+          se você compartilhar a lista, quem participa dela, o que cada pessoa pode editar e quem
+          marcou cada item como comprado. Seu nome aparece para as pessoas da mesma lista;
         </Topico>
         <Topico>
           os preços que você escolher informar (item, valor, loja e dia). Outras pessoas só veem uma

@@ -12,6 +12,7 @@ import { eHoraDeComprar, quandoDoItem } from '@/domain/gestacao';
 import { ordenarLista, resumirLista } from '@/domain/lista';
 import { listaComoTexto } from '@/domain/texto-lista';
 import { ORDENS } from '@/domain/tipos';
+import { useNomesDaLista } from '@/hooks/use-nomes-da-lista';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
 import { useSemanasDeGestacao } from '@/store/gestacao';
@@ -29,6 +30,8 @@ export default function MinhaListaScreen() {
   const lista = useSessaoStore((s) => (s.usuario ? s.lista : undefined));
   const compartilhada = lista && !lista.souDona;
   const semanas = useSemanasDeGestacao();
+  const meuId = useSessaoStore((s) => s.usuario?.id);
+  const nomes = useNomesDaLista();
 
   const vazia = itens.length === 0;
 
@@ -47,6 +50,11 @@ export default function MinhaListaScreen() {
           podeMarcar={permissao === 'total'}
           horaDeComprar={
             semanas !== undefined && !item.comprado && eHoraDeComprar(quandoDoItem(item), semanas)
+          }
+          compradoPor={
+            item.comprado && item.compradoPor && item.compradoPor !== meuId
+              ? nomes[item.compradoPor]
+              : undefined
           }
         />
       )}

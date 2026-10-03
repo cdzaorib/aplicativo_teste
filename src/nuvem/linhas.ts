@@ -16,6 +16,8 @@ export type LinhaItem = {
   quantidade: number;
   comprado: boolean;
   removido: boolean;
+  /** Preenchido pelo banco; o app não envia. */
+  comprado_por?: string | null;
   criado_em: string;
   atualizado_em: string;
 };
@@ -49,6 +51,7 @@ export function deLinha(linha: LinhaItem): RegistroNuvem {
     ...(linha.preco_centavos !== null && { precoCentavos: linha.preco_centavos }),
     quantidade: linha.quantidade,
     comprado: linha.comprado,
+    ...(linha.comprado_por && { compradoPor: linha.comprado_por }),
     removido: linha.removido,
     criadoEm: Date.parse(linha.criado_em),
     atualizadoEm: Date.parse(linha.atualizado_em),

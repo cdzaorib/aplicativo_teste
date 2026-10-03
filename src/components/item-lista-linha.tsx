@@ -17,9 +17,17 @@ type Props = {
   podeMarcar?: boolean;
   /** A fase de comprar o item já chegou (pela data prevista do parto). */
   horaDeComprar?: boolean;
+  /** Numa lista compartilhada, o nome de quem comprou, se não foi a própria pessoa. */
+  compradoPor?: string;
 };
 
-export function ItemListaLinha({ item, onAlternar, podeMarcar = true, horaDeComprar }: Props) {
+export function ItemListaLinha({
+  item,
+  onAlternar,
+  podeMarcar = true,
+  horaDeComprar,
+  compradoPor,
+}: Props) {
   const theme = useTheme();
   const detalhes = [item.modelo, item.quantidade > 1 ? `${item.quantidade} un.` : '']
     .filter(Boolean)
@@ -53,6 +61,11 @@ export function ItemListaLinha({ item, onAlternar, podeMarcar = true, horaDeComp
             {detalhes ? (
               <ThemedText type="small" themeColor="textSecondary">
                 {detalhes}
+              </ThemedText>
+            ) : null}
+            {compradoPor ? (
+              <ThemedText type="small" themeColor="textSecondary">
+                Comprado por {compradoPor}
               </ThemedText>
             ) : null}
             <View style={styles.selos}>

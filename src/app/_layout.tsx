@@ -2,10 +2,12 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 
-import { Colors } from '@/constants/theme';
+import type { Paleta } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/hooks/use-theme';
 import { prepararLembretes } from '@/notificacoes/lembretes';
 import { iniciarNuvem } from '@/nuvem/iniciar';
+import { useAparenciaStore } from '@/store/aparencia';
 import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 
@@ -14,7 +16,7 @@ SplashScreen.preventAutoHideAsync();
 // Se uma tela quebrar, mostra uma mensagem com "Tentar de novo" em vez de uma tela branca.
 export { TelaDeErro as ErrorBoundary } from '@/components/tela-de-erro';
 
-function temaNavegacao(base: Theme, cores: (typeof Colors)['light' | 'dark']): Theme {
+function temaNavegacao(base: Theme, cores: Paleta): Theme {
   return {
     ...base,
     colors: {
@@ -29,41 +31,45 @@ function temaNavegacao(base: Theme, cores: (typeof Colors)['light' | 'dark']): T
 }
 
 /**
- * Aguarda a lista salva no aparelho ser carregada, mantendo a splash screen até lá,
- * e então liga a sincronização com a nuvem.
+ * Aguarda a lista salva no aparelho ser carregada e então liga a sincronização com a nuvem.
  */
 function useListaCarregada() {
   const carregada = useListaStore((s) => s.carregada);
 
   useEffect(() => {
-    if (!carregada) return;
-    SplashScreen.hideAsync();
     // Só sincroniza depois de ter a lista do aparelho, para não misturar com uma lista vazia.
-    return iniciarNuvem();
+    if (carregada) return iniciarNuvem();
   }, [carregada]);
 
   return carregada;
 }
 
-/** Com os avisos de fase ligados, prepara a exibição deles com o app aberto. */
+/** Com avisos de fase ou de consulta, prepara a exibição deles com o app aberto. */
 function useLembretes() {
   const lembretes = useGestacaoStore((s) => s.lembretes);
+  const temConsulta = useGestacaoStore((s) => s.proximaConsulta !== undefined);
   useEffect(() => {
-    if (lembretes) prepararLembretes().catch(() => {});
-  }, [lembretes]);
+    if (lembretes || temConsulta) prepararLembretes().catch(() => {});
+  }, [lembretes, temConsulta]);
 }
 
 export default function RootLayout() {
   const scheme = useColorScheme();
-  const carregada = useListaCarregada();
+  const cores = useTheme();
+  const listaCarregada = useListaCarregada();
+  // O tema escolhido já foi lido do aparelho (para não abrir no tema errado e trocar em seguida).
+  const aparenciaCarregada = useAparenciaStore((s) => s.carregada);
+  const carregado = listaCarregada && aparenciaCarregada;
   useLembretes();
 
-  if (!carregada) return null;
+  // A splash screen fica até a lista e o tema serem lidos do aparelho.
+  useEffect(() => {
+    if (carregado) SplashScreen.hideAsync();
+  }, [carregado]);
 
-  const tema =
-    scheme === 'dark'
-      ? temaNavegacao(DarkTheme, Colors.dark)
-      : temaNavegacao(DefaultTheme, Colors.light);
+  if (!carregado) return null;
+
+  const tema = temaNavegacao(scheme === 'dark' ? DarkTheme : DefaultTheme, cores);
 
   return (
     <ThemeProvider value={tema}>
@@ -79,6 +85,7 @@ export default function RootLayout() {
         <Stack.Screen name="privacidade" options={{ title: 'Privacidade' }} />
         <Stack.Screen name="excluir-conta" options={{ title: 'Excluir conta' }} />
         <Stack.Screen name="presentes" options={{ title: 'Lista de presentes' }} />
+        <Stack.Screen name="mala" options={{ title: 'Mala da maternidade' }} />
         {/* Página que os convidados abrem pelo link, sem login. */}
         <Stack.Screen name="presente/[codigo]" options={{ headerShown: false }} />
       </Stack>

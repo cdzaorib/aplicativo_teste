@@ -507,7 +507,8 @@ describe('lista de presentes', () => {
     const estranho = await pessoa('Estranho');
     assert.equal((await como(estranho, 'select * from public.presentes')).length, 0);
     assert.equal((await como(estranho, 'select * from public.links_presentes')).length, 0);
-    assert.equal((await como(null, 'select * from public.presentes')).length, 0);
+    // Sem login, o banco recusa a leitura (o convidado usa só as funções com o código).
+    assert.equal(await falhaComo(null, 'select * from public.presentes'), '42501');
   });
 
   it('desfaz com a chave certa; com outra chave, não', async () => {
@@ -610,5 +611,49 @@ describe('lista de presentes', () => {
     assert.equal(await ver(codigo), null);
     const { rows } = await db.query('select count(*)::int as n from public.presentes');
     assert.equal(rows[0].n, 0);
+  });
+});
+
+describe('permissões das tabelas', () => {
+  // O RLS já esconde as linhas; sem a permissão, o banco recusa antes mesmo de olhar o RLS.
+  const SO_COM_LOGIN = [
+    'listas',
+    'membros_lista',
+    'itens',
+    'itens_lista',
+    'precos_informados',
+    'presentes',
+    'links_presentes',
+  ];
+
+  it('sem login, nenhuma tabela da lista pode ser lida nem alterada', async () => {
+    for (const tabela of SO_COM_LOGIN) {
+      assert.equal(await falhaComo(null, `select * from public.${tabela}`), '42501', tabela);
+      assert.equal(await falhaComo(null, `delete from public.${tabela}`), '42501', tabela);
+    }
+  });
+
+  it('com login, as tabelas mudadas só pelas funções não aceitam escrita direta', async () => {
+    const ana = await pessoa('Ana');
+    const lista = await garantirLista(ana);
+    for (const sql of [
+      `insert into public.listas (dona_id) values ('${ana}')`,
+      `update public.listas set codigo_convite = 'AAAAAAAA'`,
+      `delete from public.listas`,
+      `insert into public.membros_lista (lista_id, user_id) values ('${lista.lista_id}', '${ana}')`,
+      `update public.membros_lista set pode_editar_lista = true`,
+      `delete from public.membros_lista`,
+      `delete from public.itens`,
+      `delete from public.precos_informados`,
+    ]) {
+      assert.equal(await falhaComo(ana, sql), '42501', sql);
+    }
+  });
+
+  it('ninguém apaga tudo de uma vez (truncate) pela API', async () => {
+    const ana = await pessoa('Ana');
+    for (const tabela of [...SO_COM_LOGIN, 'ofertas', 'historico_ofertas']) {
+      assert.equal(await falhaComo(ana, `truncate public.${tabela} cascade`), '42501', tabela);
+    }
   });
 });

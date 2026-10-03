@@ -21,16 +21,17 @@ export default function PrivacidadeScreen() {
 
       <Secao titulo="Sem entrar na conta">
         <Paragrafo>
-          Você pode usar o app sem conta. Nesse caso, nada sai do seu aparelho: a lista do enxoval e
-          a data prevista do parto ficam guardadas só nele.
+          Você pode usar o app sem conta. Nesse caso, nada sai do seu aparelho: a lista do enxoval,
+          a data prevista do parto e a próxima consulta ficam guardadas só nele.
         </Paragrafo>
       </Secao>
 
-      <Secao titulo="Data prevista do parto">
+      <Secao titulo="Dados da gestação">
         <Paragrafo>
-          A data prevista do parto é um dado de saúde. Ela fica só no seu aparelho e serve para
-          mostrar o que é hora de comprar. Nunca é enviada para a nuvem nem para quem compartilha a
-          lista com você.
+          A data prevista do parto, a data da próxima consulta e as perguntas que você anota para
+          ela são dados de saúde. Ficam só no seu aparelho e servem para mostrar a semana da
+          gestação, o que é hora de comprar e os avisos que o próprio aparelho agenda. Nunca são
+          enviados para a nuvem nem para quem compartilha a lista com você.
         </Paragrafo>
       </Secao>
 

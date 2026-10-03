@@ -1,8 +1,10 @@
+import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Botao } from '@/components/botao';
 import { Icone } from '@/components/icone';
+import { ProximaConsulta } from '@/components/proxima-consulta';
 import { FormularioDataPrevista } from '@/components/quando-comprar';
 import { ThemedText } from '@/components/themed-text';
 import { MaxContentWidth, Radius, Spacing } from '@/constants/theme';
@@ -15,6 +17,7 @@ import {
   SINAIS_DE_ALERTA,
 } from '@/domain/conteudo-gestacao';
 import { faseDaGestacao, formatarData, tempoDeGestacao } from '@/domain/gestacao';
+import { itensProntos, prazoDaMala, TOTAL_ITENS_MALA } from '@/domain/mala-maternidade';
 import { useInicioDoDia } from '@/hooks/use-inicio-do-dia';
 import { useScreenInsets } from '@/hooks/use-screen-insets';
 import { useTheme } from '@/hooks/use-theme';
@@ -77,6 +80,10 @@ export default function GestacaoScreen() {
           />
         )}
       </View>
+
+      <ProximaConsulta />
+
+      <MalaDaMaternidade dataPrevista={dataPrevista} />
 
       <View style={styles.secao}>
         <ThemedText type="smallBold" accessibilityRole="header">
@@ -192,6 +199,25 @@ function Progresso({
         <Botao titulo="Alterar" variante="secundario" onPress={onAlterar} />
       </View>
     </>
+  );
+}
+
+function MalaDaMaternidade({ dataPrevista }: { dataPrevista?: string }) {
+  const theme = useTheme();
+  const prontos = itensProntos(useGestacaoStore((s) => s.malaPronta));
+  return (
+    <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
+      <ThemedText type="smallBold">Mala da maternidade</ThemedText>
+      <ThemedText type="small">
+        {prontos === TOTAL_ITENS_MALA
+          ? 'A mala está pronta.'
+          : `${prontos} de ${TOTAL_ITENS_MALA} itens prontos.`}{' '}
+        {dataPrevista
+          ? `Deixe tudo pronto até ${formatarData(prazoDaMala(dataPrevista))}.`
+          : 'Deixe tudo pronto 3 semanas antes da data prevista.'}
+      </ThemedText>
+      <Botao titulo="Ver o que levar" variante="secundario" onPress={() => router.push('/mala')} />
+    </View>
   );
 }
 

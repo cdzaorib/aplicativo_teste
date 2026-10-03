@@ -3,10 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CATALOGO } from '@/domain/catalogo';
 import { migrarListaSalva, useListaStore } from '../lista';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
-
 const catalogo = (id: string) => {
   const item = CATALOGO.find((c) => c.id === id);
   if (!item) throw new Error(`Item ${id} não existe no catálogo`);

@@ -4,9 +4,6 @@ import { supabase } from '@/nuvem/supabase';
 import { useListaStore } from '@/store/lista';
 import { entrarNaLista, ErroCompartilhar, formatarCodigo } from '../compartilhar';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
 jest.mock('@/nuvem/supabase', () => ({ supabase: { rpc: jest.fn() } }));
 jest.mock('@/nuvem/sincronizar', () => ({ sincronizar: jest.fn(() => Promise.resolve()) }));
 

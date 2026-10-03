@@ -21,6 +21,11 @@ type Props = {
   unidade: UnidadePreco;
 };
 
+/** Abre só links https: um link estranho vindo do banco (javascript:, http:) é ignorado. */
+function abrirLinkSeguro(link: string) {
+  if (/^https:\/\//i.test(link)) Linking.openURL(link).catch(() => {});
+}
+
 /**
  * Ofertas da Shopee coletadas para o item (Fase 2b). Enquanto não houver ofertas, por exemplo
  * antes de a coleta ser ligada, não mostra nada.
@@ -84,7 +89,7 @@ function CartaoOferta({ oferta, faixa }: { oferta: Oferta; faixa?: FaixaPreco })
     <Pressable
       accessibilityRole="link"
       accessibilityLabel={`${oferta.nome}, ${preco}. Abrir na Shopee`}
-      onPress={() => Linking.openURL(oferta.link)}
+      onPress={() => abrirLinkSeguro(oferta.link)}
       style={({ pressed }) => [
         styles.cartao,
         { backgroundColor: theme.backgroundElement },

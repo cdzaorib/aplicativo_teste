@@ -159,7 +159,8 @@ export function ItemForm({
           <ThemedText type="smallBold">Já comprei</ThemedText>
           <Switch
             accessibilityLabel="Já comprei"
-            accessibilityState={{ checked: comprado, disabled: !editaItem }}
+            aria-checked={comprado}
+            aria-disabled={!editaItem}
             value={comprado}
             onValueChange={setComprado}
             disabled={!editaItem}

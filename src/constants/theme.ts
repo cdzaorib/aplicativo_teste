@@ -50,9 +50,35 @@ export const Colors = {
     alertaBg: '#3D2E14',
     alertaText: '#F5CF8E',
   },
+  /** Escuro com fundo totalmente preto ("modo black"), que economiza bateria em telas OLED. */
+  black: {
+    text: '#F2F1EF',
+    textSecondary: '#ABB2BA',
+    background: '#000000',
+    backgroundElement: '#141616',
+    backgroundSelected: '#232727',
+    border: '#2C3030',
+    primary: '#6CC3AE',
+    onPrimary: '#0B2620',
+    danger: '#F2B8B5',
+    essencialBg: '#173A31',
+    essencialText: '#A6E3CF',
+    utilBg: '#18304A',
+    utilText: '#A9CCF0',
+    opcionalBg: '#2C2738',
+    opcionalText: '#CFC4E6',
+    evitarBg: '#44201B',
+    evitarText: '#F6B8AD',
+    alertaBg: '#3D2E14',
+    alertaText: '#F5CF8E',
+  },
 } as const;
 
-export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
+export type Paleta = (typeof Colors)[keyof typeof Colors];
+
+export type ThemeColor = keyof typeof Colors.light &
+  keyof typeof Colors.dark &
+  keyof typeof Colors.black;
 
 export const Fonts = Platform.select({
   ios: {

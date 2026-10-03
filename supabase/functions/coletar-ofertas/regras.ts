@@ -92,6 +92,16 @@ export function precoPlausivel(precoCentavos: number, faixa: ItemColeta['faixa']
   return precoCentavos >= faixa.minCentavos * 0.6 && precoCentavos <= faixa.maxCentavos * 2;
 }
 
+/** O link, se for https. Um link estranho (javascript:, http:) nunca chega ao app. */
+export function linkSeguro(link: string | null | undefined): string | undefined {
+  if (!link) return undefined;
+  try {
+    return new URL(link).protocol === 'https:' ? link : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Converte os produtos da Shopee nas melhores ofertas do item, na ordem de relevância. */
 export function paraOfertas(
   produtos: ProdutoShopee[],
@@ -103,7 +113,8 @@ export function paraOfertas(
   for (const produto of produtos) {
     const precoMin = reaisParaCentavos(produto.priceMin);
     const produtoId = String(produto.itemId);
-    if (!precoMin || !produto.productLink || vistos.has(produtoId)) continue;
+    const link = linkSeguro(produto.productLink);
+    if (!precoMin || !link || vistos.has(produtoId)) continue;
     if (!precoPlausivel(precoMin, item.faixa)) continue;
     vistos.add(produtoId);
     const avaliacao = Number.parseFloat(produto.ratingStar ?? '');
@@ -116,8 +127,8 @@ export function paraOfertas(
       preco_max_centavos: Math.max(precoMin, reaisParaCentavos(produto.priceMax) ?? precoMin),
       // Link comum do produto: sem afiliado por enquanto. Para usar o de afiliado, troque por
       // produto.offerLink.
-      link: produto.productLink,
-      imagem_url: produto.imageUrl ?? null,
+      link,
+      imagem_url: linkSeguro(produto.imageUrl) ?? null,
       avaliacao: Number.isFinite(avaliacao) ? Math.round(avaliacao * 10) / 10 : null,
       vendas: typeof produto.sales === 'number' ? produto.sales : null,
       coletado_em: coletadoEm,

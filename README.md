@@ -8,6 +8,10 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
   cada fase da gestação e avisa quando cada fase começa;
 - acompanha a gestação semana a semana, com lembretes do pré-natal, sinais de alerta e
   curiosidades, sempre com a fonte e o aviso de que não substitui a consulta;
+- guarda a próxima consulta de pré-natal e as perguntas para levar, e avisa na véspera e 2 horas
+  antes;
+- tem a lista da mala da maternidade (documentos, para a mãe, para o bebê e para o acompanhante),
+  com o prazo para deixá-la pronta;
 - para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na média ou
   barato demais para ser verdade;
 - com login pelo Google, salva a lista na nuvem e sincroniza entre aparelhos;
@@ -15,6 +19,7 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
   e as mudanças aparecem na hora para todos;
 - monta a lista de presentes do chá de bebê: os convidados abrem um link, sem instalar nada, e
   marcam o que vão dar, sem repetir;
+- tem tema claro, escuro, preto (fundo totalmente preto, para telas OLED) ou automático;
 - a conta pode ser excluída pelo próprio app, com todos os dados dela.
 
 Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login, banco, tempo real e Edge
@@ -46,9 +51,12 @@ Capturas da versão web (React Native Web). No celular, as abas são as nativas 
 - **Lista de presentes sem login:** os convidados usam só funções do banco que exigem um código
   secreto de 16 caracteres; quem escolheu fica visível só para a família, e desfazer exige uma
   chave guardada no aparelho do convidado (o banco guarda só o hash).
-- **Privacidade:** a data prevista do parto (dado de saúde, LGPD) nunca sai do aparelho, e a
-  exclusão de conta apaga tudo em cascata.
-- **Testes e CI:** 175 testes do app (Jest e Testing Library) e 43 do banco, que aplicam todas as
+- **Privacidade:** a data prevista do parto e a próxima consulta (dados de saúde, LGPD) nunca
+  saem do aparelho, e a exclusão de conta apaga tudo em cascata.
+- **Segurança revisada:** sem SQL montado com texto, RLS em todas as tabelas, permissões
+  mínimas para quem não tem login e ataques testados contra o Supabase de verdade
+  ([`docs/seguranca.md`](docs/seguranca.md)).
+- **Testes e CI:** 199 testes do app (Jest e Testing Library) e 47 do banco, que aplicam todas as
   migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
   tipos do app e das Edge Functions, Prettier e os testes em cada push.
 
@@ -141,3 +149,4 @@ scripts/        geração do catálogo da coleta de ofertas
 - [`docs/ofertas-shopee.md`](docs/ofertas-shopee.md) — como ligar as ofertas da Shopee.
 - [`docs/publicar.md`](docs/publicar.md) — o que falta para publicar na Google Play e na App Store.
 - [`docs/metricas.md`](docs/metricas.md) — consultas de ativação, retenção e uso, sem rastreamento.
+- [`docs/seguranca.md`](docs/seguranca.md) — revisão de segurança (SQL injection, RLS, segredos).

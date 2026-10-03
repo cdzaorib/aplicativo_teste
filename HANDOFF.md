@@ -119,6 +119,11 @@ Nenhuma das duas está em uso nem exposta.
     não deu para abrir daqui.
   - **Curiosidades:** ACOG, NHS, MedlinePlus, American Pregnancy Association, GLOWM e
     Perinatal Institute.
+  - **Mala da maternidade** (`src/domain/mala-maternidade.ts`): documentos pela Caderneta da
+    Gestante (Ministério da Saúde); o resto e o prazo de 3 semanas antes da data prevista pela
+    lista do NHS (Best Start in Life); bebê conforto pela Resolução Contran nº 819/2021;
+    acompanhante pelas Leis 11.108/2005 e 14.737/2023. O app avisa que cada maternidade tem a
+    sua lista.
 - **Revisar os começos de cada fase** (`INICIO_COMPRA`) com quem for revisar o catálogo. A
   semana 32 para a mala da maternidade foi uma escolha de produto, não uma recomendação médica.
 - **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
@@ -161,31 +166,21 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - colocar a versão web no ar (`vercel.json` pronto), para ter os endereços públicos;
   - uma revisão jurídica do texto.
 - **Exclusão de conta pelo app:** aba Conta → "Excluir minha conta", o que a Apple exige. Apaga
-  também a lista e a data prevista do parto guardadas no aparelho.
+  também a lista, a data prevista do parto e a próxima consulta guardadas no aparelho, e cancela
+  os avisos agendados.
 
 ## Estado atual
 
-- **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #1.
-- **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2, ainda aberto, traz:
-  - a Fase 3 (compartilhamento) e o limite de tentativas de convite;
-  - a lista em tempo real e o "Comprado por" na lista compartilhada;
-  - o filtro "Falta comprar", o puxar para atualizar, a vibração ao marcar e o "Por onde
-    começar";
-  - o "quando comprar", os avisos de fase e as faixas de preço completas;
-  - a estrutura das ofertas da Shopee (Fase 2b), com histórico;
-  - a busca no catálogo e o envio da lista por mensagem;
-  - a exclusão de conta, a política de privacidade, o "Entrar com a Apple" (desligado) e o guia
-    de publicação;
-  - a correção da volta do login no Android, ajustes de acessibilidade e de teclado, a tela de
-    erro e os tipos do banco gerados pelo Supabase;
-  - o README de portfólio e as consultas de métricas (`docs/metricas.md`).
+- **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #2.
+- **PR:** #1 (Fases 0 a 2a) e #2 (Fase 3, tempo real, lista de presentes, aba Gestação e o
+  resto do acabamento) já estão na `main`. O #3 traz a "Próxima consulta" na aba Gestação.
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
-  - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções
-    (RPC), criadas pelas migrações em `supabase/migrations/`.
+  - Tabelas `listas`, `membros_lista`, `itens`, `precos_informados`, `links_presentes` e
+    `presentes`, além das funções (RPC), criadas pelas migrações em `supabase/migrations/`.
   - `privado.tentativas_convite` conta as tentativas de código de convite.
-  - Realtime: `itens` e `membros_lista` estão na publicação `supabase_realtime`. O Realtime
-    respeita o RLS, então cada pessoa só recebe as mudanças que pode ler.
+  - Realtime: `itens`, `membros_lista` e `presentes` estão na publicação `supabase_realtime`. O
+    Realtime respeita o RLS, então cada pessoa só recebe as mudanças que pode ler.
   - Edge Function `excluir-conta` (`supabase/functions/`), publicada com `verify_jwt = false`. Ela
     mesma confere o token no Supabase Auth.
   - `itens_lista` não é mais usada (ver item 3).
@@ -197,6 +192,13 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       código secreto do link; as de montar a lista conferem quem pode editar.
   - O advisor também avisa que `privado.tentativas_convite` tem RLS sem política. É intencional:
     só a função `entrar_na_lista` mexe nela, e o esquema `privado` não é publicado.
+  - Permissões reforçadas além do RLS (`20261003060000_endurecer_permissoes.sql`, aplicada):
+    - sem login, nenhuma tabela da lista;
+    - com login, `listas` e `membros_lista` só pelas funções;
+    - ninguém apaga itens ou preços nem usa `TRUNCATE`;
+    - revisão completa, com os ataques testados no Supabase de verdade: `docs/seguranca.md`.
+  - Edge Function `coletar-ofertas` na versão 3: descarta link e imagem que não sejam `https`.
+    Continua sem as credenciais da Shopee.
 - **Feito:**
   - Fase 0.
   - Fase 1: sugestões, lista, comprado, ordenação, orçamento, itens próprios, login com Google
@@ -230,6 +232,26 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     lembretes do pré-natal da fase, curiosidade da semana e sinais de alerta (com 192 e CVV 188).
     Usa a mesma data prevista da Minha lista, que continua só no aparelho. O conteúdo fica em
     `src/domain/conteudo-gestacao.ts`, cada item com a fonte.
+  - Próxima consulta (aba Gestação, `src/components/proxima-consulta.tsx`): a pessoa anota a
+    data e a hora da próxima consulta de pré-natal e as perguntas para levar. O aparelho avisa na
+    véspera, às 19h, e 2 horas antes (`avisosDaConsulta` em `src/domain/consulta.ts`, canal
+    `consultas` no Android). Tudo fica só no aparelho, como a data prevista: é dado de saúde.
+    Quando a consulta passa, o cartão pede a próxima. Excluir a conta apaga a consulta e cancela
+    os avisos.
+  - Mala da maternidade (tela `src/app/mala.tsx`, cartão na aba Gestação): o que levar para o
+    parto em 4 grupos (documentos, para você, para o bebê, para o acompanhante), cada um com a
+    fonte. Os itens marcados ficam só no aparelho (`malaPronta` em `src/store/gestacao.ts`). Com
+    a data prevista, mostra até quando deixar tudo pronto. Também lembra o direito ao
+    acompanhante.
+  - Tema: aba Conta → "Aparência" (Automático, Claro, Escuro ou Preto), salvo no aparelho
+    (`src/store/aparencia.ts`). O Preto ("modo black") é o escuro com fundo totalmente preto
+    (`Colors.black`), que economiza bateria em telas OLED; para o sistema, ele conta como escuro. O `useColorScheme` do app usa a escolha. No celular, o
+    `Appearance.setColorScheme` troca também as abas nativas, os alertas e o teclado. A splash
+    screen espera o tema ser lido, para não abrir no tema errado.
+  - Acessibilidade na web: as caixas de marcar, os chips e os botões desligados usam `aria-checked`,
+    `aria-selected` e `aria-disabled`. O React Native Web 0.21 ignora o `accessibilityState`, então
+    antes o leitor de tela da web não sabia se a caixa estava marcada. No celular, os dois
+    funcionam.
   - Lista de presentes do chá de bebê: quem edita a lista escolhe os itens e cria um link
     secreto; os convidados abrem no navegador, sem login, e marcam "Vou dar este" com o nome.
     Ver "Como a lista de presentes funciona".
@@ -253,8 +275,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 175 testes do
-    app (inclusive de componentes, com a Testing Library) e 43 testes do banco e da coleta de
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 199 testes do
+    app (inclusive de componentes, com a Testing Library) e 47 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
     ordenação e a data mantida depois de recarregar.
@@ -265,8 +287,19 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     - duas contas de teste (dona e convidado) entraram com senha e chamaram a função;
     - a lista e os itens da dona sumiram, e o convidado voltou para a própria lista;
     - as duas contas foram excluídas pela própria função, e o banco ficou vazio de novo.
-  - `expo export` gera os bundles de Android, iOS e web.
-  - Fluxo web com Playwright, inclusive a persistência após recarregar.
+  - `expo export` gera os bundles de Android, iOS e web. O `expo-doctor` passa em 19 de 21
+    checagens; as outras 2 só falham porque a rede desta sessão bloqueia os servidores do Expo.
+  - Passeio completo na web com Playwright (03/10/2026), 38 conferências, sem erro no console:
+    - lista, sugestões e busca;
+    - marcar como comprado, filtros e edição de preço;
+    - comparar preço;
+    - data prevista, consulta e mala;
+    - temas escuro e preto em todas as telas, inclusive a de página não encontrada;
+    - persistência depois de recarregar;
+    - página do convidado com o banco simulado.
+  - Página não encontrada (`src/app/+not-found.tsx`) em português e no tema do app. Na Vercel, o
+    `buildCommand` copia o `+not-found.html` para `404.html`, que a Vercel usa nos endereços que
+    não existem.
   - RLS testado no banco com dois usuários simulados, numa transação desfeita:
     - cada um lê e grava só os próprios itens;
     - o upsert por `user_id,id` funciona;

@@ -6,6 +6,7 @@ import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 import { AvisoRevisao } from '@/components/aviso-revisao';
 import { Botao } from '@/components/botao';
+import { Chips } from '@/components/chips';
 import { ExcluirConta } from '@/components/excluir-conta';
 import { ListaCompartilhada } from '@/components/lista-compartilhada';
 import { ThemedText } from '@/components/themed-text';
@@ -17,12 +18,14 @@ import { useTheme } from '@/hooks/use-theme';
 import { entrarComApple, entrarComGoogle, sair } from '@/nuvem/auth';
 import { sincronizar } from '@/nuvem/sincronizar';
 import { supabase } from '@/nuvem/supabase';
+import { APARENCIAS, useAparenciaStore } from '@/store/aparencia';
 import { useSessaoStore } from '@/store/sessao';
 
 export default function ContaScreen() {
   const theme = useTheme();
   const insets = useScreenInsets();
   const conectado = useSessaoStore((s) => s.usuario !== null);
+  const aparencia = useAparenciaStore((s) => s.aparencia);
 
   return (
     <ScrollView
@@ -48,6 +51,20 @@ export default function ContaScreen() {
           <ListaCompartilhada />
         </View>
       )}
+
+      <View style={styles.secao}>
+        <ThemedText type="smallBold">Aparência</ThemedText>
+        <Chips
+          rotulo="Tema"
+          opcoes={APARENCIAS}
+          valor={aparencia}
+          onChange={useAparenciaStore.getState().definirAparencia}
+        />
+        <ThemedText type="small" themeColor="textSecondary">
+          No automático, o app segue o tema claro ou escuro do celular. O preto deixa o fundo
+          totalmente preto, o que economiza bateria em telas OLED.
+        </ThemedText>
+      </View>
 
       <View style={styles.secao}>
         <ThemedText type="smallBold">Sobre o conteúdo</ThemedText>

@@ -30,7 +30,8 @@ se aparecer.
 
 ## 1. Sem login
 
-- [ ] O app abre na aba **Minha lista**, vazia, com o cartão "Quando comprar".
+- [ ] O app abre na aba **Minha lista**, vazia, com o cartão "Quando comprar" e os 3 passos de
+      "Por onde começar".
 - [ ] **Sugestões:** os itens aparecem por categoria, com prioridade e fonte. "Adicionar N itens
       essenciais" coloca os essenciais na lista.
 - [ ] **Buscar no catálogo:** digitar "berco" (sem acento) acha o berço; "body longa" acha o

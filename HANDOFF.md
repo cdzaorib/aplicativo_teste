@@ -199,6 +199,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - Quem comprou: numa lista compartilhada, o item comprado por outra pessoa mostra "Comprado por
     Paulo" na lista e na edição, para ninguém comprar duas vezes. Ver "Como o compartilhamento
     funciona".
+  - "Por onde começar": com a lista vazia, a Minha lista mostra os 3 primeiros passos
+    (sugestões, data prevista e login para compartilhar).
   - Filtro "Mostrar: Tudo · Falta comprar · Comprados" na Minha lista (`filtrarLista`). Não fica
     salvo, para a lista sempre abrir inteira.
   - Acabamento da Minha lista: puxar para baixo sincroniza (com login) e marcar como comprado dá

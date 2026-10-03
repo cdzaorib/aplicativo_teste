@@ -22,6 +22,13 @@ import { useSemanasDeGestacao } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 import { usePermissao, useSessaoStore } from '@/store/sessao';
 
+/** O que mostrar a quem abre o app pela primeira vez, com a lista vazia. */
+const PRIMEIROS_PASSOS = [
+  'Veja as sugestões: o que é essencial, útil, opcional ou desaconselhado, com a fonte de cada item. Com um toque, dá para adicionar todos os essenciais.',
+  'Informe a data prevista do parto, aqui em cima, para saber o que já é hora de comprar.',
+  'Na aba Conta, entre com o Google para salvar a lista na nuvem e montar o enxoval junto com quem você quiser.',
+];
+
 export default function MinhaListaScreen() {
   const theme = useTheme();
   const insets = useScreenInsets();
@@ -115,11 +122,18 @@ export default function MinhaListaScreen() {
       ListEmptyComponent={
         vazia ? (
           <View style={styles.vazia}>
-            <ThemedText themeColor="textSecondary">
-              {permissao === 'total'
-                ? 'Sua lista está vazia. Comece pelas sugestões de enxoval ou adicione um item seu.'
-                : 'A lista ainda está vazia.'}
-            </ThemedText>
+            {permissao === 'total' ? (
+              <>
+                <ThemedText type="smallBold">Por onde começar</ThemedText>
+                {PRIMEIROS_PASSOS.map((passo, i) => (
+                  <ThemedText key={passo} themeColor="textSecondary">
+                    {i + 1}. {passo}
+                  </ThemedText>
+                ))}
+              </>
+            ) : (
+              <ThemedText themeColor="textSecondary">A lista ainda está vazia.</ThemedText>
+            )}
             <Botao titulo="Ver sugestões" onPress={() => router.navigate('/sugestoes')} />
           </View>
         ) : (

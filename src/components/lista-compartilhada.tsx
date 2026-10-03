@@ -1,5 +1,5 @@
 import { useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Share, StyleSheet, Switch, View } from 'react-native';
 
 import { Botao } from '@/components/botao';
@@ -67,6 +67,11 @@ function PainelDona({ lista }: { lista: InfoLista }) {
       .catch(() => setMembros([]));
   }, []);
   useFocusEffect(carregar);
+  // Alguém entrou na lista ou mudou de permissão (aviso em tempo real): recarrega as pessoas.
+  const mudancasMembros = useSessaoStore((s) => s.mudancasMembros);
+  useEffect(() => {
+    if (mudancasMembros > 0) carregar();
+  }, [mudancasMembros, carregar]);
 
   async function enviarConvite(codigoConvite: string) {
     try {

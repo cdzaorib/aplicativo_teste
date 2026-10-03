@@ -110,3 +110,19 @@ function mesclarSemEditarLista(
   itens.sort(porCriacao);
   return { itens, enviar };
 }
+
+/**
+ * A mudança que a nuvem avisou (tempo real) já está no aparelho: é o eco do que o próprio
+ * aparelho gravou, ou algo que uma sincronização já trouxe. Nesse caso não é preciso sincronizar.
+ */
+export function mudancaJaConhecida(
+  registro: RegistroNuvem,
+  locais: ItemLista[],
+  removidos: Record<string, number>,
+): boolean {
+  const local = locais.find((item) => item.id === registro.id);
+  if (local) return local.atualizadoEm >= registro.atualizadoEm;
+  const removidoEm = removidos[registro.id];
+  if (removidoEm !== undefined) return removidoEm >= registro.atualizadoEm;
+  return registro.removido;
+}

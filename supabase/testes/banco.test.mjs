@@ -335,3 +335,16 @@ describe('ofertas', () => {
     await db.exec('rollback to savepoint antes');
   });
 });
+
+describe('tempo real', () => {
+  it('avisa só as mudanças dos itens e das pessoas da lista', async () => {
+    const { rows } = await db.query(
+      `select schemaname || '.' || tablename as tabela from pg_publication_tables
+       where pubname = 'supabase_realtime' order by 1`,
+    );
+    assert.deepEqual(
+      rows.map((linha) => linha.tabela),
+      ['public.itens', 'public.membros_lista'],
+    );
+  });
+});

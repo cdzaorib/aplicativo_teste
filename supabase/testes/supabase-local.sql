@@ -1,6 +1,6 @@
 -- O mínimo do Supabase para rodar as migrações num Postgres local (PGlite) nos testes:
--- papéis da API, esquema auth com auth.users e auth.uid(), extensões e as permissões padrão
--- que o Supabase dá ao esquema public.
+-- papéis da API, esquema auth com auth.users e auth.uid(), extensões, a publicação do Realtime e
+-- as permissões padrão que o Supabase dá ao esquema public.
 
 create role anon nologin noinherit;
 create role authenticated nologin noinherit;
@@ -28,6 +28,9 @@ as $$
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')
   )::uuid
 $$;
+
+-- Publicação que o Supabase Realtime lê; no Supabase ela já vem criada, vazia.
+create publication supabase_realtime;
 
 grant usage on schema public to anon, authenticated, service_role;
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;

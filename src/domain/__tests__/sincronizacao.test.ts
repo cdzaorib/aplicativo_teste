@@ -1,4 +1,4 @@
-import { mesclarListas, type RegistroNuvem } from '../sincronizacao';
+import { mesclarListas, mudancaJaConhecida, type RegistroNuvem } from '../sincronizacao';
 import type { ItemLista } from '../tipos';
 
 function item(id: string, atualizadoEm: number, dados: Partial<ItemLista> = {}): ItemLista {
@@ -147,5 +147,26 @@ describe('mesclarListas sem permissão de editar a lista', () => {
     );
     expect(itens[0]).toEqual(item('a', 10, { precoCentavos: 5000 }));
     expect(enviar).toEqual([]);
+  });
+});
+
+describe('mudancaJaConhecida', () => {
+  it('ignora o eco do que o aparelho gravou', () => {
+    expect(mudancaJaConhecida(registro('a', 10), [item('a', 10)], {})).toBe(true);
+    expect(mudancaJaConhecida(registro('a', 10, { removido: true }), [], { a: 10 })).toBe(true);
+  });
+
+  it('sincroniza quando outra pessoa mudou, criou ou removeu um item', () => {
+    expect(mudancaJaConhecida(registro('a', 20), [item('a', 10)], {})).toBe(false);
+    expect(mudancaJaConhecida(registro('b', 20), [item('a', 10)], {})).toBe(false);
+    expect(mudancaJaConhecida(registro('a', 20, { removido: true }), [item('a', 10)], {})).toBe(
+      false,
+    );
+    // Alterado em outro aparelho depois de removido neste: volta para a lista.
+    expect(mudancaJaConhecida(registro('a', 20), [], { a: 10 })).toBe(false);
+  });
+
+  it('ignora a remoção de um item que o aparelho já não tem', () => {
+    expect(mudancaJaConhecida(registro('a', 20, { removido: true }), [], {})).toBe(true);
   });
 });

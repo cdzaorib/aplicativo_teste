@@ -11,6 +11,9 @@ import { useListaStore } from '@/store/lista';
 
 SplashScreen.preventAutoHideAsync();
 
+// Se uma tela quebrar, mostra uma mensagem com "Tentar de novo" em vez de uma tela branca.
+export { TelaDeErro as ErrorBoundary } from '@/components/tela-de-erro';
+
 function temaNavegacao(base: Theme, cores: (typeof Colors)['light' | 'dark']): Theme {
   return {
     ...base,

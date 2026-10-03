@@ -49,6 +49,8 @@ Pontos que só o aparelho confirma:
     Ela também troca o código pela sessão (`concluirLogin`, uma troca só por código), o que cobre
     o caso de o sistema fechar o app enquanto a pessoa está no navegador.
 - Sincronização entre dois aparelhos com a mesma conta.
+- Lista em tempo real (Supabase Realtime): a mudança feita num aparelho aparece no outro em
+  poucos segundos. Não dá para testar desta sessão, porque a rede bloqueia o Supabase.
 - Compartilhamento entre duas contas: convite, permissões dadas pela dona e "sair da lista".
 - "Excluir minha conta" pelo app. A função já foi testada de ponta a ponta no Supabase, mas não
   a partir do app.
@@ -96,8 +98,10 @@ Nenhuma das duas está em uso nem exposta.
     - Nada vai para o servidor.
     - O módulo `expo-notifications` só carrega quando é usado: no Expo Go do Android ele dá erro
       ao carregar, por isso lá o interruptor não aparece.
-  - **Falta, alertas push (do servidor):** por exemplo quando a dona libera uma permissão ou um
-    preço cai. Os de preço dependem da Fase 2b ligada.
+  - **Feito, tempo real com o app aberto:** a lista e as permissões mudam na hora, sem
+    sincronizar à mão (ver "Como o compartilhamento funciona").
+  - **Falta, alertas push (do servidor), com o app fechado:** por exemplo quando a dona libera
+    uma permissão ou um preço cai. Os de preço dependem da Fase 2b ligada.
   - No Android, o Expo Go não recebe push desde o SDK 53. Testar exige um development build
     (`eas build --profile development`), além de conta no Expo e credenciais do Firebase (FCM).
 - **Revisar os começos de cada fase** (`INICIO_COMPRA`) com quem for revisar o catálogo. A
@@ -147,6 +151,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções
     (RPC), criadas pelas migrações em `supabase/migrations/`.
   - `privado.tentativas_convite` conta as tentativas de código de convite.
+  - Realtime: `itens` e `membros_lista` estão na publicação `supabase_realtime`. O Realtime
+    respeita o RLS, então cada pessoa só recebe as mudanças que pode ler.
   - Edge Function `excluir-conta` (`supabase/functions/`), publicada com `verify_jwt = false`. Ela
     mesma confere o token no Supabase Auth.
   - `itens_lista` não é mais usada (ver item 3).
@@ -179,6 +185,11 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     falta, o que já foi comprado e os totais (`src/domain/texto-lista.ts`).
   - Excluir conta (aba Conta): apaga a conta e os dados dela. Os convidados da dona voltam para
     as próprias listas.
+  - Lista em tempo real: o que outra pessoa (ou outro aparelho) muda na lista aparece em poucos
+    segundos; a permissão nova vale na hora; a dona vê quem entrou sem sair da tela.
+  - Tela de erro (`src/components/tela-de-erro.tsx`): se uma tela quebrar, aparece "Algo deu
+    errado" com "Tentar de novo", em vez de uma tela branca. É o `ErrorBoundary` exportado em
+    `src/app/_layout.tsx`. Conferida na web com uma rota temporária que quebra.
   - Quando comprar:
     - A pessoa informa a data prevista do parto no topo da lista. Ela fica só no aparelho
       (`src/store/gestacao.ts`), nunca na nuvem, porque é dado de saúde (LGPD).
@@ -189,8 +200,9 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa (lint, typecheck, Prettier, 142 testes do app, inclusive de componentes
-    com a Testing Library, e 26 testes do banco e da coleta de ofertas).
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 150 testes do
+    app (inclusive de componentes, com a Testing Library) e 29 testes do banco e da coleta de
+    ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
     ordenação e a data mantida depois de recarregar.
   - `npm run test:supabase` (também no CI) aplica todas as migrações num Postgres local (PGlite) e
@@ -239,6 +251,18 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - As telas usam `usePermissao()` para esconder ou travar o que não pode.
 - **Entrar:** sincroniza, chama `entrar_na_lista`, que junta os itens no servidor, limpa a lista
   do aparelho e sincroniza de novo.
+- **Tempo real** (`src/nuvem/tempo-real.ts`, ligado em `iniciarNuvem`): um canal do Supabase
+  Realtime por usuário e lista atual, trocado quando a lista muda.
+  - Mudança em `itens` da lista: sincroniza 0,5 s depois, juntando avisos seguidos. O eco do que
+    o próprio aparelho gravou é ignorado (`mudancaJaConhecida`), para não buscar a lista à toa.
+  - Mudança na própria linha de `membros_lista` (permissão nova, removido pela dona): sincroniza,
+    o que atualiza as permissões e, se for o caso, troca de lista.
+  - Mudança em `membros_lista` da lista: a aba Conta da dona recarrega as pessoas
+    (`mudancasMembros` na sessão). Quem sai da lista não chega por aqui, porque a linha passa a
+    ser de outra lista; a tela recarrega ao abrir.
+  - O que chegou com o app em segundo plano é coberto pela sincronização ao voltar para o app.
+  - Cada pessoa logada com o app aberto usa uma conexão do Realtime. O plano gratuito do Supabase
+    aceita até 200 ao mesmo tempo; confira o limite atual no painel quando houver uso.
 - **Outro aparelho:** a lista do aparelho guarda `listaId`. Se a pessoa virou convidada numa lista
   por outro celular, os itens locais, que são de outra lista, são descartados antes de
   sincronizar (`itensSaoDeOutraLista`). Voltando para a própria lista, eles ficam como cópia.
@@ -310,7 +334,11 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   `react-native-url-polyfill`.
 - **Login sem `expo-auth-session`:** a URL de retorno é montada com `Linking.createURL`.
 - **Edge Functions:** rodam no Deno, por isso `supabase/functions` fica fora do `tsconfig.json` e
-  do ESLint. Publique com a ferramenta `deploy_edge_function` do conector.
+  do ESLint. `npm run typecheck:funcoes` confere os tipos com o Deno (também no CI). Publique com a
+  ferramenta `deploy_edge_function` do conector.
+  - `coletar-ofertas` (v2) busca 4 itens por vez (`emParalelo`), para caber no tempo da função.
+- **Canais do Realtime:** o `supabase.channel(nome)` devolve o canal existente se o nome se
+  repetir, mesmo enquanto ele está sendo fechado. Por isso cada canal leva um número novo.
 - **Testes do banco:** `supabase/testes/supabase-local.sql` recria o mínimo do Supabase (papéis,
   `auth.users`, `auth.uid()`, `pgcrypto`). Toda migração nova roda neles automaticamente.
 - **TypeScript 6:** `types` começa vazio, por isso o `tsconfig.json` declara

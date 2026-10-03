@@ -25,12 +25,15 @@ type SessaoState = {
   sincronizando: boolean;
   ultimaSincronizacao?: number;
   erroSincronizacao?: string;
+  /** Aumenta quando alguém entra na lista ou muda de permissão (aviso em tempo real). */
+  mudancasMembros: number;
 };
 
 /** Usuário conectado, lista atual e estado da sincronização com a nuvem. */
 export const useSessaoStore = create<SessaoState>()(() => ({
   usuario: null,
   sincronizando: false,
+  mudancasMembros: 0,
 }));
 
 /** Sem conta ou na própria lista, a pessoa pode tudo; numa lista compartilhada, o que a dona deixar. */

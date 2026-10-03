@@ -78,7 +78,10 @@ precisa estar em **Test users**.
       itens**, os itens aparecem.
 - [ ] Mude algo na lista. Em poucos segundos, o horário de "Lista salva na nuvem" muda.
 - [ ] **Dois aparelhos com a mesma conta:** entre no outro celular e confira se a lista aparece
-      igual. Mude algo num e toque em "Sincronizar agora" no outro.
+      igual.
+  - [ ] Com os dois abertos na **Minha lista**, marque um item como comprado num deles. Em
+        poucos segundos ele aparece marcado no outro, sem tocar em nada (tempo real).
+  - [ ] Se não aparecer, toque em "Sincronizar agora" na aba **Conta** do outro e me avise.
 - [ ] **Sair:** a lista some do aparelho. Entrar de novo traz a lista de volta.
 
 ## 3. Lista compartilhada (precisa de duas contas Google)
@@ -91,14 +94,20 @@ estar em **Test users** no Google.
   - [ ] A lista de **B** passa a ser a de **A**, com os itens de **B** juntados, sem repetir
         itens do catálogo.
   - [ ] Na aba **Minha lista** de **B** aparece "Lista compartilhada de A".
+  - [ ] Se **A** estiver com a aba **Conta** aberta, o nome de **B** aparece em poucos segundos,
+        sem sair da tela.
 - [ ] Sem permissão, **B** só vê:
   - [ ] não consegue marcar "comprado";
   - [ ] não vê "Adicionar";
   - [ ] na edição, os campos ficam travados.
 - [ ] **A** liga "Pode editar preços" para **B**.
-  - [ ] Depois de sincronizar, **B** consegue mudar só o preço.
-  - [ ] A mudança aparece para **A**.
+  - [ ] Em poucos segundos, sem **B** tocar em nada, o aviso na **Minha lista** de **B** muda
+        para "Você pode editar os preços".
+  - [ ] **B** consegue mudar só o preço.
+  - [ ] A mudança aparece para **A** em poucos segundos.
 - [ ] **A** liga "Pode editar a lista" para **B**: **B** passa a editar tudo.
+  - [ ] **B** marca um item como comprado e ele aparece marcado para **A** sem **A** tocar em
+        nada.
 - [ ] **B** toca em "Sair da lista compartilhada" e volta para a própria lista, com uma cópia dos
       itens.
 - [ ] **B** entra de novo e **A** usa "Remover": **B** volta para a própria lista.

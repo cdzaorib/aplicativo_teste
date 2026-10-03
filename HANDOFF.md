@@ -1,6 +1,6 @@
 # Handoff — App Enxoval
 
-Atualizado em 02/10/2026. Atualize este arquivo ao final de cada etapa.
+Atualizado em 03/10/2026. Atualize este arquivo ao final de cada etapa.
 
 Produto, decisões e fases: [`PLANO.md`](PLANO.md). Como rodar e estrutura de pastas:
 [`README.md`](README.md).
@@ -134,10 +134,14 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
 ## Estado atual
 
 - **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #1.
-- **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2 traz:
+- **PR:** #1 (Fases 0 a 2a) já está na `main`. O #2, ainda aberto, traz:
   - a Fase 3 (compartilhamento) e o limite de tentativas de convite;
-  - o "quando comprar" e as faixas de preço completas;
-  - a exclusão de conta, a política de privacidade e a correção da volta do login no Android.
+  - o "quando comprar", os avisos de fase e as faixas de preço completas;
+  - a estrutura das ofertas da Shopee (Fase 2b), com histórico;
+  - a busca no catálogo e o envio da lista por mensagem;
+  - a exclusão de conta, a política de privacidade, o "Entrar com a Apple" (desligado) e o guia
+    de publicação;
+  - a correção da volta do login no Android e ajustes de acessibilidade.
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
   - Tabelas `listas`, `membros_lista`, `itens` e `precos_informados`, além das funções
@@ -185,13 +189,13 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa (lint, typecheck, Prettier, 116 testes do app, inclusive de componentes
-    com a Testing Library, e 14 testes do banco).
+  - `npm run check` passa (lint, typecheck, Prettier, 142 testes do app, inclusive de componentes
+    com a Testing Library, e 26 testes do banco e da coleta de ofertas).
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
     ordenação e a data mantida depois de recarregar.
   - `npm run test:supabase` (também no CI) aplica todas as migrações num Postgres local (PGlite) e
-    testa compartilhamento, permissões, exclusão de conta e limite de convites. Sem as migrações
-    novas, os testes delas falham.
+    testa compartilhamento, permissões, exclusão de conta, limite de convites, ofertas e as regras
+    da coleta. Sem as migrações novas, os testes delas falham.
   - Exclusão de conta testada de ponta a ponta no Supabase real:
     - duas contas de teste (dona e convidado) entraram com senha e chamaram a função;
     - a lista e os itens da dona sumiram, e o convidado voltou para a própria lista;

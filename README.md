@@ -132,3 +132,4 @@ scripts/        geração do catálogo da coleta de ofertas
 - [`docs/teste-no-celular.md`](docs/teste-no-celular.md) — roteiro de teste no Android e no iPhone.
 - [`docs/ofertas-shopee.md`](docs/ofertas-shopee.md) — como ligar as ofertas da Shopee.
 - [`docs/publicar.md`](docs/publicar.md) — o que falta para publicar na Google Play e na App Store.
+- [`docs/metricas.md`](docs/metricas.md) — consultas de ativação, retenção e uso, sem rastreamento.

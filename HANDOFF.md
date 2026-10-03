@@ -116,6 +116,11 @@ Nenhuma das duas está em uso nem exposta.
   - Ficaram de fora os preços de marcas importadas ou artesanais muito acima do comum.
   - Vale conferir de tempos em tempos e, quando houver uso, comparar com os preços informados.
 
+- **Métricas de uso:** [`docs/metricas.md`](docs/metricas.md) traz consultas para o SQL Editor
+  (pessoas, ativação com 10 itens ou mais, retenção aproximada, compartilhamento, preços
+  informados e itens mais escolhidos). São só somas; o app não tem analytics. Foram rodadas no
+  banco real e funcionam, mas hoje dão zero.
+
 ### 6. Antes de publicar (Fase 4)
 
 O guia completo, com decisões, contas, builds (`eas.json`) e rascunho dos formulários de

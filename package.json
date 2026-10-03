@@ -52,12 +52,13 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
+    "typecheck:funcoes": "npx --yes deno@2 check supabase/functions/excluir-conta/index.ts supabase/functions/coletar-ofertas/index.ts",
     "test": "jest",
     "test:supabase": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"supabase/testes/*.test.mjs\"",
     "gerar:catalogo-coleta": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/catalogo-coleta.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run lint && npm run typecheck && npm run format:check && npm test && npm run test:supabase"
+    "check": "npm run lint && npm run typecheck && npm run typecheck:funcoes && npm run format:check && npm test && npm run test:supabase"
   },
   "jest": {
     "preset": "jest-expo",

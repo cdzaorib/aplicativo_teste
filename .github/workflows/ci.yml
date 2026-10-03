@@ -17,6 +17,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - name: Tipos das Edge Functions (Deno)
+        run: npm run typecheck:funcoes
       - run: npm run format:check
       - run: npm test -- --ci
       - name: Testes do banco e da coleta de ofertas (Postgres local)

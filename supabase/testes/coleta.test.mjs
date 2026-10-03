@@ -10,6 +10,7 @@ import {
   assinar,
   cabecalhoAutorizacao,
   consultaOfertas,
+  emParalelo,
   OFERTAS_POR_ITEM,
   paraOfertas,
   precoPlausivel,
@@ -130,5 +131,32 @@ describe('catálogo da coleta', () => {
   it('está igual ao catálogo do app (rode npm run gerar:catalogo-coleta se mudou)', async () => {
     const gravado = JSON.parse(await readFile(ARQUIVO_CATALOGO_COLETA, 'utf8'));
     assert.deepEqual(gravado, itensParaColeta());
+  });
+});
+
+describe('coleta em paralelo', () => {
+  it('processa todos os itens sem passar do limite de buscas ao mesmo tempo', async () => {
+    let emAndamento = 0;
+    let maximo = 0;
+    const feitos = [];
+    await emParalelo([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 4, async (n) => {
+      emAndamento += 1;
+      maximo = Math.max(maximo, emAndamento);
+      await new Promise((resolver) => setTimeout(resolver, 5));
+      feitos.push(n);
+      emAndamento -= 1;
+    });
+    assert.equal(maximo, 4);
+    assert.deepEqual(
+      feitos.sort((a, b) => a - b),
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    );
+  });
+
+  it('funciona com menos itens que o limite e com nenhum', async () => {
+    const feitos = [];
+    await emParalelo(['a'], 4, async (x) => feitos.push(x));
+    await emParalelo([], 4, async (x) => feitos.push(x));
+    assert.deepEqual(feitos, ['a']);
   });
 });

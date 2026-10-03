@@ -12,8 +12,10 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import catalogo from './catalogo.json' with { type: 'json' };
 import {
   assinar,
+  BUSCAS_SIMULTANEAS,
   cabecalhoAutorizacao,
   consultaOfertas,
+  emParalelo,
   ENDERECO_API,
   paraOfertas,
   resumoDoDia,
@@ -74,7 +76,7 @@ Deno.serve(async (req) => {
   const dia = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
   const resultado = { itens: 0, ofertas: 0, falhas: [] as string[] };
 
-  for (const item of catalogo as ItemColeta[]) {
+  await emParalelo(catalogo as ItemColeta[], BUSCAS_SIMULTANEAS, async (item) => {
     try {
       const ofertas = paraOfertas(
         await buscarNaShopee(appId, segredo, item.busca),
@@ -105,7 +107,7 @@ Deno.serve(async (req) => {
     } catch (erro) {
       resultado.falhas.push(`${item.id}: ${erro instanceof Error ? erro.message : String(erro)}`);
     }
-  }
+  });
 
   console.log('Coleta de ofertas', JSON.stringify(resultado));
   return resposta(resultado);

@@ -143,3 +143,22 @@ export function resumoDoDia(ofertas: LinhaOferta[], dia: string): LinhaHistorico
     quantidade: precos.length,
   };
 }
+
+/** Quantos itens buscar na Shopee ao mesmo tempo (a coleta inteira precisa caber no tempo da função). */
+export const BUSCAS_SIMULTANEAS = 4;
+
+/** Roda a tarefa para cada item, no máximo `limite` ao mesmo tempo. Erros ficam com a tarefa. */
+export async function emParalelo<T>(
+  itens: T[],
+  limite: number,
+  tarefa: (item: T) => Promise<void>,
+): Promise<void> {
+  let proximo = 0;
+  async function trabalhador() {
+    while (proximo < itens.length) {
+      const item = itens[proximo++];
+      await tarefa(item);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limite, itens.length) }, trabalhador));
+}

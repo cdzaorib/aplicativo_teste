@@ -34,6 +34,7 @@ precisa estar ativado no projeto: veja [`docs/login-google.md`](docs/login-googl
 | `npm run test:supabase`         | Testa as regras do banco (migrações num Postgres local, PGlite) e da coleta de ofertas |
 | `npm run gerar:catalogo-coleta` | Atualiza a lista de itens da coleta de ofertas depois de mudar o catálogo              |
 | `npm run lint`                  | Verifica o código com ESLint                                                           |
+| `npm run typecheck:funcoes`     | Verifica os tipos das Edge Functions (Deno)                                            |
 | `npm run typecheck`             | Verifica os tipos com TypeScript                                                       |
 | `npm run format`                | Formata o código com Prettier                                                          |
 | `npm run check`                 | Roda tudo acima, como o CI faz em cada push e PR                                       |

@@ -10,7 +10,8 @@ A estrutura já está pronta e publicada. Falta só a credencial da Shopee.
     dobro do máximo (kit ou outro produto).
   - Guarda as 5 primeiras por relevância, apaga as antigas e registra o resumo do dia.
 - **App:** a tela "Comparar preço" mostra as ofertas quando existem, com o selo "dentro da faixa",
-  "abaixo" etc. Enquanto a tabela estiver vazia, a seção não aparece.
+  "abaixo" etc., e o menor preço dos últimos 30 dias. Enquanto a tabela estiver vazia, a seção não
+  aparece.
 
 Sem as credenciais, a função responde "Credenciais da Shopee não configuradas" e não faz nada.
 

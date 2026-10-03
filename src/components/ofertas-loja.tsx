@@ -5,12 +5,14 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { SeloAvaliacao } from '@/components/avaliacao-preco';
 import { ThemedText } from '@/components/themed-text';
 import { Radius, Spacing } from '@/constants/theme';
+import { formatarData } from '@/domain/gestacao';
+import { resumirHistorico, type ResumoHistorico } from '@/domain/historico';
 import { formatarPreco } from '@/domain/lista';
 import { avaliarPreco, type FaixaPreco } from '@/domain/precos';
 import type { UnidadePreco } from '@/domain/tipos';
 import { useTheme } from '@/hooks/use-theme';
 import type { Oferta } from '@/nuvem/linhas';
-import { buscarOfertas } from '@/nuvem/ofertas';
+import { buscarHistorico, buscarOfertas, DIAS_HISTORICO } from '@/nuvem/ofertas';
 
 type Props = {
   catalogoId: string;
@@ -25,6 +27,7 @@ type Props = {
  */
 export function OfertasLoja({ catalogoId, faixa, unidade }: Props) {
   const [ofertas, setOfertas] = useState<Oferta[]>([]);
+  const [historico, setHistorico] = useState<ResumoHistorico>();
 
   useEffect(() => {
     let ativo = true;
@@ -32,6 +35,9 @@ export function OfertasLoja({ catalogoId, faixa, unidade }: Props) {
       .then((encontradas) => ativo && setOfertas(encontradas))
       // Sem internet, a tela continua útil com a faixa e os links das lojas.
       .catch(() => ativo && setOfertas([]));
+    buscarHistorico(catalogoId)
+      .then((dias) => ativo && setHistorico(resumirHistorico(dias)))
+      .catch(() => ativo && setHistorico(undefined));
     return () => {
       ativo = false;
     };
@@ -47,6 +53,13 @@ export function OfertasLoja({ catalogoId, faixa, unidade }: Props) {
         Preço por {unidade}, atualizado em {atualizadas.toLocaleDateString('pt-BR')}. Confira na
         loja antes de comprar.
       </ThemedText>
+      {historico && historico.dias > 1 && (
+        <ThemedText type="small">
+          Menor preço nos últimos {DIAS_HISTORICO} dias:{' '}
+          {formatarPreco(historico.menor.precoCentavos)} em {formatarData(historico.menor.dia)}.
+          Hoje: {formatarPreco(historico.atualCentavos)}.
+        </ThemedText>
+      )}
       {ofertas.map((oferta) => (
         <CartaoOferta key={oferta.produtoId} oferta={oferta} faixa={faixa} />
       ))}

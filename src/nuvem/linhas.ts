@@ -138,3 +138,20 @@ export function deLinhaOferta(linha: LinhaOferta): Oferta {
     coletadoEm: Date.parse(linha.coletado_em),
   };
 }
+
+/** Resumo de um dia de ofertas de um item (tabela `historico_ofertas`). */
+export type DiaHistorico = { dia: string; menorPrecoCentavos: number; medianaCentavos: number };
+
+export type LinhaHistorico = {
+  dia: string;
+  menor_preco_centavos: number;
+  mediana_centavos: number;
+};
+
+export function deLinhaHistorico(linha: LinhaHistorico): DiaHistorico {
+  return {
+    dia: linha.dia,
+    menorPrecoCentavos: linha.menor_preco_centavos,
+    medianaCentavos: linha.mediana_centavos,
+  };
+}

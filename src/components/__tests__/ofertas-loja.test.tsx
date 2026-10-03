@@ -2,10 +2,14 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 
 import type { Oferta } from '@/nuvem/linhas';
-import { buscarOfertas } from '@/nuvem/ofertas';
+import { buscarHistorico, buscarOfertas } from '@/nuvem/ofertas';
 import { OfertasLoja } from '../ofertas-loja';
 
-jest.mock('@/nuvem/ofertas', () => ({ buscarOfertas: jest.fn() }));
+jest.mock('@/nuvem/ofertas', () => ({
+  DIAS_HISTORICO: 30,
+  buscarOfertas: jest.fn(),
+  buscarHistorico: jest.fn(),
+}));
 jest.mock('expo-image', () => ({ Image: () => null }));
 
 const faixa = { minCentavos: 40000, maxCentavos: 250000 };
@@ -23,6 +27,7 @@ const oferta: Oferta = {
 
 beforeEach(() => {
   jest.mocked(buscarOfertas).mockReset();
+  jest.mocked(buscarHistorico).mockReset().mockResolvedValue([]);
 });
 
 describe('OfertasLoja', () => {
@@ -61,5 +66,19 @@ describe('OfertasLoja', () => {
     jest.mocked(buscarOfertas).mockRejectedValue(new Error('sem internet'));
     await render(<OfertasLoja catalogoId="berco" faixa={faixa} unidade="unidade" />);
     expect(screen.queryByText('Ofertas na Shopee')).toBeNull();
+  });
+
+  it('mostra o menor preço dos últimos dias quando há histórico', async () => {
+    jest.mocked(buscarOfertas).mockResolvedValue([oferta]);
+    jest.mocked(buscarHistorico).mockResolvedValue([
+      { dia: '2026-09-20', menorPrecoCentavos: 79990, medianaCentavos: 85000 },
+      { dia: '2026-10-03', menorPrecoCentavos: 89990, medianaCentavos: 95000 },
+    ]);
+    await render(<OfertasLoja catalogoId="berco" faixa={faixa} unidade="unidade" />);
+
+    const texto = await screen.findByText(/Menor preço nos últimos 30 dias/);
+    expect(texto.props.children.join('').replace(/\u00a0/g, ' ')).toContain(
+      'R$ 799,90 em 20/09/2026. Hoje: R$ 899,90.',
+    );
   });
 });

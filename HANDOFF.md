@@ -86,8 +86,9 @@ Nenhuma das duas está em uso nem exposta.
   - **App:** a seção "Ofertas na Shopee" (`src/components/ofertas-loja.tsx`) aparece na tela
     "Comparar preço" quando há ofertas dos últimos 3 dias.
   - O usuário decidiu não usar links de afiliado por enquanto: a oferta leva ao `productLink`.
-  - **Falta depois de ligar:** mostrar o histórico de preço (`historico_ofertas`) no app e
-    conferir se os filtros de preço deixam passar só produtos certos.
+  - **Histórico:** a mesma seção mostra o menor preço dos últimos 30 dias e o de hoje
+    (`historico_ofertas`), quando há mais de um dia de coleta.
+  - **Falta depois de ligar:** conferir se os filtros de preço deixam passar só produtos certos.
 - **Fase 3 restante:**
   - **Feito, avisos locais:** com a data prevista e o interruptor ligado, o aparelho avisa às 10h
     do dia em que começa cada fase de compras. Ver `src/notificacoes/lembretes.ts` e

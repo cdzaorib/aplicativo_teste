@@ -44,7 +44,11 @@ export function ExcluirConta() {
         desabilitado={ocupado}
         onPress={excluir}
       />
-      {erro && <ThemedText style={{ color: theme.danger }}>{erro}</ThemedText>}
+      {erro && (
+        <ThemedText accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
+          {erro}
+        </ThemedText>
+      )}
     </View>
   );
 }

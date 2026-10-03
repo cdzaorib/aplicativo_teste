@@ -166,6 +166,8 @@ function PainelDona({ lista }: { lista: InfoLista }) {
             placeholder="XXXX-XXXX"
             autoCapitalize="characters"
             autoCorrect={false}
+            autoComplete="off"
+            spellCheck={false}
             value={codigo}
             onChangeText={setCodigo}
           />
@@ -294,7 +296,7 @@ function PainelConvidado({ lista }: { lista: InfoLista }) {
 function MensagemErro({ texto }: { texto: string }) {
   const theme = useTheme();
   return (
-    <ThemedText type="small" style={{ color: theme.danger }}>
+    <ThemedText type="small" accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
       {texto}
     </ThemedText>
   );

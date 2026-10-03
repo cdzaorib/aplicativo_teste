@@ -57,10 +57,10 @@ export default function ContaScreen() {
 
       <View style={styles.secao}>
         <ThemedText type="smallBold">Privacidade</ThemedText>
-        <Link href="/privacidade">
+        <Link href="/privacidade" style={styles.link}>
           <ThemedText type="linkPrimary">Política de privacidade</ThemedText>
         </Link>
-        <Link href="/excluir-conta">
+        <Link href="/excluir-conta" style={styles.link}>
           <ThemedText type="linkPrimary">Como excluir a conta</ThemedText>
         </Link>
       </View>
@@ -105,7 +105,11 @@ function CartaoNuvem() {
             executar(entrarComGoogle, 'Não foi possível entrar. Tente de novo em instantes.')
           }
         />
-        {erro && <ThemedText style={{ color: theme.danger }}>{erro}</ThemedText>}
+        {erro && (
+          <ThemedText accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
+            {erro}
+          </ThemedText>
+        )}
       </>
     );
   }
@@ -153,7 +157,11 @@ function CartaoNuvem() {
           )
         }
       />
-      {erro && <ThemedText style={{ color: theme.danger }}>{erro}</ThemedText>}
+      {erro && (
+        <ThemedText accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
+          {erro}
+        </ThemedText>
+      )}
     </>
   );
 }
@@ -175,5 +183,9 @@ const styles = StyleSheet.create({
   },
   usuario: {
     gap: Spacing.half,
+  },
+  // Links de texto ficam com pelo menos 44 pontos de altura para tocar.
+  link: {
+    paddingVertical: Spacing.two,
   },
 });

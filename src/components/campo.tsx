@@ -30,7 +30,7 @@ export function Campo({ rotulo, erro, style, ...props }: CampoProps) {
         {...props}
       />
       {erro ? (
-        <ThemedText type="small" style={{ color: theme.danger }}>
+        <ThemedText type="small" accessibilityLiveRegion="polite" style={{ color: theme.danger }}>
           {erro}
         </ThemedText>
       ) : null}

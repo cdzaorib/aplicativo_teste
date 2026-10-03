@@ -92,7 +92,8 @@ export default function CompararPrecoScreen() {
     <ScrollView
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={[styles.conteudo, styles.espacado]}
-      keyboardShouldPersistTaps="handled">
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets>
       <View style={styles.titulo}>
         <ThemedText type="smallBold" style={styles.nome}>
           {item.nome}

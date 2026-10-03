@@ -27,7 +27,9 @@ export default function ContaScreen() {
   return (
     <ScrollView
       style={{ backgroundColor: theme.background }}
-      contentContainerStyle={[styles.conteudo, insets]}>
+      contentContainerStyle={[styles.conteudo, insets]}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets>
       <ThemedText type="subtitle">Conta</ThemedText>
 
       <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>

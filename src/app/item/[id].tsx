@@ -37,7 +37,8 @@ export default function EditarItemScreen() {
     <ScrollView
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={[styles.conteudo, styles.espacado]}
-      keyboardShouldPersistTaps="handled">
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets>
       {doCatalogo && (
         <View style={[styles.dica, { backgroundColor: theme.backgroundElement }]}>
           <ThemedText type="small">{doCatalogo.porque}</ThemedText>

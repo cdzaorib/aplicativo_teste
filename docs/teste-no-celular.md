@@ -64,6 +64,9 @@ se aparecer.
   - Para ver um aviso sem esperar semanas, informe uma data prevista que faça uma fase começar
     amanhã. Por exemplo, para o 3º trimestre (semana 28), use uma data daqui a 12 semanas mais 1
     dia. O aviso chega às 10h.
+- [ ] **Teclado:** nos campos de preço, de data e na edição do item, o teclado não cobre o campo
+      em que você está digitando. O botão logo abaixo (por exemplo, "Avaliar preço" ou "Salvar
+      data") funciona no primeiro toque, sem precisar fechar o teclado antes.
 - [ ] Feche o app de vez e abra de novo: a lista e a data continuam lá.
 
 ## 2. Login com Google

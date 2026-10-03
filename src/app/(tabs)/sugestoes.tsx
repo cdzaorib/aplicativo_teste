@@ -51,6 +51,8 @@ export default function SugestoesScreen() {
     <SectionList
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={[styles.conteudo, insets]}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
       sections={secoes}
       keyExtractor={(item) => item.id}
       stickySectionHeadersEnabled={false}

@@ -43,6 +43,10 @@ A web em outra porta ou pelo túnel cai na Site URL.
 Pontos que só o aparelho confirma:
 
 - Abas nativas (`expo-router/unstable-native-tabs`) e ícones (`sf` no iOS, `md` no Android).
+- Teclado: as telas com campos usam `automaticallyAdjustKeyboardInsets` (iPhone) e
+  `keyboardShouldPersistTaps="handled"`, como no guia de teclado do Expo. No Android, o sistema
+  redimensiona a tela. O `react-native-keyboard-controller` não está no Expo Go; se o teclado
+  ainda cobrir campos no Android, ele resolve num development build.
 - Volta do login para o app:
   - **iOS:** o `openAuthSessionAsync` captura o retorno.
   - **Android:** o deep link chega também ao Expo Router, na rota `src/app/auth-callback.tsx`.

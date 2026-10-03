@@ -36,6 +36,8 @@ export default function MinhaListaScreen() {
     <FlatList
       style={{ backgroundColor: theme.background }}
       contentContainerStyle={[styles.conteudo, insets]}
+      keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
       data={ordenarLista(itens, ordem)}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (

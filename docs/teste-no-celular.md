@@ -60,6 +60,13 @@ se aparecer.
   - [ ] O cartão mostra as semanas e o trimestre.
   - [ ] Os itens da fase ganham o selo "Hora de comprar".
   - [ ] "Alterar" e "Apagar data" funcionam.
+- [ ] **Aba Gestação** (entre Minha lista e Sugestões, com ícone próprio):
+  - [ ] Sem data prevista, pede a data e já mostra o aviso de que o app não substitui o
+        pré-natal, o "Comece o pré-natal", a curiosidade do dia e os sinais de alerta.
+  - [ ] Com a data, mostra semanas e dias, a barra de progresso, quanto falta e os lembretes da
+        fase (por exemplo, "Vacina dTpa" a partir da 20ª semana e "Exame de glicose" entre a 24ª
+        e a 28ª).
+  - [ ] Mudar a data numa aba muda na outra (Minha lista e Gestação usam a mesma data).
 - [ ] **Avisos de fase (só no iPhone pelo Expo Go):** ligue "Avisar quando começar cada fase de
       compras" e permita as notificações.
   - No Android, o interruptor não aparece no Expo Go, porque o Expo Go do Android não tem

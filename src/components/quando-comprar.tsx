@@ -34,7 +34,7 @@ export function QuandoComprar({ itens }: { itens: ItemLista[] }) {
       {dataPrevista && !editando ? (
         <Resumo dataPrevista={dataPrevista} itens={itens} onAlterar={() => setEditando(true)} />
       ) : (
-        <Formulario
+        <FormularioDataPrevista
           dataPrevista={dataPrevista}
           onConcluir={() => setEditando(false)}
           podeCancelar={editando}
@@ -129,14 +129,19 @@ function Lembretes({ dataPrevista }: { dataPrevista: string }) {
   );
 }
 
-function Formulario({
+/** Campo da data prevista do parto, usado aqui e na aba Gestação. */
+export function FormularioDataPrevista({
   dataPrevista,
   podeCancelar,
   onConcluir,
+  titulo = 'Quando comprar',
+  explicacao = 'Informe a data prevista do parto para ver o que comprar em cada fase.',
 }: {
   dataPrevista?: string;
   podeCancelar: boolean;
   onConcluir: () => void;
+  titulo?: string;
+  explicacao?: string;
 }) {
   const definirDataPrevista = useGestacaoStore((s) => s.definirDataPrevista);
   const lembretes = useGestacaoStore((s) => s.lembretes);
@@ -157,10 +162,10 @@ function Formulario({
 
   return (
     <>
-      <ThemedText type="smallBold">Quando comprar</ThemedText>
+      <ThemedText type="smallBold">{titulo}</ThemedText>
       <ThemedText type="small" themeColor="textSecondary">
-        Informe a data prevista do parto para ver o que comprar em cada fase. A data fica só neste
-        aparelho: não vai para a nuvem nem para a lista compartilhada.
+        {explicacao} A data fica só neste aparelho: não vai para a nuvem nem para a lista
+        compartilhada.
       </ThemedText>
       <Campo
         rotulo="Data prevista do parto"

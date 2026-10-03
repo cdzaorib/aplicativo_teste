@@ -22,6 +22,9 @@ export default function AppTabs() {
           <TabTrigger name="index" href="/" asChild>
             <BotaoAba>Minha lista</BotaoAba>
           </TabTrigger>
+          <TabTrigger name="gestacao" href="/gestacao" asChild>
+            <BotaoAba>Gestação</BotaoAba>
+          </TabTrigger>
           <TabTrigger name="sugestoes" href="/sugestoes" asChild>
             <BotaoAba>Sugestões</BotaoAba>
           </TabTrigger>
@@ -69,7 +72,8 @@ const styles = StyleSheet.create({
   barra: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: Spacing.two,
+    // Com 4 abas, cabe até em telas de 320 pontos.
+    gap: Spacing.one,
     padding: Spacing.two,
     borderRadius: Radius.large,
     width: '100%',
@@ -77,7 +81,7 @@ const styles = StyleSheet.create({
   },
   botao: {
     paddingVertical: Spacing.one,
-    paddingHorizontal: Spacing.three,
+    paddingHorizontal: Spacing.two,
     borderRadius: Radius.medium,
   },
   pressionado: {

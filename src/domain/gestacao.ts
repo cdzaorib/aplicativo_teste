@@ -43,6 +43,16 @@ export function semanasDeGestacao(dataPrevista: string, agora = new Date()): num
   return Math.max(0, Math.floor(diasGestacao / 7));
 }
 
+/** Semanas e dias de gestação hoje (por exemplo, 25 semanas e 3 dias) e quantos dias faltam. */
+export function tempoDeGestacao(
+  dataPrevista: string,
+  agora = new Date(),
+): { semanas: number; dias: number; diasParaAData: number } {
+  const diasParaAData = diaDaData(dataPrevista) - diaDeHoje(agora);
+  const diasGestacao = Math.max(0, DIAS_GESTACAO - diasParaAData);
+  return { semanas: Math.floor(diasGestacao / 7), dias: diasGestacao % 7, diasParaAData };
+}
+
 /** Texto curto da fase atual, por exemplo "2º trimestre". */
 export function faseDaGestacao(semanas: number): string {
   if (semanas < 14) return '1º trimestre';

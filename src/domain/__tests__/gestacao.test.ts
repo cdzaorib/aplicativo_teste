@@ -9,6 +9,7 @@ import {
   mascararData,
   quandoDoItem,
   semanasDeGestacao,
+  tempoDeGestacao,
 } from '../gestacao';
 
 // 2 de outubro de 2026, meio-dia no horário do aparelho.
@@ -117,5 +118,18 @@ describe('lembretesDasFases', () => {
 
   it('não agenda nada se todas as fases já começaram', () => {
     expect(lembretesDasFases('2026-09-01', HOJE)).toEqual([]);
+  });
+});
+
+describe('tempoDeGestacao', () => {
+  it('conta semanas, dias e quanto falta para a data prevista', () => {
+    // 15/01/2027 menos 280 dias = 10/04/2026. Em 03/10/2026 são 176 dias: 25 semanas e 1 dia.
+    expect(tempoDeGestacao('2027-01-15', new Date(2026, 9, 3))).toEqual({
+      semanas: 25,
+      dias: 1,
+      diasParaAData: 104,
+    });
+    // Depois da data prevista, os dias para a data ficam negativos.
+    expect(tempoDeGestacao('2026-10-01', new Date(2026, 9, 3)).diasParaAData).toBe(-2);
   });
 });

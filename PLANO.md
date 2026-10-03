@@ -48,6 +48,12 @@ Cada item do catálogo tem:
 - lista de presentes do chá de bebê: os convidados abrem um link, sem instalar o app, e marcam
   o que vão dar (feito; o link depende da versão web no ar).
 
+### 3.4 Gestação
+
+Aba com as semanas de gestação, lembretes do pré-natal por fase, sinais de alerta e curiosidades.
+O app não é médico: todo conteúdo cita a fonte (Ministério da Saúde, FEBRASGO, CDC, NHS, ACOG) e
+manda conversar com a equipe de pré-natal. Precisa de revisão profissional antes de publicar.
+
 ### 3.3 Preços
 
 - preço atual por loja + histórico;

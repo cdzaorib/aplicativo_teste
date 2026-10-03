@@ -6,6 +6,8 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
 - organiza a lista de compras com orçamento;
 - com a data prevista do parto (guardada só no aparelho), mostra o que já é hora de comprar em
   cada fase da gestação e avisa quando cada fase começa;
+- acompanha a gestação semana a semana, com lembretes do pré-natal, sinais de alerta e
+  curiosidades, sempre com a fonte e o aviso de que não substitui a consulta;
 - para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na média ou
   barato demais para ser verdade;
 - com login pelo Google, salva a lista na nuvem e sincroniza entre aparelhos;
@@ -46,7 +48,7 @@ Capturas da versão web (React Native Web). No celular, as abas são as nativas 
   chave guardada no aparelho do convidado (o banco guarda só o hash).
 - **Privacidade:** a data prevista do parto (dado de saúde, LGPD) nunca sai do aparelho, e a
   exclusão de conta apaga tudo em cascata.
-- **Testes e CI:** 167 testes do app (Jest e Testing Library) e 43 do banco, que aplicam todas as
+- **Testes e CI:** 175 testes do app (Jest e Testing Library) e 43 do banco, que aplicam todas as
   migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
   tipos do app e das Edge Functions, Prettier e os testes em cada push.
 
@@ -111,7 +113,7 @@ precisa estar ativado no projeto: veja [`docs/login-google.md`](docs/login-googl
 ```
 src/
   app/          telas (Expo Router: cada arquivo é uma rota)
-    (tabs)/     abas: Minha lista, Sugestões, Conta
+    (tabs)/     abas: Minha lista, Gestação, Sugestões, Conta
     item/       modais de criar e editar item
     preco/      modal de comparar preço
     presente/   página que os convidados abrem pelo link da lista de presentes (sem login)

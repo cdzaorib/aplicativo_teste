@@ -42,7 +42,8 @@ A web em outra porta ou pelo túnel cai na Site URL.
 
 Pontos que só o aparelho confirma:
 
-- Abas nativas (`expo-router/unstable-native-tabs`) e ícones (`sf` no iOS, `md` no Android).
+- Abas nativas (`expo-router/unstable-native-tabs`) e ícones (`sf` no iOS, `md` no Android),
+  inclusive o da aba Gestação (`heart.text.square` no iPhone, `pregnant_woman` no Android).
 - Teclado: as telas com campos usam `automaticallyAdjustKeyboardInsets` (iPhone) e
   `keyboardShouldPersistTaps="handled"`, como no guia de teclado do Expo. No Android, o sistema
   redimensiona a tela. O `react-native-keyboard-controller` não está no Expo Go; se o teclado
@@ -108,6 +109,16 @@ Nenhuma das duas está em uso nem exposta.
     uma permissão ou um preço cai. Os de preço dependem da Fase 2b ligada.
   - No Android, o Expo Go não recebe push desde o SDK 53. Testar exige um development build
     (`eas build --profile development`), além de conta no Expo e credenciais do Firebase (FCM).
+- **Revisar o conteúdo da aba Gestação** (`src/domain/conteudo-gestacao.ts`) com o mesmo
+  profissional do catálogo. Foi pesquisado em out/2026 com WebSearch, porque os sites do governo
+  estão bloqueados nesta sessão:
+  - **Ministério da Saúde:** pré-natal até a 12ª semana; pelo menos 7 consultas (orientação de
+    2024); mensais até a 28ª semana, quinzenais até a 36ª e semanais depois; dTpa a partir da 20ª.
+  - **Glicose entre a 24ª e a 28ª semana:** MS, FEBRASGO e SBD.
+  - **Sinais de alerta:** CDC (Hear Her) e NHS. Vale conferir com a Caderneta da Gestante, que
+    não deu para abrir daqui.
+  - **Curiosidades:** ACOG, NHS, MedlinePlus, American Pregnancy Association, GLOWM e
+    Perinatal Institute.
 - **Revisar os começos de cada fase** (`INICIO_COMPRA`) com quem for revisar o catálogo. A
   semana 32 para a mala da maternidade foi uma escolha de produto, não uma recomendação médica.
 - **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
@@ -215,6 +226,10 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - Quem comprou: numa lista compartilhada, o item comprado por outra pessoa mostra "Comprado por
     Paulo" na lista e na edição, para ninguém comprar duas vezes. Ver "Como o compartilhamento
     funciona".
+  - Aba Gestação (`src/app/(tabs)/gestacao.tsx`): semanas e dias de gestação, quanto falta,
+    lembretes do pré-natal da fase, curiosidade da semana e sinais de alerta (com 192 e CVV 188).
+    Usa a mesma data prevista da Minha lista, que continua só no aparelho. O conteúdo fica em
+    `src/domain/conteudo-gestacao.ts`, cada item com a fonte.
   - Lista de presentes do chá de bebê: quem edita a lista escolhe os itens e cria um link
     secreto; os convidados abrem no navegador, sem login, e marcam "Vou dar este" com o nome.
     Ver "Como a lista de presentes funciona".
@@ -238,7 +253,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 167 testes do
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 175 testes do
     app (inclusive de componentes, com a Testing Library) e 43 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,

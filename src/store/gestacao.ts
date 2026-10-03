@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { semanasDeGestacao } from '@/domain/gestacao';
+import { useInicioDoDia } from '@/hooks/use-inicio-do-dia';
 
 type GestacaoState = {
   /** Data prevista do parto (AAAA-MM-DD). */
@@ -36,5 +37,6 @@ export const useGestacaoStore = create<GestacaoState>()(
 /** Semanas de gestação hoje, ou `undefined` se a pessoa não informou a data prevista. */
 export function useSemanasDeGestacao(): number | undefined {
   const dataPrevista = useGestacaoStore((s) => s.dataPrevista);
-  return dataPrevista ? semanasDeGestacao(dataPrevista) : undefined;
+  const hoje = useInicioDoDia();
+  return dataPrevista ? semanasDeGestacao(dataPrevista, new Date(hoje)) : undefined;
 }

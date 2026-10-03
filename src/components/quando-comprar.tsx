@@ -21,7 +21,7 @@ import {
   LEMBRETES_DISPONIVEIS,
   pedirPermissaoDeAvisos,
 } from '@/notificacoes/lembretes';
-import { useGestacaoStore } from '@/store/gestacao';
+import { useGestacaoStore, useSemanasDeGestacao } from '@/store/gestacao';
 
 /** Cartão da lista que mostra a fase da gestação e quantos itens já é hora de comprar. */
 export function QuandoComprar({ itens }: { itens: ItemLista[] }) {
@@ -53,7 +53,7 @@ function Resumo({
   itens: ItemLista[];
   onAlterar: () => void;
 }) {
-  const semanas = semanasDeGestacao(dataPrevista);
+  const semanas = useSemanasDeGestacao() ?? semanasDeGestacao(dataPrevista);
   const agora = itensParaComprarAgora(itens, semanas).length;
 
   return (

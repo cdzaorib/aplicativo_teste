@@ -15,9 +15,6 @@ import { useEscolhasPresentesStore } from '@/store/escolhas-presentes';
 import { useListaStore } from '@/store/lista';
 import { useSessaoStore } from '@/store/sessao';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
 jest.mock('expo-router', () => ({
   router: { navigate: jest.fn() },
   useLocalSearchParams: () => ({ codigo: 'CODIGO' }),

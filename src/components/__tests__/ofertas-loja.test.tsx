@@ -62,6 +62,15 @@ describe('OfertasLoja', () => {
     expect(abrir).toHaveBeenCalledWith('https://shopee.com.br/berco-1');
   });
 
+  it('não abre link que não é https', async () => {
+    jest.mocked(buscarOfertas).mockResolvedValue([{ ...oferta, link: 'javascript:alert(1)' }]);
+    const abrir = jest.spyOn(Linking, 'openURL').mockClear().mockResolvedValue(true);
+    await render(<OfertasLoja catalogoId="berco" faixa={faixa} unidade="unidade" />);
+
+    await fireEvent.press(await screen.findByLabelText(/Abrir na Shopee/));
+    expect(abrir).not.toHaveBeenCalled();
+  });
+
   it('não mostra nada enquanto não há ofertas ou sem internet', async () => {
     jest.mocked(buscarOfertas).mockRejectedValue(new Error('sem internet'));
     await render(<OfertasLoja catalogoId="berco" faixa={faixa} unidade="unidade" />);

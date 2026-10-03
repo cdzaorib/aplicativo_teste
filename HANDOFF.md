@@ -179,8 +179,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
   - Tabelas `listas`, `membros_lista`, `itens`, `precos_informados`, `links_presentes` e
     `presentes`, além das funções (RPC), criadas pelas migrações em `supabase/migrations/`.
   - `privado.tentativas_convite` conta as tentativas de código de convite.
-  - Realtime: `itens`, `membros_lista` e `presentes` estão na publicação `supabase_realtime`. O Realtime
-    respeita o RLS, então cada pessoa só recebe as mudanças que pode ler.
+  - Realtime: `itens`, `membros_lista` e `presentes` estão na publicação `supabase_realtime`. O
+    Realtime respeita o RLS, então cada pessoa só recebe as mudanças que pode ler.
   - Edge Function `excluir-conta` (`supabase/functions/`), publicada com `verify_jwt = false`. Ela
     mesma confere o token no Supabase Auth.
   - `itens_lista` não é mais usada (ver item 3).
@@ -192,6 +192,13 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       código secreto do link; as de montar a lista conferem quem pode editar.
   - O advisor também avisa que `privado.tentativas_convite` tem RLS sem política. É intencional:
     só a função `entrar_na_lista` mexe nela, e o esquema `privado` não é publicado.
+  - Permissões reforçadas além do RLS (`20261003060000_endurecer_permissoes.sql`, aplicada):
+    - sem login, nenhuma tabela da lista;
+    - com login, `listas` e `membros_lista` só pelas funções;
+    - ninguém apaga itens ou preços nem usa `TRUNCATE`;
+    - revisão completa, com os ataques testados no Supabase de verdade: `docs/seguranca.md`.
+  - Edge Function `coletar-ofertas` na versão 3: descarta link e imagem que não sejam `https`.
+    Continua sem as credenciais da Shopee.
 - **Feito:**
   - Fase 0.
   - Fase 1: sugestões, lista, comprado, ordenação, orçamento, itens próprios, login com Google
@@ -236,6 +243,10 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     fonte. Os itens marcados ficam só no aparelho (`malaPronta` em `src/store/gestacao.ts`). Com
     a data prevista, mostra até quando deixar tudo pronto. Também lembra o direito ao
     acompanhante.
+  - Tema: aba Conta → "Aparência" (Automático, Claro ou Escuro), salvo no aparelho
+    (`src/store/aparencia.ts`). O `useColorScheme` do app usa a escolha. No celular, o
+    `Appearance.setColorScheme` troca também as abas nativas, os alertas e o teclado. A splash
+    screen espera o tema ser lido, para não abrir no tema errado.
   - Acessibilidade na web: as caixas de marcar, os chips e os botões desligados usam `aria-checked`,
     `aria-selected` e `aria-disabled`. O React Native Web 0.21 ignora o `accessibilityState`, então
     antes o leitor de tela da web não sabia se a caixa estava marcada. No celular, os dois
@@ -263,8 +274,8 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 191 testes do
-    app (inclusive de componentes, com a Testing Library) e 43 testes do banco e da coleta de
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 198 testes do
+    app (inclusive de componentes, com a Testing Library) e 47 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,
     ordenação e a data mantida depois de recarregar.
@@ -275,8 +286,19 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     - duas contas de teste (dona e convidado) entraram com senha e chamaram a função;
     - a lista e os itens da dona sumiram, e o convidado voltou para a própria lista;
     - as duas contas foram excluídas pela própria função, e o banco ficou vazio de novo.
-  - `expo export` gera os bundles de Android, iOS e web.
-  - Fluxo web com Playwright, inclusive a persistência após recarregar.
+  - `expo export` gera os bundles de Android, iOS e web. O `expo-doctor` passa em 19 de 21
+    checagens; as outras 2 só falham porque a rede desta sessão bloqueia os servidores do Expo.
+  - Passeio completo na web com Playwright (03/10/2026), 27 conferências, sem erro no console:
+    - lista, sugestões e busca;
+    - marcar como comprado, filtros e edição de preço;
+    - comparar preço;
+    - data prevista, consulta e mala;
+    - tema escuro em todas as telas, inclusive a de página não encontrada;
+    - persistência depois de recarregar;
+    - página do convidado com o banco simulado.
+  - Página não encontrada (`src/app/+not-found.tsx`) em português e no tema do app. Na Vercel, o
+    `buildCommand` copia o `+not-found.html` para `404.html`, que a Vercel usa nos endereços que
+    não existem.
   - RLS testado no banco com dois usuários simulados, numa transação desfeita:
     - cada um lê e grava só os próprios itens;
     - o upsert por `user_id,id` funciona;

@@ -5,9 +5,6 @@ import { confirmar } from '@/components/confirmar';
 import { TOTAL_ITENS_MALA } from '@/domain/mala-maternidade';
 import { useGestacaoStore } from '@/store/gestacao';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
 jest.mock('@/components/vibrar', () => ({ vibrarAoMarcar: jest.fn() }));
 jest.mock('@/components/confirmar', () => ({ confirmar: jest.fn() }));
 

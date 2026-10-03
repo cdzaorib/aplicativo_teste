@@ -7,10 +7,6 @@ import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 import { concluirLogin, entrarComApple, excluirConta } from '../auth';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
-
 jest.mock('@/notificacoes/lembretes', () => ({
   cancelarLembretes: jest.fn(() => Promise.resolve()),
   cancelarAvisosDaConsulta: jest.fn(() => Promise.resolve()),

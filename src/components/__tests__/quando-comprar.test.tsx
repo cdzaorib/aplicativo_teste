@@ -9,9 +9,6 @@ import {
 import { useGestacaoStore } from '@/store/gestacao';
 import { QuandoComprar } from '../quando-comprar';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
 jest.mock('@/notificacoes/lembretes', () => ({
   LEMBRETES_DISPONIVEIS: true,
   agendarLembretes: jest.fn(() => Promise.resolve(3)),

@@ -87,6 +87,9 @@ se aparecer.
   - Para ver um aviso sem esperar semanas, informe uma data prevista que faça uma fase começar
     amanhã. Por exemplo, para o 3º trimestre (semana 28), use uma data daqui a 12 semanas mais 1
     dia. O aviso chega às 10h.
+- [ ] **Tema:** na aba Conta, em "Aparência", escolha "Escuro" com o celular no tema claro. O
+      app inteiro fica escuro, inclusive a barra de abas. Feche e abra o app: continua escuro.
+      "Automático" volta a seguir o celular.
 - [ ] **Leitor de tela (TalkBack no Android, VoiceOver no iPhone):** nas caixas de marcar (item
       comprado, mala, permissões), ele diz se a caixa está marcada. Nos botões desligados, diz que
       estão indisponíveis.

@@ -6,6 +6,7 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { prepararLembretes } from '@/notificacoes/lembretes';
 import { iniciarNuvem } from '@/nuvem/iniciar';
+import { useAparenciaStore } from '@/store/aparencia';
 import { useGestacaoStore } from '@/store/gestacao';
 import { useListaStore } from '@/store/lista';
 
@@ -29,17 +30,14 @@ function temaNavegacao(base: Theme, cores: (typeof Colors)['light' | 'dark']): T
 }
 
 /**
- * Aguarda a lista salva no aparelho ser carregada, mantendo a splash screen até lá,
- * e então liga a sincronização com a nuvem.
+ * Aguarda a lista salva no aparelho ser carregada e então liga a sincronização com a nuvem.
  */
 function useListaCarregada() {
   const carregada = useListaStore((s) => s.carregada);
 
   useEffect(() => {
-    if (!carregada) return;
-    SplashScreen.hideAsync();
     // Só sincroniza depois de ter a lista do aparelho, para não misturar com uma lista vazia.
-    return iniciarNuvem();
+    if (carregada) return iniciarNuvem();
   }, [carregada]);
 
   return carregada;
@@ -56,10 +54,18 @@ function useLembretes() {
 
 export default function RootLayout() {
   const scheme = useColorScheme();
-  const carregada = useListaCarregada();
+  const listaCarregada = useListaCarregada();
+  // O tema escolhido já foi lido do aparelho (para não abrir no tema errado e trocar em seguida).
+  const aparenciaCarregada = useAparenciaStore((s) => s.carregada);
+  const carregado = listaCarregada && aparenciaCarregada;
   useLembretes();
 
-  if (!carregada) return null;
+  // A splash screen fica até a lista e o tema serem lidos do aparelho.
+  useEffect(() => {
+    if (carregado) SplashScreen.hideAsync();
+  }, [carregado]);
+
+  if (!carregado) return null;
 
   const tema =
     scheme === 'dark'

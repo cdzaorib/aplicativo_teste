@@ -8,9 +8,6 @@ import {
 import { useGestacaoStore } from '@/store/gestacao';
 import { ProximaConsulta } from '../proxima-consulta';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
 jest.mock('@/notificacoes/lembretes', () => ({
   LEMBRETES_DISPONIVEIS: true,
   agendarAvisosDaConsulta: jest.fn(() => Promise.resolve(2)),

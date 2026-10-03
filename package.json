@@ -67,7 +67,10 @@
       "\\.css$": "<rootDir>/jest/css-vazio.js",
       "^@/assets/(.*)$": "<rootDir>/assets/$1",
       "^@/(.*)$": "<rootDir>/src/$1"
-    }
+    },
+    "setupFiles": [
+      "<rootDir>/jest/configurar.js"
+    ]
   },
   "private": true
 }

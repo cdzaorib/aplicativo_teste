@@ -66,3 +66,4 @@ scripts/        geração do catálogo da coleta de ofertas
 - [`docs/login-google.md`](docs/login-google.md) — como ativar o login com Google.
 - [`docs/teste-no-celular.md`](docs/teste-no-celular.md) — roteiro de teste no Android e no iPhone.
 - [`docs/ofertas-shopee.md`](docs/ofertas-shopee.md) — como ligar as ofertas da Shopee.
+- [`docs/publicar.md`](docs/publicar.md) — o que falta para publicar na Google Play e na App Store.

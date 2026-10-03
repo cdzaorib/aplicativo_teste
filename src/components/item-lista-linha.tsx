@@ -40,7 +40,8 @@ export function ItemListaLinha({
     <View style={[styles.linha, { backgroundColor: theme.backgroundElement }]}>
       <Pressable
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: item.comprado, disabled: !podeMarcar }}
+        aria-checked={item.comprado}
+        aria-disabled={!podeMarcar}
         accessibilityLabel={`Marcar ${item.nome} como comprado`}
         disabled={!podeMarcar}
         hitSlop={8}

@@ -80,6 +80,7 @@ export default function RootLayout() {
         <Stack.Screen name="privacidade" options={{ title: 'Privacidade' }} />
         <Stack.Screen name="excluir-conta" options={{ title: 'Excluir conta' }} />
         <Stack.Screen name="presentes" options={{ title: 'Lista de presentes' }} />
+        <Stack.Screen name="mala" options={{ title: 'Mala da maternidade' }} />
         {/* Página que os convidados abrem pelo link, sem login. */}
         <Stack.Screen name="presente/[codigo]" options={{ headerShown: false }} />
       </Stack>

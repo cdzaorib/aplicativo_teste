@@ -10,6 +10,8 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
   curiosidades, sempre com a fonte e o aviso de que não substitui a consulta;
 - guarda a próxima consulta de pré-natal e as perguntas para levar, e avisa na véspera e 2 horas
   antes;
+- tem a lista da mala da maternidade (documentos, para a mãe, para o bebê e para o acompanhante),
+  com o prazo para deixá-la pronta;
 - para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na média ou
   barato demais para ser verdade;
 - com login pelo Google, salva a lista na nuvem e sincroniza entre aparelhos;

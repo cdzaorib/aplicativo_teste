@@ -50,7 +50,8 @@ Cada item do catálogo tem:
 
 ### 3.4 Gestação
 
-Aba com as semanas de gestação, lembretes do pré-natal por fase, sinais de alerta e curiosidades.
+Aba com as semanas de gestação, lembretes do pré-natal por fase, a próxima consulta (com avisos
+e perguntas para levar), a mala da maternidade, sinais de alerta e curiosidades.
 O app não é médico: todo conteúdo cita a fonte (Ministério da Saúde, FEBRASGO, CDC, NHS, ACOG) e
 manda conversar com a equipe de pré-natal. Precisa de revisão profissional antes de publicar.
 
@@ -119,7 +120,8 @@ decisão do usuário.
 
 **Fase 4 — Lançamento (1–2 semanas)**
 Ícone, telas da loja, política de privacidade, Google Play (taxa única) e Apple Developer (anual), TestFlight/teste fechado.
-Já feito: exclusão de conta pelo app. Falta a página na web para pedir a exclusão, que o Google Play exige.
+Já feito: exclusão de conta pelo app e as páginas `/privacidade` e `/excluir-conta` da versão
+web, que o Google Play exige. Falta colocar a versão web no ar.
 
 Estimativa total: **~6–8 semanas com dedicação integral** (varia com a curva de aprendizado de React Native).
 

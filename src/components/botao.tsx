@@ -21,7 +21,7 @@ export function Botao({ titulo, onPress, variante = 'primario', desabilitado }: 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: desabilitado }}
+      aria-disabled={desabilitado}
       disabled={desabilitado}
       onPress={onPress}
       style={({ pressed }) => [

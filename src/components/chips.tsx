@@ -33,7 +33,8 @@ export function Chips<T extends string>({
           <Pressable
             key={chave}
             accessibilityRole="button"
-            accessibilityState={{ selected: selecionado, disabled: desabilitado }}
+            aria-selected={selecionado}
+            aria-disabled={desabilitado}
             disabled={desabilitado}
             // Os chips são baixos; a área de toque chega a 44 pontos sem mudar o visual.
             hitSlop={{ top: 6, bottom: 6 }}

@@ -119,6 +119,11 @@ Nenhuma das duas está em uso nem exposta.
     não deu para abrir daqui.
   - **Curiosidades:** ACOG, NHS, MedlinePlus, American Pregnancy Association, GLOWM e
     Perinatal Institute.
+  - **Mala da maternidade** (`src/domain/mala-maternidade.ts`): documentos pela Caderneta da
+    Gestante (Ministério da Saúde); o resto e o prazo de 3 semanas antes da data prevista pela
+    lista do NHS (Best Start in Life); bebê conforto pela Resolução Contran nº 819/2021;
+    acompanhante pelas Leis 11.108/2005 e 14.737/2023. O app avisa que cada maternidade tem a
+    sua lista.
 - **Revisar os começos de cada fase** (`INICIO_COMPRA`) com quem for revisar o catálogo. A
   semana 32 para a mala da maternidade foi uma escolha de produto, não uma recomendação médica.
 - **Revisar as faixas pesquisadas.** As faixas de `src/domain/faixas-preco.ts` vieram de resumos
@@ -226,6 +231,15 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     `consultas` no Android). Tudo fica só no aparelho, como a data prevista: é dado de saúde.
     Quando a consulta passa, o cartão pede a próxima. Excluir a conta apaga a consulta e cancela
     os avisos.
+  - Mala da maternidade (tela `src/app/mala.tsx`, cartão na aba Gestação): o que levar para o
+    parto em 4 grupos (documentos, para você, para o bebê, para o acompanhante), cada um com a
+    fonte. Os itens marcados ficam só no aparelho (`malaPronta` em `src/store/gestacao.ts`). Com
+    a data prevista, mostra até quando deixar tudo pronto. Também lembra o direito ao
+    acompanhante.
+  - Acessibilidade na web: as caixas de marcar, os chips e os botões desligados usam `aria-checked`,
+    `aria-selected` e `aria-disabled`. O React Native Web 0.21 ignora o `accessibilityState`, então
+    antes o leitor de tela da web não sabia se a caixa estava marcada. No celular, os dois
+    funcionam.
   - Lista de presentes do chá de bebê: quem edita a lista escolhe os itens e cria um link
     secreto; os convidados abrem no navegador, sem login, e marcam "Vou dar este" com o nome.
     Ver "Como a lista de presentes funciona".
@@ -249,7 +263,7 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
       da semana 14, 3º a partir da 28, maternidade a partir da 32 e "depois" a partir da data
       prevista.
 - **Verificação:**
-  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 184 testes do
+  - `npm run check` passa: lint, typecheck do app e das Edge Functions, Prettier, 191 testes do
     app (inclusive de componentes, com a Testing Library) e 43 testes do banco e da coleta de
     ofertas.
   - "Quando comprar" conferido na web com Playwright, nos temas claro e escuro: cartão, selos,

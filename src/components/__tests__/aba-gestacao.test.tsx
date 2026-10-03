@@ -1,6 +1,8 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
+import { router } from 'expo-router';
 
 import GestacaoScreen from '@/app/(tabs)/gestacao';
+import { TOTAL_ITENS_MALA } from '@/domain/mala-maternidade';
 import { useGestacaoStore } from '@/store/gestacao';
 
 jest.mock('@react-native-async-storage/async-storage', () =>
@@ -10,6 +12,7 @@ jest.mock(
   'react-native-safe-area-context',
   () => jest.requireActual('react-native-safe-area-context/jest/mock').default,
 );
+jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 jest.mock('@/notificacoes/lembretes', () => ({
   LEMBRETES_DISPONIVEIS: false,
   agendarLembretes: jest.fn(),
@@ -45,5 +48,15 @@ describe('aba Gestação', () => {
     expect(screen.getByText('Vacina dTpa')).toBeOnTheScreen();
     expect(screen.getByText('Curiosidade da semana')).toBeOnTheScreen();
     expect(screen.queryByText('Comece o pré-natal')).toBeNull();
+  });
+
+  it('mostra quanto da mala da maternidade está pronto e abre a lista', async () => {
+    useGestacaoStore.setState({ dataPrevista: '2027-03-30', malaPronta: ['doc-caderneta'] });
+    await render(<GestacaoScreen />);
+    expect(
+      screen.getByText(`1 de ${TOTAL_ITENS_MALA} itens prontos. Deixe tudo pronto até 09/03/2027.`),
+    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByText('Ver o que levar'));
+    expect(router.push).toHaveBeenCalledWith('/mala');
   });
 });

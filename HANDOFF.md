@@ -289,6 +289,19 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
     - as duas contas foram excluídas pela própria função, e o banco ficou vazio de novo.
   - `expo export` gera os bundles de Android, iOS e web. O `expo-doctor` passa em 19 de 21
     checagens; as outras 2 só falham porque a rede desta sessão bloqueia os servidores do Expo.
+  - Testes de ponta a ponta (`e2e/`, `npm run test:e2e`, também no CI): 10 testes com o
+    Playwright na versão web exportada.
+    - `e2e/servidor.mjs` serve a pasta `dist` com as mesmas regras do `vercel.json` (reescritas e
+      404).
+    - `e2e/base.ts` simula o Supabase e faz o teste falhar em qualquer erro no console ou
+      resposta com erro.
+    - Cobrem lista, sugestões, preço, gestação, consulta, mala, temas escuro e preto em todas as
+      telas, página não encontrada e página do convidado.
+    - Conferido que pegam erro de verdade: com o tema preto quebrado de propósito, o teste falha.
+    - O `@playwright/test` está fixo na 1.56.1, a mesma do Chromium já instalado nas sessões na
+      nuvem (`/opt/pw-browsers`). Ao atualizar, rode `npx playwright install chromium`. Foi
+      instalado com `npm install -D` porque o `npx expo install` precisa da API do Expo, que a
+      rede da sessão bloqueia; não é pacote do Expo, então não muda com o SDK.
   - Passeio completo na web com Playwright (03/10/2026), 38 conferências, sem erro no console:
     - lista, sugestões e busca;
     - marcar como comprado, filtros e edição de preço;

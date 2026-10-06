@@ -25,3 +25,14 @@ jobs:
         run: npm run test:supabase
       - name: Gerar bundles (Android, iOS e web)
         run: npx expo export --platform android --platform ios --platform web --output-dir dist
+      - name: Navegador dos testes de ponta a ponta
+        run: npx playwright install --with-deps chromium
+      - name: Testes de ponta a ponta (versão web exportada acima)
+        run: npx playwright test
+      - name: Rastros dos testes de ponta a ponta que falharam
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testes-ponta-a-ponta
+          path: test-results/
+          retention-days: 7

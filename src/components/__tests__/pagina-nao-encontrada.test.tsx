@@ -10,7 +10,7 @@ jest.mock('expo-router', () => ({
 describe('página não encontrada', () => {
   it('explica em português e leva de volta para a lista', async () => {
     await render(<PaginaNaoEncontrada />);
-    expect(screen.getByRole('header', { name: 'Página não encontrada' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Não achamos esta página' })).toBeOnTheScreen();
     expect(screen.getByText(/peça o link de novo/)).toBeOnTheScreen();
     expect(screen.getByText('Ir para a minha lista')).toBeOnTheScreen();
   });

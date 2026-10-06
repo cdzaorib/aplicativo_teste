@@ -14,7 +14,7 @@ export default function PaginaNaoEncontrada() {
       <View style={[styles.fundo, { backgroundColor: theme.background }]}>
         <View style={styles.conteudo}>
           <ThemedText type="subtitle" accessibilityRole="header">
-            Página não encontrada
+            Não achamos esta página
           </ThemedText>
           <ThemedText>
             O endereço pode estar incompleto. Se alguém mandou o link da lista de presentes, peça o

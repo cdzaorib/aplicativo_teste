@@ -8,6 +8,10 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
   cada fase da gestação e avisa quando cada fase começa;
 - acompanha a gestação semana a semana, com lembretes do pré-natal, sinais de alerta e
   curiosidades, sempre com a fonte e o aviso de que não substitui a consulta;
+- guarda a próxima consulta de pré-natal e as perguntas para levar, e avisa na véspera e 2 horas
+  antes;
+- tem a lista da mala da maternidade (documentos, para a mãe, para o bebê e para o acompanhante),
+  com o prazo para deixá-la pronta;
 - para cada item, abre a busca nas lojas e diz se um preço encontrado está caro, na média ou
   barato demais para ser verdade;
 - com login pelo Google, salva a lista na nuvem e sincroniza entre aparelhos;
@@ -15,6 +19,7 @@ Aplicativo mobile (Android e iOS) que ajuda a montar o enxoval do bebê:
   e as mudanças aparecem na hora para todos;
 - monta a lista de presentes do chá de bebê: os convidados abrem um link, sem instalar nada, e
   marcam o que vão dar, sem repetir;
+- tem tema claro, escuro, preto (fundo totalmente preto, para telas OLED) ou automático;
 - a conta pode ser excluída pelo próprio app, com todos os dados dela.
 
 Feito com React Native + Expo (SDK 57), TypeScript e Supabase (login, banco, tempo real e Edge
@@ -23,9 +28,15 @@ Functions).
 ## Telas
 
 <p>
-  <img src="docs/imagens/lista.jpg" width="240" alt="Minha lista: semanas de gestação, itens comprados e selos Hora de comprar" />
-  <img src="docs/imagens/sugestoes.jpg" width="240" alt="Sugestões: itens do catálogo com prioridade, fonte e faixa de preço" />
-  <img src="docs/imagens/comparar-preco.jpg" width="240" alt="Comparar preço: faixa comum, lojas e avaliação do preço encontrado" />
+  <img src="docs/imagens/lista.jpg" width="200" alt="Minha lista: semanas de gestação, itens comprados e selos Hora de comprar" />
+  <img src="docs/imagens/lista-preto.jpg" width="200" alt="Minha lista no tema preto (modo black)" />
+  <img src="docs/imagens/sugestoes.jpg" width="200" alt="Sugestões: itens do catálogo com prioridade, fonte e faixa de preço" />
+  <img src="docs/imagens/comparar-preco.jpg" width="200" alt="Comparar preço: faixa comum, lojas e avaliação do preço encontrado" />
+</p>
+<p>
+  <img src="docs/imagens/gestacao.jpg" width="200" alt="Gestação: semanas, próxima consulta com perguntas e mala da maternidade" />
+  <img src="docs/imagens/mala.jpg" width="200" alt="Mala da maternidade: documentos e itens marcados, com o prazo e a fonte" />
+  <img src="docs/imagens/presentes-convidado.jpg" width="200" alt="Lista de presentes do chá de bebê aberta pelo convidado, sem login" />
 </p>
 
 Capturas da versão web (React Native Web). No celular, as abas são as nativas de cada sistema.
@@ -46,11 +57,21 @@ Capturas da versão web (React Native Web). No celular, as abas são as nativas 
 - **Lista de presentes sem login:** os convidados usam só funções do banco que exigem um código
   secreto de 16 caracteres; quem escolheu fica visível só para a família, e desfazer exige uma
   chave guardada no aparelho do convidado (o banco guarda só o hash).
-- **Privacidade:** a data prevista do parto (dado de saúde, LGPD) nunca sai do aparelho, e a
-  exclusão de conta apaga tudo em cascata.
-- **Testes e CI:** 175 testes do app (Jest e Testing Library) e 43 do banco, que aplicam todas as
-  migrações num Postgres local (PGlite) e simulam pessoas pela API. O GitHub Actions roda lint,
-  tipos do app e das Edge Functions, Prettier e os testes em cada push.
+- **Privacidade:** a data prevista do parto e a próxima consulta (dados de saúde, LGPD) nunca
+  saem do aparelho, e a exclusão de conta apaga tudo em cascata.
+- **Segurança revisada:** sem SQL montado com texto, RLS em todas as tabelas, permissões
+  mínimas para quem não tem login e ataques testados contra o Supabase de verdade
+  ([`docs/seguranca.md`](docs/seguranca.md)).
+- **Testes e CI:**
+  - 199 testes do app (Jest e Testing Library);
+  - 47 do banco, que aplicam todas as migrações num Postgres local (PGlite) e simulam pessoas
+    pela API;
+  - 10 de ponta a ponta (Playwright), que usam a versão web exportada como numa pessoa de
+    verdade: montar a lista, gestação, temas escuro e preto em todas as telas e a página do
+    convidado, com o Supabase simulado e falhando em qualquer erro no console.
+
+  O GitHub Actions roda lint, tipos do app e das Edge Functions, Prettier, os testes e os bundles
+  em cada push.
 
 ## Arquitetura
 
@@ -101,12 +122,13 @@ precisa estar ativado no projeto: veja [`docs/login-google.md`](docs/login-googl
 | `npm start`                     | Inicia o servidor de desenvolvimento                                                   |
 | `npm test`                      | Roda os testes do app (Jest)                                                           |
 | `npm run test:supabase`         | Testa as regras do banco (migrações num Postgres local, PGlite) e da coleta de ofertas |
+| `npm run test:e2e`              | Exporta a versão web e roda os testes de ponta a ponta (Playwright)                    |
 | `npm run gerar:catalogo-coleta` | Atualiza a lista de itens da coleta de ofertas depois de mudar o catálogo              |
 | `npm run lint`                  | Verifica o código com ESLint                                                           |
 | `npm run typecheck:funcoes`     | Verifica os tipos das Edge Functions (Deno)                                            |
 | `npm run typecheck`             | Verifica os tipos com TypeScript                                                       |
 | `npm run format`                | Formata o código com Prettier                                                          |
-| `npm run check`                 | Roda tudo acima, como o CI faz em cada push e PR                                       |
+| `npm run check`                 | Roda tudo acima, menos os testes de ponta a ponta (o CI roda todos em cada push e PR)  |
 
 ## Estrutura
 
@@ -120,8 +142,8 @@ src/
   components/   componentes visuais reutilizáveis
   domain/       regras de negócio sem React: catálogo, faixas de preço, avaliação, mesclagem
   nuvem/        Supabase: cliente, login, sincronização, tempo real, compartilhamento e preços
-  notificacoes/ avisos locais do começo de cada fase de compras
-  store/        estado da lista, da sessão e das referências de preço (Zustand)
+  notificacoes/ avisos locais das fases de compras e da próxima consulta
+  store/        estado da lista, da sessão, da gestação, do tema e das referências de preço (Zustand)
   hooks/        hooks de tema e layout
   constants/    cores e espaçamentos
 supabase/
@@ -129,6 +151,7 @@ supabase/
   functions/    Edge Functions (Deno): excluir-conta e coletar-ofertas
   testes/       testes do banco (PGlite) e da coleta de ofertas (npm run test:supabase)
 scripts/        geração do catálogo da coleta de ofertas
+e2e/            testes de ponta a ponta da versão web (Playwright) e o servidor que imita a Vercel
 ```
 
 ## Documentos
@@ -141,3 +164,4 @@ scripts/        geração do catálogo da coleta de ofertas
 - [`docs/ofertas-shopee.md`](docs/ofertas-shopee.md) — como ligar as ofertas da Shopee.
 - [`docs/publicar.md`](docs/publicar.md) — o que falta para publicar na Google Play e na App Store.
 - [`docs/metricas.md`](docs/metricas.md) — consultas de ativação, retenção e uso, sem rastreamento.
+- [`docs/seguranca.md`](docs/seguranca.md) — revisão de segurança (SQL injection, RLS, segredos).

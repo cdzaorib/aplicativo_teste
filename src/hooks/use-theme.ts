@@ -3,12 +3,14 @@
  * https://docs.expo.dev/guides/color-schemes/
  */
 
-import { Colors } from '@/constants/theme';
+import { Colors, type Paleta } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useAparenciaStore } from '@/store/aparencia';
 
-export function useTheme() {
+/** Cores do tema atual: claro, escuro ou preto (o escuro com fundo totalmente preto). */
+export function useTheme(): Paleta {
   const scheme = useColorScheme();
-  const theme = scheme === 'unspecified' ? 'light' : scheme;
-
-  return Colors[theme];
+  const preto = useAparenciaStore((s) => s.aparencia === 'preta');
+  if (scheme !== 'dark') return Colors.light;
+  return preto ? Colors.black : Colors.dark;
 }

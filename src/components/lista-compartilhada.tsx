@@ -251,7 +251,8 @@ function LinhaPermissao({
       </ThemedText>
       <Switch
         accessibilityLabel={rotulo}
-        accessibilityState={{ checked: valor, disabled: desabilitado }}
+        aria-checked={valor}
+        aria-disabled={desabilitado}
         value={valor}
         disabled={desabilitado}
         onValueChange={onChange}

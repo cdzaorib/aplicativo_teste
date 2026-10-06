@@ -6,10 +6,6 @@ import { useListaStore } from '@/store/lista';
 import { useSessaoStore } from '@/store/sessao';
 import { acompanharLista } from '../tempo-real';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
-
 type Filtro = { table: string; filter: string };
 type Aviso = (mudanca: { new: object }) => void;
 type CanalFalso = {

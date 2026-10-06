@@ -4,10 +4,6 @@ import { buscarMembros, definirPermissoes, type Membro } from '@/nuvem/compartil
 import { useSessaoStore, type InfoLista } from '@/store/sessao';
 import { ListaCompartilhada } from '../lista-compartilhada';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
-
 // Fora de uma tela de navegação, "ao focar" vira "ao montar".
 jest.mock('expo-router', () => {
   const { useEffect } = jest.requireActual('react');

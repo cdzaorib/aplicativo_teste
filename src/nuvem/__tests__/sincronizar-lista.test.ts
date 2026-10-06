@@ -7,10 +7,6 @@ import {
   type RepositorioLista,
 } from '../sincronizar-lista';
 
-jest.mock('@react-native-async-storage/async-storage', () =>
-  jest.requireActual('@react-native-async-storage/async-storage/jest/async-storage-mock'),
-);
-
 function item(id: string, atualizadoEm: number): ItemLista {
   return {
     id,

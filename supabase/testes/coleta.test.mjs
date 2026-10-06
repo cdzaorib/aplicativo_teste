@@ -104,6 +104,23 @@ describe('conversão das ofertas', () => {
     assert.equal(ofertas[1].preco_max_centavos, 150000);
   });
 
+  it('descarta link que não é https e imagem com endereço estranho', () => {
+    const ofertas = paraOfertas(
+      [
+        produto(1, '900', { productLink: 'javascript:alert(1)' }),
+        produto(2, '900', { productLink: 'http://shopee.com.br/produto-2' }),
+        produto(3, '900', { productLink: 'não é link' }),
+        produto(4, '900', { imageUrl: 'javascript:alert(1)' }),
+      ],
+      berco,
+      COLETADO_EM,
+    );
+    assert.deepEqual(
+      ofertas.map((o) => [o.produto_id, o.imagem_url]),
+      [['4', null]],
+    );
+  });
+
   it(`guarda no máximo ${OFERTAS_POR_ITEM} ofertas por item`, () => {
     const produtos = Array.from({ length: 12 }, (_, i) => produto(i + 1, '500'));
     assert.equal(paraOfertas(produtos, berco, COLETADO_EM).length, OFERTAS_POR_ITEM);

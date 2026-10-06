@@ -1,6 +1,6 @@
 # Handoff — App Enxoval
 
-Atualizado em 03/10/2026. Atualize este arquivo ao final de cada etapa.
+Atualizado em 06/10/2026. Atualize este arquivo ao final de cada etapa.
 
 Produto, decisões e fases: [`PLANO.md`](PLANO.md). Como rodar e estrutura de pastas:
 [`README.md`](README.md).
@@ -171,9 +171,12 @@ privacidade das lojas, está em [`docs/publicar.md`](docs/publicar.md).
 
 ## Estado atual
 
-- **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #2.
-- **PR:** #1 (Fases 0 a 2a) e #2 (Fase 3, tempo real, lista de presentes, aba Gestação e o
-  resto do acabamento) já estão na `main`. O #3 traz a "Próxima consulta" na aba Gestação.
+- **Branch:** `claude/app-enxoval`, recomeçada a partir da `main` depois do merge do PR #3.
+- **PRs na `main`:**
+  - #1: Fases 0 a 2a.
+  - #2: Fase 3, tempo real, lista de presentes, aba Gestação e o resto do acabamento.
+  - #3 (06/10/2026): próxima consulta, mala da maternidade, temas escuro e preto, reforço de
+    segurança e testes de ponta a ponta no CI.
 - **Supabase:** projeto `enxoval` (`ggcocihztrpwfptnuqbc`, região `sa-east-1`) na organização
   "relatorio de passagens", plano gratuito.
   - Tabelas `listas`, `membros_lista`, `itens`, `precos_informados`, `links_presentes` e
